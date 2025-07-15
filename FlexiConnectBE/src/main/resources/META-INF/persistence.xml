@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.2" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence           http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd">
+  <persistence-unit name="com.soodthin_FlexiConnectBE_jar_1.0-SNAPSHOTPU" transaction-type="RESOURCE_LOCAL">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <class>com.soodthin.entity.CompanyImage</class>
+    <class>com.soodthin.entity.EducationHistory</class>
+    <class>com.soodthin.entity.PaymentTransaction</class>
+    <class>com.soodthin.entity.Candidate</class>
+    <class>com.soodthin.entity.Conversation</class>
+    <class>com.soodthin.entity.FollowEmployer</class>
+    <class>com.soodthin.entity.InterviewSession</class>
+    <class>com.soodthin.entity.Package</class>
+    <class>com.soodthin.entity.Rating</class>
+    <class>com.soodthin.entity.ActivityLog</class>
+    <class>com.soodthin.entity.User</class>
+    <class>com.soodthin.entity.Role</class>
+    <class>com.soodthin.entity.Employer</class>
+    <class>com.soodthin.entity.WorkExperience</class>
+    <class>com.soodthin.entity.UserPackage</class>
+    <class>com.soodthin.entity.Verification</class>
+    <class>com.soodthin.entity.Notification</class>
+    <class>com.soodthin.entity.Application</class>
+    <class>com.soodthin.entity.InterviewTurn</class>
+    <class>com.soodthin.entity.Skill</class>
+    <class>com.soodthin.entity.SavedJob</class>
+    <class>com.soodthin.entity.CandidateSkill</class>
+    <class>com.soodthin.entity.JobPost</class>
+    <properties>
+      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/flexiconnectdb?zeroDateTimeBehavior=CONVERT_TO_NULL"/>
+      <property name="javax.persistence.jdbc.user" value="root"/>
+      <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
+      <property name="javax.persistence.jdbc.password" value="12345"/>
+    </properties>
+  </persistence-unit>
+</persistence>

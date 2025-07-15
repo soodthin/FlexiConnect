@@ -1,0 +1,153 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package com.soodthin.entity;
+
+import jakarta.persistence.Basic;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedQueries;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import jakarta.validation.constraints.Size;
+import java.io.Serializable;
+import java.util.Date;
+
+/**
+ *
+ * @author ADMIN
+ */
+@Entity
+@Table(name = "interview_turn")
+@NamedQueries({
+    @NamedQuery(name = "InterviewTurn.findAll", query = "SELECT i FROM InterviewTurn i"),
+    @NamedQuery(name = "InterviewTurn.findById", query = "SELECT i FROM InterviewTurn i WHERE i.id = :id"),
+    @NamedQuery(name = "InterviewTurn.findByTurnOrder", query = "SELECT i FROM InterviewTurn i WHERE i.turnOrder = :turnOrder"),
+    @NamedQuery(name = "InterviewTurn.findByCreatedAt", query = "SELECT i FROM InterviewTurn i WHERE i.createdAt = :createdAt")})
+public class InterviewTurn implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Integer id;
+    @Lob
+    @Size(max = 65535)
+    @Column(name = "question")
+    private String question;
+    @Lob
+    @Size(max = 65535)
+    @Column(name = "answer")
+    private String answer;
+    @Lob
+    @Size(max = 65535)
+    @Column(name = "ai_feedback")
+    private String aiFeedback;
+    @Column(name = "turn_order")
+    private Integer turnOrder;
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+    @JoinColumn(name = "session_id", referencedColumnName = "id")
+    @ManyToOne
+    private InterviewSession sessionId;
+
+    public InterviewTurn() {
+    }
+
+    public InterviewTurn(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getQuestion() {
+        return question;
+    }
+
+    public void setQuestion(String question) {
+        this.question = question;
+    }
+
+    public String getAnswer() {
+        return answer;
+    }
+
+    public void setAnswer(String answer) {
+        this.answer = answer;
+    }
+
+    public String getAiFeedback() {
+        return aiFeedback;
+    }
+
+    public void setAiFeedback(String aiFeedback) {
+        this.aiFeedback = aiFeedback;
+    }
+
+    public Integer getTurnOrder() {
+        return turnOrder;
+    }
+
+    public void setTurnOrder(Integer turnOrder) {
+        this.turnOrder = turnOrder;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public InterviewSession getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(InterviewSession sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof InterviewTurn)) {
+            return false;
+        }
+        InterviewTurn other = (InterviewTurn) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "com.soodthin.entity.InterviewTurn[ id=" + id + " ]";
+    }
+    
+}
