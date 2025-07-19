@@ -4,13 +4,14 @@
  */
 package com.soodthin.repositories;
 
-import com.soodthin.entity.User;
-import java.util.Optional;
+import com.soodthin.entity.Candidate;
+import com.soodthin.entity.WorkExperience;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+
 /**
  *
  * @author ADMIN
  */
-public interface UserRepository extends JpaRepository<User, Integer> {
-    Optional<User> findByEmail(String email);
+public interface WorkExperienceRepository extends JpaRepository<WorkExperience, Integer> {
 }

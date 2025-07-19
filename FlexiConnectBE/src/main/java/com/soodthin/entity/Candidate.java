@@ -63,7 +63,7 @@ public class Candidate implements Serializable {
     private Set<FollowEmployer> followEmployerSet;
     @OneToMany(mappedBy = "candidateId")
     private Set<InterviewSession> interviewSessionSet;
-    @OneToMany(mappedBy = "candidateId")
+    @OneToMany(mappedBy = "candidate")
     private Set<EducationHistory> educationHistorySet;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne(optional = false)

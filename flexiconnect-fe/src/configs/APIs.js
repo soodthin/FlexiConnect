@@ -8,6 +8,11 @@ export const endpoints = {
     'register-employer': '/auth/register/employer',
     'login': '/auth/login',
     'current-user': '/auth/current-user',
+    'profile': "/users/candidate/profile",
+    'update-profile': "/users/candidate/profile",
+    'education': "/users/candidate/education",
+    'education-id': (id) => `/users/candidate/education/${id}`,
+
 }
 
 export const publicApi = axios.create({

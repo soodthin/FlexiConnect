@@ -4,20 +4,23 @@
  */
 package com.soodthin.services;
 
-import com.soodthin.entity.Candidate;
-import com.soodthin.entity.Employer;
+import com.soodthin.dto.EmployerRegisterDTO;
+import com.soodthin.dto.CandidateRegisterDTO;
 import com.soodthin.entity.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
  * @author ADMIN
  */
+@Service
 public interface UserService extends UserDetailsService {
 
-    User registerCandidate(Candidate candidate);
+    User registerCandidate(CandidateRegisterDTO userRegisterDTO);
 
-    User registerEmployer(Employer employer);
+    User registerEmployer(EmployerRegisterDTO employerDTO, MultipartFile[] images);
 
     User getUserByEmail(String email);
 

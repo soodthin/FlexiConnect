@@ -14,5 +14,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author ADMIN
  */
 public interface CandidateRepository extends JpaRepository<Candidate, Integer> {
-Optional<Candidate> findByUserId(User user);
+
+    Optional<Candidate> findByUserId(User user);
+
 }

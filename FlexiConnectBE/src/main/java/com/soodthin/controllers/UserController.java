@@ -4,16 +4,14 @@
  */
 package com.soodthin.controllers;
 
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
-import com.soodthin.entity.Candidate;
-import com.soodthin.entity.Employer;
+import com.soodthin.dto.EmployerRegisterDTO;
+import com.soodthin.dto.CandidateRegisterDTO;
+import com.soodthin.dto.request.UserLoginRequest;
+import com.soodthin.dto.response.UserLoginResponse;
 import com.soodthin.entity.User;
 import com.soodthin.services.UserService;
 import com.soodthin.utils.JwtUtils;
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,14 +29,13 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-    @Autowired
-    private Cloudinary cloudinary;
+    
 
-    @PostMapping("/register/candidate")
-    public ResponseEntity<?> registerCandidate(@RequestBody Candidate candidate) {
+     @PostMapping("/register/candidate")
+    public ResponseEntity<?> registerCandidate(@RequestBody CandidateRegisterDTO userRegisterDTO) {
         try {
-            User saved = userService.registerCandidate(candidate);
-            return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+            User savedUser = userService.registerCandidate(userRegisterDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -47,26 +44,12 @@ public class UserController {
 
     @PostMapping(value = "/register/employer", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> registerEmployer(
-            @RequestPart("employer") Employer employer,
+            @RequestPart("employer") EmployerRegisterDTO employerDTO,
             @RequestPart("images") MultipartFile[] images
     ) {
         try {
-            StringBuilder intro = new StringBuilder();
-            intro.append(employer.getCompanyIntro() == null ? "" : employer.getCompanyIntro());
-
-            intro.append("<div class='company-gallery'>");
-
-            for (MultipartFile file : images) {
-                Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
-                String imageUrl = uploadResult.get("secure_url").toString();
-                intro.append("<img src='").append(imageUrl).append("' alt='company image' />");
-            }
-
-            intro.append("</div>");
-            employer.setCompanyIntro(intro.toString());
-
-            User saved = userService.registerEmployer(employer);
-            return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+            User savedUser = userService.registerEmployer(employerDTO, images);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -74,18 +57,19 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User u) {
-        if (userService.authenticate(u.getEmail(), u.getPassword())) {
+    public ResponseEntity<?> login(@RequestBody UserLoginRequest loginRequest) {
+        if (userService.authenticate(loginRequest.getEmail(), loginRequest.getPassword())) {
             try {
-                User user = userService.getUserByEmail(u.getEmail());
-
+                User user = userService.getUserByEmail(loginRequest.getEmail());
                 String role = user.getRoleSet().iterator().next().getRoleName();
                 String token = JwtUtils.generateToken(user.getEmail(), role);
 
-                Map<String, Object> resp = new HashMap<>();
-                resp.put("token", token);
-                resp.put("email", user.getEmail());
-                resp.put("role", role);
+                UserLoginResponse resp = new UserLoginResponse();
+                resp.setToken(token);
+                resp.setEmail(user.getEmail());
+                resp.setRole(role);
+                resp.setFullName(user.getFullName());
+
                 return ResponseEntity.ok(resp);
             } catch (Exception e) {
                 return ResponseEntity.status(500).body("Lỗi khi tạo JWT");
@@ -113,11 +97,11 @@ public class UserController {
             if (user == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Không tìm thấy người dùng!");
             }
-
-            Map<String, Object> resp = new HashMap<>();
-            resp.put("email", user.getEmail());
-            resp.put("fullName", user.getFullName());
-            resp.put("role", user.getRoleSet().iterator().next().getRoleName());
+            
+            UserLoginResponse resp = new UserLoginResponse();
+            resp.setEmail(user.getEmail());
+            resp.setFullName(user.getFullName());
+            resp.setRole(user.getRoleSet().iterator().next().getRoleName());
 
             return ResponseEntity.ok(resp);
         } catch (Exception e) {

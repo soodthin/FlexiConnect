@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import cookie from "react-cookies";
-import { authApis, endpoints } from "../configs/APIs";
+import { authApis, endpoints } from "../../configs/APIs";
 import { FaUser, FaSearch, FaSignOutAlt, FaRobot } from "react-icons/fa";
 import { IoIosArrowDown } from "react-icons/io";
 
@@ -67,7 +67,7 @@ export default function Dashboard() {
                 <ul className="text-sm text-gray-700 divide-y">
                   <li
                     className="px-4 py-3 hover:bg-gray-100 cursor-pointer"
-                    onClick={() => navigate("/profile")}
+                    onClick={() => navigate("/candidate-profile")}
                   >
                     Hồ sơ người dùng
                   </li>

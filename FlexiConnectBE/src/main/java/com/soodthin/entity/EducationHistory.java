@@ -55,13 +55,9 @@ public class EducationHistory implements Serializable {
     @Column(name = "end_date")
     @Temporal(TemporalType.DATE)
     private Date endDate;
-    @Lob
-    @Size(max = 65535)
-    @Column(name = "description")
-    private String description;
     @JoinColumn(name = "candidate_id", referencedColumnName = "id")
     @ManyToOne
-    private Candidate candidateId;
+    private Candidate candidate;
 
     public EducationHistory() {
     }
@@ -110,20 +106,12 @@ public class EducationHistory implements Serializable {
         this.endDate = endDate;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public Candidate getCandidateId() {
-        return candidateId;
+        return candidate;
     }
 
     public void setCandidateId(Candidate candidateId) {
-        this.candidateId = candidateId;
+        this.candidate= candidateId;
     }
 
     @Override

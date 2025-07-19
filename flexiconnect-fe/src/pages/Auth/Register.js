@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Apis, { endpoints } from "../configs/APIs";
-import InputField from "../components/forms/InputField";
-import PassField from "../components/forms/PassField";
-import PassStrengthBar from "../components/forms/PassStrengthBar";
+import Apis, { endpoints } from "../../configs/APIs";
+import InputField from "../../components/forms/InputField";
+import PassField from "../../components/forms/PassField";
+import PassStrengthBar from "../../components/forms/PassStrengthBar";
 
 export default function Register() {
   const [user, setUser] = useState({});
@@ -49,11 +49,9 @@ export default function Register() {
 
     try {
       await Apis.post(endpoints["register"], {
-        userId: {
-          email: user.email,
-          password: user.password,
-          fullName: user.fullName,
-        },
+        email: user.email,
+        password: user.password,
+        fullName: user.fullName,
       });
 
       setMsg("✅ Đăng ký thành công!");
@@ -72,9 +70,8 @@ export default function Register() {
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-4">Đăng ký Ứng Viên</h2>
 
         {msg && (
-          <div className={`text-sm text-center p-2 rounded-md font-medium ${
-            msg.includes("✅") ? "bg-green-100 text-green-800" : "bg-red-100 text-red-700"
-          }`}>
+          <div className={`text-sm text-center p-2 rounded-md font-medium ${msg.includes("✅") ? "bg-green-100 text-green-800" : "bg-red-100 text-red-700"
+            }`}>
             {msg}
           </div>
         )}
@@ -125,7 +122,7 @@ export default function Register() {
           </button>
         </div>
       </form>
-          
+
     </div>
   );
 }

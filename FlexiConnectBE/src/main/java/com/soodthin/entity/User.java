@@ -79,6 +79,9 @@ public class User implements Serializable {
     @Size(max = 6)
     @Column(name = "gender")
     private String gender;
+    @Size(max = 100)
+    @Column(name = "address")
+    private String address;
     @Size(max = 255)
     @Column(name = "avatar")
     private String avatar;
@@ -339,6 +342,20 @@ public class User implements Serializable {
     @Override
     public String toString() {
         return "com.soodthin.entity.User[ id=" + id + " ]";
+    }
+
+    /**
+     * @return the address
+     */
+    public String getAddress() {
+        return address;
+    }
+
+    /**
+     * @param address the address to set
+     */
+    public void setAddress(String address) {
+        this.address = address;
     }
     
 }

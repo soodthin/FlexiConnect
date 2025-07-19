@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Apis, { endpoints } from "../configs/APIs";
+import Apis, { endpoints } from "../../configs/APIs";
 import cookie from "react-cookies";
-import InputField from "../components/forms/InputField";
-import PassField from "../components/forms/PassField";
+import InputField from "../../components/forms/InputField";
+import PassField from "../../components/forms/PassField";
 import { FaSignInAlt } from "react-icons/fa";
 
 export default function Login() {

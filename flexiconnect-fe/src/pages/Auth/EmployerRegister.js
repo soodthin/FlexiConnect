@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Apis, { endpoints } from "../configs/APIs";
-import InputField from "../components/forms/InputField";
-import PassField from "../components/forms/PassField";
-import PassStrengthBar from "../components/forms/PassStrengthBar";
+import Apis, { endpoints } from "../../configs/APIs";
+import InputField from "../../components/forms/InputField";
+import PassField from "../../components/forms/PassField";
+import PassStrengthBar from "../../components/forms/PassStrengthBar";
 
 export default function EmployerRegister() {
   const [employer, setEmployer] = useState({});
@@ -39,60 +39,60 @@ export default function EmployerRegister() {
   };
 
   const register = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const { fullName, email, password, confirmPassword, companyName, taxId } = employer;
+    const { fullName, email, password, confirmPassword, companyName, taxId } = employer;
 
-  if (!fullName || !email || !password || !confirmPassword || !companyName || !taxId) {
-    setMsg("❌ Vui lòng nhập đầy đủ các trường.");
-    return;
-  }
+    if (!fullName || !email || !password || !confirmPassword || !companyName || !taxId) {
+      setMsg("❌ Vui lòng nhập đầy đủ các trường.");
+      return;
+    }
 
-  if (password !== confirmPassword) {
-    setMsg("❌ Mật khẩu KHÔNG khớp!");
-    return;
-  }
+    if (password !== confirmPassword) {
+      setMsg("❌ Mật khẩu KHÔNG khớp!");
+      return;
+    }
 
-  if (strength.label !== "Khá" && strength.label !== "Mạnh") {
-    setMsg("❌ Mật khẩu phải đủ mạnh để đăng ký.");
-    return;
-  }
+    if (strength.label !== "Khá" && strength.label !== "Mạnh") {
+      setMsg("❌ Mật khẩu phải đủ mạnh để đăng ký.");
+      return;
+    }
 
-  if (images.length < 3) {
-    setMsg("❌ Vui lòng chọn ít nhất 3 ảnh về môi trường làm việc.");
-    return;
-  }
+    if (images.length < 3) {
+      setMsg("❌ Vui lòng chọn ít nhất 3 ảnh về môi trường làm việc.");
+      return;
+    }
 
-  try {
-    const formData = new FormData();
+    try {
+      const formData = new FormData();
 
-    const employerObj = {
-      companyName,
-      taxId,
-      companyIntro: "", 
-      userId: {
-        fullName,
-        email,
-        password,
-      },
-    };
+      const employerObj = {
+        companyName,
+        taxId,
+        companyIntro: "",
+        user: {
+          fullName,
+          email,
+          password,
+        },
+      };
 
-    formData.append("employer", new Blob([JSON.stringify(employerObj)], { type: "application/json" }));
+      formData.append("employer", new Blob([JSON.stringify(employerObj)], { type: "application/json" }));
 
-    images.forEach((img) => formData.append("images", img));
+      images.forEach((img) => formData.append("images", img));
 
-    await Apis.post(endpoints["register-employer"], formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+      await Apis.post(endpoints["register-employer"], formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-    setMsg("✅ Đăng ký thành công! Chờ quản trị viên xét duyệt.");
-    setTimeout(() => navigate("/login"), 2000);
-  } catch (err) {
-    setMsg("❌ Đăng ký thất bại. Có thể email đã tồn tại hoặc lỗi máy chủ.");
-  }
-};
+      setMsg("✅ Đăng ký thành công! Chờ quản trị viên xét duyệt.");
+      setTimeout(() => navigate("/login"), 2000);
+    } catch (err) {
+      setMsg("❌ Đăng ký thất bại. Có thể email đã tồn tại hoặc lỗi máy chủ.");
+    }
+  };
 
 
   return (
@@ -108,9 +108,8 @@ export default function EmployerRegister() {
 
         {msg && (
           <div
-            className={`text-sm text-center p-2 rounded-md font-medium ${
-              msg.includes("✅") ? "bg-green-100 text-green-800" : "bg-red-100 text-red-700"
-            }`}
+            className={`text-sm text-center p-2 rounded-md font-medium ${msg.includes("✅") ? "bg-green-100 text-green-800" : "bg-red-100 text-red-700"
+              }`}
           >
             {msg}
           </div>

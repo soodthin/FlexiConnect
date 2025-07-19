@@ -2,17 +2,18 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
  */
-package com.soodthin.repositories;
+package com.soodthin.services;
 
-import com.soodthin.entity.Candidate;
 import com.soodthin.entity.EducationHistory;
+import com.soodthin.entity.User;
 import java.util.List;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  *
  * @author ADMIN
  */
-public interface EducationHistoryRepository extends JpaRepository<EducationHistory, Integer>{
-        List<EducationHistory> findByCandidate(Candidate candidate);
+public interface EducationHistoryService {
+    List<EducationHistory> getByCandidate(User user);
+    EducationHistory save(User user, EducationHistory edu);
+    void delete(Integer id);
 }
