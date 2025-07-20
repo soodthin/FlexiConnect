@@ -171,7 +171,7 @@ public class PaymentTransaction implements Serializable {
 
     @Override
     public String toString() {
-        return "com.soodthin.entity.PaymentTransaction[ id=" + id + " ]";
+        return "com.soodthin.pojo.PaymentTransaction[ id=" + id + " ]";
     }
     
 }

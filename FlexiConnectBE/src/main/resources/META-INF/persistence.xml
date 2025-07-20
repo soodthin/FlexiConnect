@@ -25,6 +25,29 @@
     <class>com.soodthin.entity.SavedJob</class>
     <class>com.soodthin.entity.CandidateSkill</class>
     <class>com.soodthin.entity.JobPost</class>
+    <class>com.soodthin.configs.SavedJob</class>
+    <class>com.soodthin.configs.Candidate</class>
+    <class>com.soodthin.configs.Rating</class>
+    <class>com.soodthin.configs.Conversation</class>
+    <class>com.soodthin.configs.CandidateSkill</class>
+    <class>com.soodthin.configs.InterviewSession</class>
+    <class>com.soodthin.configs.Skill</class>
+    <class>com.soodthin.configs.FollowEmployer</class>
+    <class>com.soodthin.configs.Role</class>
+    <class>com.soodthin.configs.EducationHistory</class>
+    <class>com.soodthin.configs.Application</class>
+    <class>com.soodthin.configs.Verification</class>
+    <class>com.soodthin.configs.Employer</class>
+    <class>com.soodthin.configs.JobPost</class>
+    <class>com.soodthin.configs.UserPackage</class>
+    <class>com.soodthin.configs.InterviewTurn</class>
+    <class>com.soodthin.configs.Package</class>
+    <class>com.soodthin.configs.WorkExperience</class>
+    <class>com.soodthin.configs.ActivityLog</class>
+    <class>com.soodthin.configs.CompanyImage</class>
+    <class>com.soodthin.configs.User</class>
+    <class>com.soodthin.configs.PaymentTransaction</class>
+    <class>com.soodthin.configs.Notification</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/flexiconnectdb?zeroDateTimeBehavior=CONVERT_TO_NULL"/>
       <property name="javax.persistence.jdbc.user" value="root"/>

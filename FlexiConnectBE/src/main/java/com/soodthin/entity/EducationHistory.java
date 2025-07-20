@@ -11,7 +11,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
@@ -111,7 +110,7 @@ public class EducationHistory implements Serializable {
     }
 
     public void setCandidateId(Candidate candidateId) {
-        this.candidate= candidateId;
+        this.candidate = candidateId;
     }
 
     @Override
@@ -136,7 +135,7 @@ public class EducationHistory implements Serializable {
 
     @Override
     public String toString() {
-        return "com.soodthin.entity.EducationHistory[ id=" + id + " ]";
+        return "com.soodthin.pojo.EducationHistory[ id=" + id + " ]";
     }
     
 }

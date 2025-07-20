@@ -122,7 +122,7 @@ public class Conversation implements Serializable {
 
     @Override
     public String toString() {
-        return "com.soodthin.entity.Conversation[ id=" + id + " ]";
+        return "com.soodthin.pojo.Conversation[ id=" + id + " ]";
     }
     
 }

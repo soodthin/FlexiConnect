@@ -76,7 +76,7 @@ public class SavedJobPK implements Serializable {
 
     @Override
     public String toString() {
-        return "com.soodthin.entity.SavedJobPK[ candidateId=" + candidateId + ", jobPostId=" + jobPostId + " ]";
+        return "com.soodthin.pojo.SavedJobPK[ candidateId=" + candidateId + ", jobPostId=" + jobPostId + " ]";
     }
     
 }

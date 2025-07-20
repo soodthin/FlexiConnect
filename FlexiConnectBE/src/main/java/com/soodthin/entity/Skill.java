@@ -41,12 +41,12 @@ public class Skill implements Serializable {
     private Integer id;
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 50)
+    @Size(min = 1, max = 100)
     @Column(name = "skill_name")
     private String skillName;
     @ManyToMany(mappedBy = "skillSet")
     private Set<JobPost> jobPostSet;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "skill")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "skillId")
     private Set<CandidateSkill> candidateSkillSet;
 
     public Skill() {
@@ -115,7 +115,7 @@ public class Skill implements Serializable {
 
     @Override
     public String toString() {
-        return "com.soodthin.entity.Skill[ id=" + id + " ]";
+        return "com.soodthin.pojo.Skill[ id=" + id + " ]";
     }
     
 }

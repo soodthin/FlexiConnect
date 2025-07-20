@@ -131,7 +131,7 @@ public class CompanyImage implements Serializable {
 
     @Override
     public String toString() {
-        return "com.soodthin.entity.CompanyImage[ id=" + id + " ]";
+        return "com.soodthin.pojo.CompanyImage[ id=" + id + " ]";
     }
     
 }

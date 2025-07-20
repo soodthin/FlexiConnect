@@ -160,7 +160,7 @@ public class WorkExperience implements Serializable {
 
     @Override
     public String toString() {
-        return "com.soodthin.entity.WorkExperience[ id=" + id + " ]";
+        return "com.soodthin.pojo.WorkExperience[ id=" + id + " ]";
     }
     
 }

@@ -155,7 +155,7 @@ public class ActivityLog implements Serializable {
 
     @Override
     public String toString() {
-        return "com.soodthin.entity.ActivityLog[ id=" + id + " ]";
+        return "com.soodthin.pojo.ActivityLog[ id=" + id + " ]";
     }
     
 }

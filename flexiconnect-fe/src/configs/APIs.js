@@ -12,6 +12,7 @@ export const endpoints = {
     'update-profile': "/users/candidate/profile",
     'education': "/users/candidate/education",
     'education-id': (id) => `/users/candidate/education/${id}`,
+    'candidate-skills': "/candidate/skills",
 
 }
 

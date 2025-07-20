@@ -143,7 +143,7 @@ public class UserPackage implements Serializable {
 
     @Override
     public String toString() {
-        return "com.soodthin.entity.UserPackage[ id=" + id + " ]";
+        return "com.soodthin.pojo.UserPackage[ id=" + id + " ]";
     }
     
 }

@@ -145,7 +145,7 @@ public class Rating implements Serializable {
 
     @Override
     public String toString() {
-        return "com.soodthin.entity.Rating[ id=" + id + " ]";
+        return "com.soodthin.pojo.Rating[ id=" + id + " ]";
     }
     
 }

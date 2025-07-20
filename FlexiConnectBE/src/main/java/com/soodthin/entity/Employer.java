@@ -197,7 +197,7 @@ public class Employer implements Serializable {
 
     @Override
     public String toString() {
-        return "com.soodthin.entity.Employer[ id=" + id + " ]";
+        return "com.soodthin.pojo.Employer[ id=" + id + " ]";
     }
     
 }

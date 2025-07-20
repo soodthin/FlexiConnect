@@ -103,7 +103,7 @@ public class Role implements Serializable {
 
     @Override
     public String toString() {
-        return "com.soodthin.entity.Role[ id=" + id + " ]";
+        return "com.soodthin.pojo.Role[ id=" + id + " ]";
     }
     
 }

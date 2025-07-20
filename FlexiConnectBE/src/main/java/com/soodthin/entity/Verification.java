@@ -146,7 +146,7 @@ public class Verification implements Serializable {
 
     @Override
     public String toString() {
-        return "com.soodthin.entity.Verification[ id=" + id + " ]";
+        return "com.soodthin.pojo.Verification[ id=" + id + " ]";
     }
     
 }

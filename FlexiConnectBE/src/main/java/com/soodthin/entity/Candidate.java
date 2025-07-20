@@ -218,7 +218,7 @@ public class Candidate implements Serializable {
 
     @Override
     public String toString() {
-        return "com.soodthin.entity.Candidate[ id=" + id + " ]";
+        return "com.soodthin.pojo.Candidate[ id=" + id + " ]";
     }
     
 }

@@ -108,7 +108,7 @@ public class FollowEmployer implements Serializable {
 
     @Override
     public String toString() {
-        return "com.soodthin.entity.FollowEmployer[ followEmployerPK=" + followEmployerPK + " ]";
+        return "com.soodthin.pojo.FollowEmployer[ followEmployerPK=" + followEmployerPK + " ]";
     }
     
 }

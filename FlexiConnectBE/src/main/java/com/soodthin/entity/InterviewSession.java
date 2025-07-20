@@ -146,7 +146,7 @@ public class InterviewSession implements Serializable {
 
     @Override
     public String toString() {
-        return "com.soodthin.entity.InterviewSession[ id=" + id + " ]";
+        return "com.soodthin.pojo.InterviewSession[ id=" + id + " ]";
     }
     
 }

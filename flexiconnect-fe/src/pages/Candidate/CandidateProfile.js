@@ -2,10 +2,15 @@ import { useEffect, useState } from "react";
 import { authApis, endpoints } from "../../configs/APIs";
 import classNames from "classnames";
 import EducationHistory from "./EducationHistory";
+import Skill from "./Skill";
+import { useNavigate } from "react-router-dom";
+
 
 export default function CandidateProfilePage() {
   const [profile, setProfile] = useState({});
   const [activeTab, setActiveTab] = useState("profile");
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     authApis()
@@ -34,8 +39,17 @@ export default function CandidateProfilePage() {
   };
 
   return (
+
     <div className="max-w-5xl mx-auto p-8">
+       <button
+        onClick={() => navigate("/")}
+        className="mb-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded"
+      >
+        ← Quay về trang chủ
+      </button>
       <h1 className="text-3xl font-bold mb-6">Hồ Sơ Ứng Viên</h1>
+
+     
 
       <div className="flex space-x-4 border-b mb-6">
         {[
@@ -141,11 +155,7 @@ export default function CandidateProfilePage() {
         </div>
       )}
 
-      {activeTab === "skills" && (
-        <div className="text-gray-500 p-6 rounded-lg border bg-gray-50">
-          🔨 TODO: SkillsSelector Component here
-        </div>
-      )}
+      {activeTab === "skills" && <Skill />}
     </div>
   );
 }

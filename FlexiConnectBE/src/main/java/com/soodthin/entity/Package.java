@@ -168,7 +168,7 @@ public class Package implements Serializable {
 
     @Override
     public String toString() {
-        return "com.soodthin.entity.Package[ id=" + id + " ]";
+        return "com.soodthin.pojo.Package[ id=" + id + " ]";
     }
     
 }

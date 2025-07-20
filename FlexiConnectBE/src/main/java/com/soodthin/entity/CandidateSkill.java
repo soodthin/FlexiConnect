@@ -4,14 +4,18 @@
  */
 package com.soodthin.entity;
 
+import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 
@@ -23,41 +27,46 @@ import java.io.Serializable;
 @Table(name = "candidate_skill")
 @NamedQueries({
     @NamedQuery(name = "CandidateSkill.findAll", query = "SELECT c FROM CandidateSkill c"),
-    @NamedQuery(name = "CandidateSkill.findByCandidateId", query = "SELECT c FROM CandidateSkill c WHERE c.candidateSkillPK.candidateId = :candidateId"),
-    @NamedQuery(name = "CandidateSkill.findBySkillId", query = "SELECT c FROM CandidateSkill c WHERE c.candidateSkillPK.skillId = :skillId"),
+    @NamedQuery(name = "CandidateSkill.findById", query = "SELECT c FROM CandidateSkill c WHERE c.id = :id"),
     @NamedQuery(name = "CandidateSkill.findByLevel", query = "SELECT c FROM CandidateSkill c WHERE c.level = :level")})
 public class CandidateSkill implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @EmbeddedId
-    protected CandidateSkillPK candidateSkillPK;
-    @Size(max = 12)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Integer id;
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 50)
     @Column(name = "level")
     private String level;
-    @JoinColumn(name = "candidate_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "candidate_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Candidate candidate;
-    @JoinColumn(name = "skill_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "skill_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
-    private Skill skill;
+    private Skill skillId;
 
     public CandidateSkill() {
     }
 
-    public CandidateSkill(CandidateSkillPK candidateSkillPK) {
-        this.candidateSkillPK = candidateSkillPK;
+    public CandidateSkill(Integer id) {
+        this.id = id;
     }
 
-    public CandidateSkill(int candidateId, int skillId) {
-        this.candidateSkillPK = new CandidateSkillPK(candidateId, skillId);
+    public CandidateSkill(Integer id, String level) {
+        this.id = id;
+        this.level = level;
     }
 
-    public CandidateSkillPK getCandidateSkillPK() {
-        return candidateSkillPK;
+    public Integer getId() {
+        return id;
     }
 
-    public void setCandidateSkillPK(CandidateSkillPK candidateSkillPK) {
-        this.candidateSkillPK = candidateSkillPK;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getLevel() {
@@ -68,26 +77,26 @@ public class CandidateSkill implements Serializable {
         this.level = level;
     }
 
-    public Candidate getCandidate() {
+    public Candidate getCandidateId() {
         return candidate;
     }
 
-    public void setCandidate(Candidate candidate) {
-        this.candidate = candidate;
+    public void setCandidateId(Candidate candidateId) {
+        this.candidate = candidateId;
     }
 
-    public Skill getSkill() {
-        return skill;
+    public Skill getSkillId() {
+        return skillId;
     }
 
-    public void setSkill(Skill skill) {
-        this.skill = skill;
+    public void setSkillId(Skill skillId) {
+        this.skillId = skillId;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (candidateSkillPK != null ? candidateSkillPK.hashCode() : 0);
+        hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
 
@@ -98,7 +107,7 @@ public class CandidateSkill implements Serializable {
             return false;
         }
         CandidateSkill other = (CandidateSkill) object;
-        if ((this.candidateSkillPK == null && other.candidateSkillPK != null) || (this.candidateSkillPK != null && !this.candidateSkillPK.equals(other.candidateSkillPK))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
         return true;
@@ -106,7 +115,7 @@ public class CandidateSkill implements Serializable {
 
     @Override
     public String toString() {
-        return "com.soodthin.entity.CandidateSkill[ candidateSkillPK=" + candidateSkillPK + " ]";
+        return "com.soodthin.pojo.CandidateSkill[ id=" + id + " ]";
     }
     
 }

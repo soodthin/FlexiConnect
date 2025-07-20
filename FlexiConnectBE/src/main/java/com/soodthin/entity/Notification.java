@@ -159,7 +159,7 @@ public class Notification implements Serializable {
 
     @Override
     public String toString() {
-        return "com.soodthin.entity.Notification[ id=" + id + " ]";
+        return "com.soodthin.pojo.Notification[ id=" + id + " ]";
     }
     
 }

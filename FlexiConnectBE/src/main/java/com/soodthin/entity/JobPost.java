@@ -278,7 +278,7 @@ public class JobPost implements Serializable {
 
     @Override
     public String toString() {
-        return "com.soodthin.entity.JobPost[ id=" + id + " ]";
+        return "com.soodthin.pojo.JobPost[ id=" + id + " ]";
     }
     
 }
