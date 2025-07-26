@@ -26,8 +26,6 @@ import org.springframework.web.server.ResponseStatusException;
 public class CandidateServiceImpl implements CandidateService{
      
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
     private CandidateRepository candidateRepository;
 
         @Override
@@ -63,3 +61,4 @@ public class CandidateServiceImpl implements CandidateService{
     }
 
 }
+    

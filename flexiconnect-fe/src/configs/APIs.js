@@ -4,15 +4,22 @@ import cookie from 'react-cookies'
 const BASE_URL = 'http://localhost:8080/api';
 
 export const endpoints = {
+    /* Auth */
     'register': '/auth/register/candidate',
     'register-employer': '/auth/register/employer',
     'login': '/auth/login',
     'current-user': '/auth/current-user',
-    'profile': "/users/candidate/profile",
+
+    /* Candidate */
+    'candidate-profile': "/users/candidate/profile",
     'update-profile': "/users/candidate/profile",
-    'education': "/users/candidate/education",
-    'education-id': (id) => `/users/candidate/education/${id}`,
-    'candidate-skills': "/candidate/skills",
+    'education': "/candidate/education",
+    'education-id': (id) => `/candidate/education/${id}`,
+    'skills': "/candidate/skills",
+    'workexperience': "/candidate/workexperience",
+
+    /* Employer */
+    'employer-profile': "/users/employer/profile",
 
 }
 

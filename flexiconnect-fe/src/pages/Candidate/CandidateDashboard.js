@@ -1,20 +1,32 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import cookie from "react-cookies";
 import { authApis, endpoints } from "../../configs/APIs";
-import { FaUser, FaSearch, FaSignOutAlt, FaRobot } from "react-icons/fa";
-import { IoIosArrowDown } from "react-icons/io";
+import { FaRobot } from "react-icons/fa";
+import JobPostList from "../../components/JobPostList";
 
-export default function Dashboard() {
+export default function CandidateDashboard() {
   const [user, setUser] = useState(null);
-  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [, setShowUserMenu] = useState(false);
   const [showAiMenu, setShowAiMenu] = useState(false);
+  const [isDark] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("theme") === "dark";
+    }
+    return false;
+  });
+  const userMenuRef = useRef();
+  const aiMenuRef = useRef();
   const navigate = useNavigate();
 
-  const logout = () => {
-    cookie.remove("token");
-    navigate("/login");
-  };
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [isDark]);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -23,133 +35,82 @@ export default function Dashboard() {
         setUser(res.data);
       } catch (err) {
         console.error(err);
-        navigate("/login");
+        // Cho phép public vẫn xem được không chuyển hướng nữa
       }
     };
     loadUser();
   }, [navigate]);
 
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+        setShowUserMenu(false);
+      }
+      if (aiMenuRef.current && !aiMenuRef.current.contains(e.target)) {
+        setShowAiMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-[#f7f6f3] px-6 py-6 relative text-gray-800 transition-all">
-      {/* Header */}
-      <header className="flex justify-between items-center mb-10">
-        {/* Search Bar */}
-        <div className="flex items-center bg-white border border-gray-300 rounded-2xl px-4 py-2 w-full max-w-xl shadow-sm transition focus-within:ring-2 focus-within:ring-beige-500">
-          <FaSearch className="text-gray-400 mr-2" />
-          <input
-            type="text"
-            placeholder="Tìm việc làm, kỹ năng, công ty..."
-            className="w-full text-sm bg-transparent outline-none"
-          />
-        </div>
-
-        {/* Right Side: Employer link + User menu */}
-        <div className="flex items-center gap-4 ml-6">
-          <button
-            onClick={() => navigate("/employer-register")}
-            className="text-sm text-gray-600 hover:text-black hover:underline transition"
-          >
-            <span className="font-semibold">Bạn là nhà tuyển dụng?</span>
-          </button>
-
-          {/* User Icon + Dropdown */}
-          <div className="relative">
-            <button
-              className="flex items-center gap-2 hover:opacity-80 transition"
-              onClick={() => setShowUserMenu(!showUserMenu)}
-            >
-              <FaUser className="text-xl text-gray-700" />
-              <IoIosArrowDown className="text-gray-500" />
-            </button>
-
-            {showUserMenu && (
-              <div className="absolute right-0 mt-2 w-52 bg-white border rounded-xl shadow-lg z-30 animate-fade-in-up">
-                <ul className="text-sm text-gray-700 divide-y">
-                  <li
-                    className="px-4 py-3 hover:bg-gray-100 cursor-pointer"
-                    onClick={() => navigate("/candidate-profile")}
-                  >
-                    Hồ sơ người dùng
-                  </li>
-                  <li
-                    className="px-4 py-3 hover:bg-gray-100 cursor-pointer"
-                    onClick={() => navigate("/applied-jobs")}
-                  >
-                    Việc đã ứng tuyển
-                  </li>
-                  <li
-                    className="px-4 py-3 hover:bg-gray-100 cursor-pointer"
-                    onClick={() => navigate("/notifications")}
-                  >
-                    Thông báo từ công ty
-                  </li>
-                  <li
-                    className="px-4 py-3 hover:bg-gray-100 cursor-pointer"
-                    onClick={() => navigate("/upgrade")}
-                  >
-                    Nâng cấp tài khoản
-                  </li>
-                  <li
-                    className="px-4 py-3 text-red-600 hover:bg-gray-100 cursor-pointer"
-                    onClick={logout}
-                  >
-                    <FaSignOutAlt className="inline-block mr-2" />
-                    Đăng xuất
-                  </li>
-                </ul>
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
-
+    <div className="min-h-screen bg-[#f7f6f3] dark:bg-[#181818] px-6 py-6 font-inter text-[#222222] dark:text-[#f5efe6] transition-all">
       {/* Main Content */}
-      <main className="text-gray-800">
-        <h2 className="text-3xl font-semibold mb-2 tracking-tight">
-          👋 Chào {user?.fullName || "ứng viên"}!
-        </h2>
-        <p className="text-gray-600 text-base mb-6">
-          Tìm việc mơ ước của bạn ngay hôm nay.
-        </p>
-
-        <section className="bg-white rounded-2xl shadow p-6 text-center text-gray-400 border border-dashed border-gray-300 min-h-[200px] flex items-center justify-center transition-all">
-          🔍 Kết quả tìm kiếm hoặc gợi ý việc làm sẽ hiển thị ở đây...
-        </section>
-      </main>
-
-      {/* Floating AI Assistant */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <button
-          className="bg-black text-white p-4 rounded-full shadow-lg hover:scale-105 transition-all duration-300"
-          onClick={() => setShowAiMenu(!showAiMenu)}
-        >
-          <FaRobot className="text-xl" />
-        </button>
-
-        {showAiMenu && (
-          <div className="absolute bottom-16 right-0 w-64 bg-white shadow-xl rounded-2xl p-4 space-y-2 border z-50 animate-fade-in-up">
-            <p className="text-sm text-gray-500 font-semibold mb-2">⚙️ Trợ lý AI</p>
-            <button
-              className="block w-full text-left px-3 py-2 hover:bg-gray-100 rounded-md text-sm transition"
-              onClick={() => navigate("/ai-cv")}
-            >
-              ✍️ Viết lại mô tả CV
-            </button>
-            <button
-              className="block w-full text-left px-3 py-2 hover:bg-gray-100 rounded-md text-sm transition"
-              onClick={() => navigate("/ai-job-recommend")}
-            >
-              🎯 Gợi ý việc làm
-            </button>
-            <button
-              className="block w-full text-left px-3 py-2 hover:bg-gray-100 rounded-md text-sm transition"
-              onClick={() => navigate("/ai-interview")}
-            >
-              🎤 Luyện phỏng vấn
-            </button>
+      <main className="text-[#222222] dark:text-[#f5efe6] max-w-6xl mx-auto">
+        {user?.role === "CANDIDATE" && (
+          <div className="mb-10">
+            <h2 className="text-4xl font-bold mb-2 tracking-tight bg-gradient-to-r from-[#111111] via-[#6b7280] to-[#f5efe6] dark:from-[#f5efe6] dark:via-[#888] dark:to-[#232323] text-transparent bg-clip-text">
+              Chào {user?.fullName || "Ứng viên"}!
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300 text-lg mb-6">
+              Hãy khám phá công việc mơ ước của bạn ngay hôm nay.
+            </p>
           </div>
         )}
-      </div>
+
+        {/* Job Listing Section (public + candidate) */}
+        <JobPostList />
+      </main>
+
+      {/* Floating AI Assistant Button (chỉ cho candidate) */}
+      {user?.role === "CANDIDATE" && (
+        <div className="fixed bottom-8 right-8 z-50" ref={aiMenuRef}>
+          <button
+            className="bg-black dark:bg-[#f5efe6] text-white dark:text-black p-5 rounded-full shadow-xl hover:scale-110 transition-all duration-300 border-4 border-white dark:border-[#232323]"
+            onClick={() => setShowAiMenu((v) => !v)}
+          >
+            <FaRobot className="text-2xl" />
+          </button>
+
+          {showAiMenu && (
+            <div className="absolute bottom-20 right-0 w-72 bg-[#f5efe6] dark:bg-[#232323] shadow-2xl rounded-3xl p-6 space-y-3 border border-[#d1d5db] dark:border-[#444] z-50 animate-fade-in-up">
+              <p className="text-base text-[#111111] dark:text-[#f5efe6] font-semibold mb-3 flex items-center gap-2">
+                <FaRobot className="text-[#6b7280] dark:text-[#f5efe6]" />
+                Trợ lý AI
+              </p>
+              <button
+                className="block w-full text-left px-4 py-3 mb-1 bg-white dark:bg-[#353535] hover:bg-[#f5f5dc] dark:hover:bg-[#444] rounded-lg text-sm text-[#222222] dark:text-[#f5efe6] font-medium transition"
+                onClick={() => navigate("/ai-cv")}
+              >
+                ✍️ Viết lại mô tả CV
+              </button>
+              <button
+                className="block w-full text-left px-4 py-3 mb-1 bg-white dark:bg-[#353535] hover:bg-[#f5f5dc] dark:hover:bg-[#444] rounded-lg text-sm text-[#222222] dark:text-[#f5efe6] font-medium transition"
+                onClick={() => navigate("/ai-job-recommend")}
+              >
+                🎯 Gợi ý việc làm
+              </button>
+              <button
+                className="block w-full text-left px-4 py-3 bg-white dark:bg-[#353535] hover:bg-[#f5f5dc] dark:hover:bg-[#444] rounded-lg text-sm text-[#222222] dark:text-[#f5efe6] font-medium transition"
+                onClick={() => navigate("/ai-interview")}
+              >
+                🎤 Luyện phỏng vấn
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

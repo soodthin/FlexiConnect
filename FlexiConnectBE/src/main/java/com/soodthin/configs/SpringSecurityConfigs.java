@@ -29,7 +29,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
     "com.soodthin.controllers",
     "com.soodthin.repositories",
     "com.soodthin.services",
-    "com.soodthin.init",
     "com.soodthin.filters"})
 public class SpringSecurityConfigs {
 
@@ -51,6 +50,7 @@ public class SpringSecurityConfigs {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/job-posts").permitAll()
                 .requestMatchers("/api/users/candidate/**").permitAll()
                 .anyRequest().authenticated()
                 )

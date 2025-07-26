@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class', // Bật dark mode sử dụng class 'dark'
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
     "./public/index.html",
@@ -7,14 +8,14 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Màu be (beige)
+        // Màu be (beige) chủ đạo
         beige: {
-          light: '#f5f5dc',
-          DEFAULT: '#e6e1d3',
-          dark: '#d8d3c3',
+          light: '#f7f6f3',    // Sáng, dùng nền phụ
+          DEFAULT: '#f5efe6',  // Chủ đạo
+          dark: '#e6e1d3',     // Đậm hơn
         },
 
-        // Xám tùy chỉnh nếu muốn tone riêng
+        // Xám tùy chỉnh (tone riêng)
         gray: {
           50: '#f9fafb',
           100: '#f3f4f6',
@@ -28,13 +29,14 @@ module.exports = {
           900: '#111827',
         },
 
-        // Đen tinh chỉnh
+        // Các sắc thái đen
         black: '#0f0f0f',
         offblack: '#111111',
-        softblack: '#1c1c1c',
+        softblack: '#222222',
 
         // Trắng bổ sung
         offwhite: '#fafafa',
+        white: '#ffffff',
       },
     },
   },

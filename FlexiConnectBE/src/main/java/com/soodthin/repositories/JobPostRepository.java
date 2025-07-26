@@ -5,6 +5,7 @@
 package com.soodthin.repositories;
 
 import com.soodthin.entity.JobPost;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
@@ -12,5 +13,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author ADMIN
  */
 public interface JobPostRepository extends JpaRepository<JobPost, Integer>{
-    
+        List<JobPost> findByStatus(String status);
+
 }

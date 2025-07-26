@@ -1,40 +1,28 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { authApis, endpoints } from "../../configs/APIs";
-import EducationHistory from "./EducationHistory";
-import Skill from "./Skill";
-import WorkExperience from "./WorkExperience";
+import CompanyInfo from "./CompanyInfo";
+import CompanyIntro from "./CompanyIntro";
 import classNames from "classnames";
 
 const SECTIONS = [
   { id: "profile", label: "Thông tin cá nhân", icon: "👤" },
-  { id: "education", label: "Học vấn", icon: "🎓" },
-  { id: "experience", label: "Kinh nghiệm", icon: "💼" },
-  { id: "skills", label: "Kỹ năng - AI", icon: "🛠️"  },
+  { id: "company", label: "Thông tin công ty", icon: "🏢" },
+  { id: "intro", label: "Giới thiệu công ty", icon: "📝" },
 ];
 
-export default function CandidateProfilePage() {
+export default function EmployerProfilePage() {
   const [profile, setProfile] = useState(null);
   const [scrollTarget, setScrollTarget] = useState("");
   const [currentSection, setCurrentSection] = useState("profile");
   const navigate = useNavigate();
   const sectionRefs = useRef({});
-  const profileCompletion = 78; // %
-
-  useEffect(() => {
-    const html = document.documentElement;
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
-      html.classList.add("dark");
-    } else {
-      html.classList.remove("dark");
-    }
-  }, []);
+  const profileCompletion = 85;
 
   useEffect(() => {
     const loadProfile = async () => {
       try {
-        const res = await authApis().get(endpoints["candidate-profile"]);
+        const res = await authApis().get(endpoints["employer-profile"]);
         setProfile(res.data);
       } catch (err) {
         console.error(err);
@@ -66,27 +54,11 @@ export default function CandidateProfilePage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    alert("Đã copy link hồ sơ vào clipboard!");
-  };
-
-  const handlePreview = () => {
-    window.open("/preview-profile", "_blank");
-  };
-
-  const handleDownloadPDF = () => {
-    alert("Chức năng tải PDF sẽ được cập nhật!");
-  };
-
   return (
-
     <div className="w-full min-h-screen flex bg-beige-light dark:bg-[#181818]">
-      {/* Sidebar trái */}
-      
       <aside className="hidden sm:flex flex-col gap-2 w-56 h-screen sticky top-0 left-0 bg-white dark:bg-[#232323] p-4 border-r border-neutral-300 dark:border-neutral-700">
         <button
-          onClick={() => navigate("/candidate-dashboard")}
+          onClick={() => navigate("/")}
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-black text-beige dark:bg-beige dark:text-black font-semibold shadow hover:bg-gray-800 dark:hover:bg-[#f5f5dc] transition text-xs"
         >
           ← Quay về
@@ -106,11 +78,9 @@ export default function CandidateProfilePage() {
           </button>
         ))}
       </aside>
-
-      {/* Content bên phải */}
       <main className="flex-1 overflow-y-auto px-4 sm:px-8 py-8">
+        {/* Các tiện ích và tiến độ */}
         <div className="flex flex-wrap gap-3 items-center mb-6">
-          {/* Hoàn thiện, share, preview, pdf,... */}
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-500 dark:text-gray-300">Hoàn thiện hồ sơ</span>
             <div className="w-32 h-2 bg-gray-200 dark:bg-[#282828] rounded-full overflow-hidden">
@@ -121,25 +91,21 @@ export default function CandidateProfilePage() {
             </div>
             <span className="text-xs text-blue-600 font-bold ml-1">{profileCompletion}%</span>
           </div>
-
-          <button onClick={handleShare} className="button-util">🔗 Chia sẻ</button>
-          <button onClick={handlePreview} className="button-util">👁️ Xem trước</button>
-          <button onClick={handleDownloadPDF} className="button-util">📄 Tải PDF</button>
-          <div className="button-score">⭐ AI Score: 8.9/10</div>
+          {/* ...Các nút chia sẻ, xem trước, PDF, AI Score... */}
         </div>
 
         {profile ? (
-
           <div className="flex flex-col gap-8">
+            {/* Thông tin cá nhân, giữ ngay trong file này */}
             <section
               id="profile"
-              ref={(el) => (sectionRefs.current["candidate-profile"] = el)}
+              ref={(el) => (sectionRefs.current["profile"] = el)}
               className="bg-white dark:bg-[#232323] rounded-xl shadow p-4 sm:p-6 flex flex-col sm:flex-row items-center gap-6"
             >
               <img
                 src={
                   profile.avatarUrl ||
-                  "https://ui-avatars.com/api/?name=" + encodeURIComponent(profile.fullName || "User")
+                  "https://ui-avatars.com/api/?name=" + encodeURIComponent(profile.fullName || "Employer")
                 }
                 alt="avatar"
                 className="w-20 h-20 rounded-full object-cover border-4 border-beige dark:border-beige"
@@ -149,39 +115,21 @@ export default function CandidateProfilePage() {
                 <div className="flex flex-wrap gap-x-8 text-gray-600 dark:text-gray-300 text-sm">
                   <span>{profile.email}</span>
                   <span>{profile.phoneNumber}</span>
-                  <span>{profile.address}</span>
                 </div>
-                <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">{profile.title}</div>
-                <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">{profile.bio}</div>
-                {profile.resumeFile && (
-                  <a
-                    className="inline-block mt-2 px-4 py-2 bg-beige dark:bg-[#282828] text-[#111] dark:text-beige rounded-full text-xs font-semibold shadow hover:underline"
-                    href={profile.resumeFile}
-                    target="_blank" rel="noreferrer"
-                  >
-                    Xem CV hiện tại
-                  </a>
-                )}
               </div>
             </section>
-
-            <section id="education" ref={(el) => (sectionRefs.current["education"] = el)} className="section-block">
-              <EducationHistory />
+            {/* Thông tin công ty và giới thiệu: import section riêng */}
+            <section id="company" ref={(el) => (sectionRefs.current["company"] = el)} className="section-block">
+              <CompanyInfo profile={profile} />
             </section>
-
-            <section id="experience" ref={(el) => (sectionRefs.current["experience"] = el)} className="section-block">
-              <WorkExperience />
-            </section>
-
-            <section id="skills" ref={(el) => (sectionRefs.current["skills"] = el)} className="section-block">
-              <Skill />
+            <section id="intro" ref={(el) => (sectionRefs.current["intro"] = el)} className="section-block">
+              <CompanyIntro profile={profile} />
             </section>
           </div>
         ) : (
-          <div className="text-center text-gray-500 py-16">Đang tải thông tin hồ sơ...</div>
+          <div className="text-center text-gray-500 py-16">Đang tải thông tin hồ sơ nhà tuyển dụng...</div>
         )}
       </main>
     </div>
   );
-
 }

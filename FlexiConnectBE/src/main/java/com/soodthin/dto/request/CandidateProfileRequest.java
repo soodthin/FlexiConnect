@@ -9,7 +9,7 @@ package com.soodthin.dto.request;
  * @author ADMIN
  */
 public class CandidateProfileRequest {
-      private String title;
+     private String title;
     private String bio;
     private String resumeFile;
 

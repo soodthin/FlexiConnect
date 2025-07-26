@@ -26,6 +26,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Set;
 
@@ -74,15 +75,13 @@ public class JobPost implements Serializable {
     private BigDecimal salaryMin;
     @Column(name = "salary_max")
     private BigDecimal salaryMax;
-    @Size(max = 10)
+    @Size(max = 100)
     @Column(name = "job_type")
     private String jobType;
     @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
+    private LocalDateTime  createdAt;
     @Column(name = "expired_at")
-    @Temporal(TemporalType.DATE)
-    private Date expiredAt;
+    private LocalDateTime  expiredAt;
     @Size(max = 6)
     @Column(name = "status")
     private String status;
@@ -176,19 +175,19 @@ public class JobPost implements Serializable {
         this.jobType = jobType;
     }
 
-    public Date getCreatedAt() {
+    public LocalDateTime  getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(LocalDateTime  createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Date getExpiredAt() {
+    public LocalDateTime  getExpiredAt() {
         return expiredAt;
     }
 
-    public void setExpiredAt(Date expiredAt) {
+    public void setExpiredAt(LocalDateTime  expiredAt) {
         this.expiredAt = expiredAt;
     }
 

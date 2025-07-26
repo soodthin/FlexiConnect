@@ -21,7 +21,6 @@ public class SkillResponse {
    this.level = level;
 }
 
-
     /**
      * @return the skillId
      */

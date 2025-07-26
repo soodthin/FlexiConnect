@@ -7,6 +7,7 @@ package com.soodthin.repositories;
 import com.soodthin.entity.Candidate;
 import com.soodthin.entity.WorkExperience;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
@@ -14,4 +15,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author ADMIN
  */
 public interface WorkExperienceRepository extends JpaRepository<WorkExperience, Integer> {
+    List<WorkExperience> findByCandidateId(Candidate candidate);
+    Optional<WorkExperience> findById(Integer id);
 }

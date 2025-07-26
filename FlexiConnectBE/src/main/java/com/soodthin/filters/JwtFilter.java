@@ -31,6 +31,11 @@ public class JwtFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
+        if (path.contains("/api/job-posts")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
 
         String header = request.getHeader("Authorization");
         if (header == null || !header.startsWith("Bearer ")) {

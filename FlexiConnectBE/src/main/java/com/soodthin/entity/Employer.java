@@ -57,8 +57,8 @@ public class Employer implements Serializable {
     private String website;
     @Lob
     @Size(max = 65535)
-    @Column(name = "address")
-    private String address;
+    @Column(name = "company_address")
+    private String companyAddress;
     @Lob
     @Size(max = 65535)
     @Column(name = "company_intro")
@@ -119,13 +119,7 @@ public class Employer implements Serializable {
         this.website = website;
     }
 
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
+   
 
     public String getCompanyIntro() {
         return companyIntro;
@@ -198,6 +192,20 @@ public class Employer implements Serializable {
     @Override
     public String toString() {
         return "com.soodthin.pojo.Employer[ id=" + id + " ]";
+    }
+
+    /**
+     * @return the companyAddress
+     */
+    public String getCompanyAddress() {
+        return companyAddress;
+    }
+
+    /**
+     * @param companyAddress the companyAddress to set
+     */
+    public void setCompanyAddress(String companyAddress) {
+        this.companyAddress = companyAddress;
     }
     
 }

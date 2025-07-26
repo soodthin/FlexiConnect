@@ -15,11 +15,10 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  *
@@ -32,6 +31,7 @@ import java.util.Date;
     @NamedQuery(name = "EducationHistory.findById", query = "SELECT e FROM EducationHistory e WHERE e.id = :id"),
     @NamedQuery(name = "EducationHistory.findBySchool", query = "SELECT e FROM EducationHistory e WHERE e.school = :school"),
     @NamedQuery(name = "EducationHistory.findByMajor", query = "SELECT e FROM EducationHistory e WHERE e.major = :major"),
+    @NamedQuery(name = "EducationHistory.findByDegree", query = "SELECT e FROM EducationHistory e WHERE e.degree = :degree"),
     @NamedQuery(name = "EducationHistory.findByStartDate", query = "SELECT e FROM EducationHistory e WHERE e.startDate = :startDate"),
     @NamedQuery(name = "EducationHistory.findByEndDate", query = "SELECT e FROM EducationHistory e WHERE e.endDate = :endDate")})
 public class EducationHistory implements Serializable {
@@ -42,18 +42,19 @@ public class EducationHistory implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-    @Size(max = 100)
+    @Size(max = 50)
     @Column(name = "school")
     private String school;
-    @Size(max = 100)
+    @Size(max = 50)
     @Column(name = "major")
     private String major;
+    @Size(max = 50)
+    @Column(name = "degree")
+    private String degree;
     @Column(name = "start_date")
-    @Temporal(TemporalType.DATE)
-    private Date startDate;
+    private LocalDate startDate;
     @Column(name = "end_date")
-    @Temporal(TemporalType.DATE)
-    private Date endDate;
+    private LocalDate endDate;
     @JoinColumn(name = "candidate_id", referencedColumnName = "id")
     @ManyToOne
     private Candidate candidate;
@@ -89,28 +90,28 @@ public class EducationHistory implements Serializable {
         this.major = major;
     }
 
-    public Date getStartDate() {
+    public String getDegree() {
+        return degree;
+    }
+
+    public void setDegree(String degree) {
+        this.degree = degree;
+    }
+
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
-    }
-
-    public Candidate getCandidateId() {
-        return candidate;
-    }
-
-    public void setCandidateId(Candidate candidateId) {
-        this.candidate = candidateId;
     }
 
     @Override
@@ -135,7 +136,21 @@ public class EducationHistory implements Serializable {
 
     @Override
     public String toString() {
-        return "com.soodthin.pojo.EducationHistory[ id=" + id + " ]";
+        return "com.soodthin.entity.EducationHistory[ id=" + id + " ]";
     }
-    
+
+    /**
+     * @return the candidate
+     */
+    public Candidate getCandidate() {
+        return candidate;
+    }
+
+    /**
+     * @param candidate the candidate to set
+     */
+    public void setCandidate(Candidate candidate) {
+        this.candidate = candidate;
+    }
+
 }

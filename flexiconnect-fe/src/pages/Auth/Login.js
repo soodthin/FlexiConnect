@@ -1,15 +1,19 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Apis, { endpoints } from "../../configs/APIs";
 import cookie from "react-cookies";
-import InputField from "../../components/forms/InputField";
-import PassField from "../../components/forms/PassField";
 import { FaSignInAlt } from "react-icons/fa";
+
+import { unstable_PasswordToggleField as PasswordToggleField } from "radix-ui";
+import { EyeClosedIcon, EyeOpenIcon } from "@radix-ui/react-icons";
+
+import { MyDispatcherContext } from "../../configs/MyContexts";
 
 export default function Login() {
   const [user, setUser] = useState({});
   const [msg, setMsg] = useState(null);
   const navigate = useNavigate();
+  const dispatch = useContext(MyDispatcherContext);
 
   const setState = (value, field) => {
     setUser({ ...user, [field]: value });
@@ -20,19 +24,43 @@ export default function Login() {
     setMsg(null);
 
     try {
+      // Đăng nhập lấy token
       const res = await Apis.post(endpoints["login"], {
         email: user.email,
         password: user.password,
       });
+      console.log("Login response:", res.data);
 
-      cookie.save("token", res.data.token);
-      cookie.save("email", res.data.email);
-      cookie.save("role", res.data.role);
+      const { token, role } = res.data;
+
+      cookie.save("token", token);
+
+      // Sau khi có token, gọi API lấy thông tin user chi tiết
+      const userInfoRes = await Apis.get(endpoints["current-user"], {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const userInfo = userInfoRes.data;
+
+      // Lưu user vào cookie nếu cần (tuỳ app), chủ yếu là dispatch context
+      // cookie.save("user", JSON.stringify(userInfo));
+
+      // Đưa user vào context để Header hiện ngay tên user
+      dispatch({ type: "login", payload: userInfo });
 
       setMsg("✅ Đăng nhập thành công!");
-      setTimeout(() => navigate("/"), 1000);
+
+      setTimeout(() => {
+        if (role === "CANDIDATE") {
+          navigate("/candidate-dashboard");
+        } else if (role === "EMPLOYER") {
+          navigate("/employer-dashboard");
+        } else {
+          navigate("/");
+        }
+      }, 1000);
     } catch (err) {
-      console.error(err);
+      console.error("Login error:", err);
+
       setMsg("❌ Đăng nhập thất bại! Vui lòng kiểm tra lại email hoặc mật khẩu.");
     }
   };
@@ -47,30 +75,49 @@ export default function Login() {
 
         {msg && (
           <div
-            className={`text-sm text-center p-2 rounded-md font-medium ${
-              msg.includes("✅")
+            className={`text-sm text-center p-2 rounded-md font-medium ${msg.includes("✅")
                 ? "bg-green-100 text-green-800"
                 : "bg-red-100 text-red-700"
-            }`}
+              }`}
           >
             {msg}
           </div>
         )}
 
-        <InputField
-          label="Email"
-          type="email"
-          value={user.email || ""}
-          onChange={(e) => setState(e.target.value, "email")}
-          required
-        />
+        <div className="space-y-1">
+          <label className="block text-sm font-medium text-gray-700">Email</label>
+          <div className="flex items-center gap-2 rounded-md border border-gray-300 bg-gray-100 px-3 h-10 hover:border-black focus-within:ring-2 focus-within:ring-black">
+            <input
+              type="email"
+              className="flex-1 bg-transparent outline-none text-sm text-gray-800 placeholder-gray-400"
+              placeholder="Nhập email..."
+              value={user.email || ""}
+              onChange={(e) => setState(e.target.value, "email")}
+              required
+            />
+          </div>
+        </div>
 
-        <PassField
-          label="Mật khẩu"
-          value={user.password || ""}
-          onChange={(e) => setState(e.target.value, "password")}
-          required
-        />
+        <div className="space-y-1">
+          <label className="block text-sm font-medium text-gray-700">Mật khẩu</label>
+          <PasswordToggleField.Root>
+            <div className="flex items-center gap-2 rounded-md border border-gray-300 bg-gray-100 px-3 h-10 hover:border-black focus-within:ring-2 focus-within:ring-black">
+              <PasswordToggleField.Input
+                className="flex-1 bg-transparent outline-none text-sm text-gray-800 placeholder-gray-400"
+                placeholder="Nhập mật khẩu..."
+                value={user.password || ""}
+                onChange={(e) => setState(e.target.value, "password")}
+                required
+              />
+              <PasswordToggleField.Toggle className="outline-none flex items-center justify-center w-5 h-5 text-gray-500">
+                <PasswordToggleField.Icon
+                  visible={<EyeOpenIcon />}
+                  hidden={<EyeClosedIcon />}
+                />
+              </PasswordToggleField.Toggle>
+            </div>
+          </PasswordToggleField.Root>
+        </div>
 
         <button
           type="submit"
