@@ -5,14 +5,21 @@
 package com.soodthin.controllers;
 
 import com.soodthin.dto.request.EmployerProfileRequest;
+import com.soodthin.dto.request.JobPostRequest;
 import com.soodthin.dto.response.EmployerProfileResponse;
+import com.soodthin.dto.response.JobPostResponse;
+import com.soodthin.entity.JobPost;
 import com.soodthin.entity.User;
 import com.soodthin.repositories.UserRepository;
 import com.soodthin.services.EmployerService;
+import com.soodthin.services.JobPostService;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
 /**
  *
  * @author ADMIN
@@ -26,6 +33,8 @@ public class EmployerController {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private JobPostService jobPostService;
 
     @GetMapping("/profile")
     public ResponseEntity<EmployerProfileResponse> getProfile(Authentication authentication) {
@@ -44,5 +53,52 @@ public class EmployerController {
         User user = userRepository.findByEmail(email).orElseThrow();
         employerService.updateProfile(user, request);
         return ResponseEntity.ok("Cập nhật hồ sơ thành công!");
-    }   
+    }
+
+     @PostMapping("/job-post")
+    public ResponseEntity<JobPost> createJobPost(
+            Authentication authentication,
+            @RequestBody JobPostRequest request
+    ) {
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email).orElseThrow();
+        JobPost jobPost = jobPostService.createJobPost(user, request);
+        return ResponseEntity.ok(jobPost);
+    }
+
+        @GetMapping("/job-posts")
+    public ResponseEntity<List<JobPostResponse>> getJobPostsByEmployer(Authentication authentication) {
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email).orElseThrow();
+        List<JobPostResponse> jobPosts = jobPostService.getJobPostsByEmployer(user);
+        return ResponseEntity.ok(jobPosts);
+    }
+
+    @PutMapping("/job-post/{id}")
+    public ResponseEntity<JobPost> updateJobPost(
+            Authentication authentication,
+            @PathVariable Integer id,
+            @RequestBody JobPostRequest request
+    ) {
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email).orElseThrow();
+        JobPost updated = jobPostService.updateJobPost(user, id, request);
+        return ResponseEntity.ok(updated);
+    }
+
+    @DeleteMapping("/job-post/{id}")
+    public ResponseEntity<?> deleteJobPost(
+            Authentication authentication,
+            @PathVariable Integer id
+    ) {
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email).orElseThrow();
+        jobPostService.deleteJobPost(user, id);
+        return ResponseEntity.ok("Xóa bài tuyển dụng thành công!");
+    }
+
+
+
+    
+
 }

@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { MyDispatcherContext } from "../configs/MyContexts";
 import cookie from "react-cookies";
 import { authApis, endpoints } from "../configs/APIs";
-import Header from "../components/Header";
+import Header from "./Header";
 
 export default function MainLayout({ children }) {
   const dispatch = useContext(MyDispatcherContext);

@@ -8,12 +8,12 @@ package com.soodthin.controllers;
  *
  * @author ADMIN
  */
-import com.soodthin.dto.JobPostDTO;
+import com.soodthin.dto.response.JobPostResponse;
 import com.soodthin.services.JobPostService;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -22,9 +22,9 @@ public class JobPostController {
     @Autowired
     private JobPostService jobPostService;
 
-    @GetMapping("/job-posts")
-    public List<JobPostDTO> getAllPublicJobPosts() {
+   @GetMapping("/job-posts")
+    public List<JobPostResponse> getAllPublicJobPosts() {
         return jobPostService.getAllPublicJobPosts();
     }
-}
 
+}

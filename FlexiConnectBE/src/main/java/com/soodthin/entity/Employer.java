@@ -69,7 +69,7 @@ public class Employer implements Serializable {
     private Set<FollowEmployer> followEmployerSet;
     @OneToMany(mappedBy = "employerId")
     private Set<CompanyImage> companyImageSet;
-    @OneToMany(mappedBy = "employerId")
+    @OneToMany(mappedBy = "employer")
     private Set<JobPost> jobPostSet;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne(optional = false)

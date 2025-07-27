@@ -31,7 +31,7 @@ public class JwtFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        if (path.contains("/api/job-posts")) {
+        if (path.contains("/api/job-post")) {
             filterChain.doFilter(request, response);
             return;
         }

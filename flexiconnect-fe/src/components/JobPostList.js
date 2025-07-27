@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
-
+import RadixSelect from "./RadixSelect";
 export default function JobPostList() {
   const [jobPosts, setJobPosts] = useState([]);
   const [filteredPosts, setFilteredPosts] = useState([]);
   const [selectedLocations, setSelectedLocations] = useState([]);
+  const [selectedSalary, setSelectedSalary] = useState("Tất cả");
+  const [selectedJobType, setSelectedJobType] = useState("Tất cả");
   const [expandedJobIds, setExpandedJobIds] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
@@ -22,15 +24,44 @@ export default function JobPostList() {
   }, []);
 
   useEffect(() => {
-    if (selectedLocations.length === 0 || selectedLocations.includes("Tất cả")) {
-      setFilteredPosts(jobPosts);
-    } else {
-      setFilteredPosts(
-        jobPosts.filter((job) => selectedLocations.includes(job.location))
-      );
+    let posts = jobPosts;
+
+    // Filter location
+    if (!(selectedLocations.length === 0 || selectedLocations.includes("Tất cả"))) {
+      posts = posts.filter((job) => selectedLocations.includes(job.location));
     }
+
+    // Filter salary
+    if (selectedSalary !== "Tất cả") {
+      // selectedSalary dạng như ["Từ 0 - 10 triệu", "Từ 10 - 20 triệu", ...]
+      // Chuyển sang khoảng số để lọc
+      const salaryRanges = {
+        "Dưới 10 triệu": [0, 10],
+        "10 - 20 triệu": [10, 20],
+        "20 - 30 triệu": [20, 30],
+        "30 - 50 triệu": [30, 50],
+        "Trên 50 triệu": [50, Infinity]
+      };
+      const [min, max] = salaryRanges[selectedSalary];
+      posts = posts.filter((job) => {
+        // Nếu cả min và max đều null thì là thỏa thuận, không lọc
+        if (!job.salaryMin && !job.salaryMax) return false;
+        // Nếu thỏa thuận thì bỏ qua
+        const salaryMin = job.salaryMin || 0;
+        const salaryMax = job.salaryMax || Infinity;
+        // Lọc nếu có giao với khoảng đã chọn
+        return (salaryMin <= max && salaryMax >= min);
+      });
+    }
+
+    // Filter job type
+    if (selectedJobType !== "Tất cả") {
+      posts = posts.filter((job) => job.jobType === selectedJobType);
+    }
+
+    setFilteredPosts(posts);
     setCurrentPage(1);
-  }, [selectedLocations, jobPosts]);
+  }, [selectedLocations, selectedSalary, selectedJobType, jobPosts]);
 
   const formatSalary = (min, max) => {
     if (!min && !max) return "Thoả thuận";
@@ -42,6 +73,20 @@ export default function JobPostList() {
   const locations = [
     "Tất cả",
     ...Array.from(new Set(jobPosts.map((job) => job.location).filter(Boolean)))
+  ];
+
+  const salaryOptions = [
+    "Tất cả",
+    "Dưới 10 triệu",
+    "10 - 20 triệu",
+    "20 - 30 triệu",
+    "30 - 50 triệu",
+    "Trên 50 triệu"
+  ];
+
+  const jobTypeOptions = [
+    "Tất cả",
+    ...Array.from(new Set(jobPosts.map((job) => job.jobType).filter(Boolean)))
   ];
 
   const handleLocationToggle = (loc) => {
@@ -57,22 +102,23 @@ export default function JobPostList() {
     }
   };
 
-  const toggleExpand = (id) => {
-    setExpandedJobIds((prev) =>
-      prev.includes(id) ? prev.filter((jobId) => jobId !== id) : [...prev, id]
-    );
-  };
-
   const totalPages = Math.ceil(filteredPosts.length / itemsPerPage);
   const paginatedPosts = filteredPosts.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
+  const toggleExpand = (id) => {
+    setExpandedJobIds((prev) =>
+      prev.includes(id) ? prev.filter((jobId) => jobId !== id) : [...prev, id]
+    );
+  };
+
   return (
     <div className="p-4">
-      {/* Location filter */}
+      {/* Filter section */}
       <div className="mb-4 flex flex-wrap gap-2 items-center">
+        {/* Location filter */}
         <Popover.Root>
           <Popover.Trigger className="px-4 py-1 rounded-full text-sm border bg-gray-100 text-gray-800">
             {selectedLocations.length > 0 ? selectedLocations.join(", ") : "Chọn tỉnh/thành"}
@@ -98,6 +144,24 @@ export default function JobPostList() {
             </Popover.Content>
           </Popover.Portal>
         </Popover.Root>
+
+        {/* Salary filter */}
+        <RadixSelect
+          value={selectedSalary}
+          onValueChange={setSelectedSalary}
+          options={salaryOptions}
+          placeholder="Mức lương"
+        />
+
+
+        {/* JobType filter */}
+        <RadixSelect
+          value={selectedJobType}
+          onValueChange={setSelectedJobType}
+          options={jobTypeOptions}
+          placeholder="Loại công việc"
+        />
+
       </div>
 
       {/* Job cards */}
@@ -109,7 +173,7 @@ export default function JobPostList() {
           >
             <div className="flex items-center mb-3">
               <div className="w-10 h-10 bg-gray-100 rounded mr-3 flex items-center justify-center text-sm font-semibold">
-                {job.companyName[0]}
+                {job.companyName && job.companyName[0]}
               </div>
               <div>
                 <h2 className="text-sm font-semibold text-gray-800">
@@ -156,9 +220,6 @@ export default function JobPostList() {
                 </svg>
                 Lưu tin
               </button>
-
-
-
 
               <button
                 onClick={() => toggleExpand(job.id)}

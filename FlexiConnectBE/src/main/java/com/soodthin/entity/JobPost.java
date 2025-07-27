@@ -20,14 +20,11 @@ import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Set;
 
 /**
@@ -104,7 +101,7 @@ public class JobPost implements Serializable {
     private Set<Application> applicationSet;
     @JoinColumn(name = "employer_id", referencedColumnName = "id")
     @ManyToOne
-    private Employer employerId;
+    private Employer employer;
 
     public JobPost() {
     }
@@ -248,11 +245,11 @@ public class JobPost implements Serializable {
     }
 
     public Employer getEmployerId() {
-        return employerId;
+        return employer;
     }
 
     public void setEmployerId(Employer employerId) {
-        this.employerId = employerId;
+        this.employer = employerId;
     }
 
     @Override

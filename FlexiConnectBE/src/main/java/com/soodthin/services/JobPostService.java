@@ -4,7 +4,10 @@
  */
 package com.soodthin.services;
 
-import com.soodthin.dto.JobPostDTO;
+import com.soodthin.dto.request.JobPostRequest;
+import com.soodthin.dto.response.JobPostResponse;
+import com.soodthin.entity.JobPost;
+import com.soodthin.entity.User;
 import java.util.List;
 
 /**
@@ -12,5 +15,14 @@ import java.util.List;
  * @author ADMIN
  */
 public interface JobPostService {
-    List<JobPostDTO> getAllPublicJobPosts();
+
+    JobPost createJobPost(User user, JobPostRequest request);
+
+    List<JobPostResponse> getJobPostsByEmployer(User user);
+
+    JobPost updateJobPost(User user, Integer id, JobPostRequest request);
+
+    void deleteJobPost(User user, Integer id);
+
+   List<JobPostResponse> getAllPublicJobPosts();
 }

@@ -3,10 +3,11 @@ import MainLayout from "./layouts/MainLayout";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import CandidateDashboard from "./pages/Candidate/CandidateDashboard";
+import EmployerDashboard from "./pages/Employer/EmployerDashboard";
 import CandidateProfile from "./pages/Candidate/CandidateProfile";
 import EmployerProfile from "./pages/Employer/EmployerProfile";
 import EmployerRegister from "./pages/Auth/EmployerRegister";
-import PrivateRoute from "./components/PrivateRoute";
+import PrivateRoute from "./layouts/PrivateRoute";
 import Unauthorized from "./pages/Auth/Unauthorized";
 import Dashboard from "./components/JobPostList";
 import { MyUserContext, MyDispatcherContext } from "./configs/MyContexts";
@@ -57,6 +58,14 @@ function App() {
                 element={
                   <PrivateRoute allowedRoles={["EMPLOYER"]}>
                     <EmployerProfile />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/employer-dashboard"
+                element={
+                  <PrivateRoute allowedRoles={["EMPLOYER"]}>
+                    <EmployerDashboard />
                   </PrivateRoute>
                 }
               />

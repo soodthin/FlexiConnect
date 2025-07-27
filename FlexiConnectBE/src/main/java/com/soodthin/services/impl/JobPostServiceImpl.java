@@ -1,36 +1,96 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.soodthin.services.impl;
 
-import com.soodthin.dto.JobPostDTO;
+import com.soodthin.dto.request.JobPostRequest;
+import com.soodthin.dto.response.JobPostResponse;
+import com.soodthin.entity.Employer;
 import com.soodthin.entity.JobPost;
+import com.soodthin.entity.User;
+import com.soodthin.repositories.EmployerRepository;
 import com.soodthin.repositories.JobPostRepository;
 import com.soodthin.services.JobPostService;
-/**
- *
- * @author ADMIN
- */import java.util.List;
-import java.util.stream.Collectors;
-
+import jakarta.transaction.Transactional;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 public class JobPostServiceImpl implements JobPostService {
 
     @Autowired
     private JobPostRepository jobPostRepository;
 
+    @Autowired
+    private EmployerRepository employerRepository;
+
+    @Autowired
+    private ModelMapper modelMapper;
+
     @Override
-    public List<JobPostDTO> getAllPublicJobPosts() {
+    public JobPost createJobPost(User user, JobPostRequest request) {
+        Employer employer = employerRepository.findByUserId(user)
+                .orElseThrow(() -> new RuntimeException("Employer not found"));
+
+        JobPost jobPost = modelMapper.map(request, JobPost.class);
+        jobPost.setEmployerId(employer);
+
+        return jobPostRepository.save(jobPost);
+    }
+
+    @Override
+    public List<JobPostResponse> getJobPostsByEmployer(User user) {
+        Employer employer = employerRepository.findByUserId(user)
+                .orElseThrow(() -> new RuntimeException("Employer not found"));
+
+        List<JobPost> jobPosts = jobPostRepository.findByEmployer(employer);
+
+        return jobPosts.stream()
+                .map(job -> modelMapper.map(job, JobPostResponse.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public JobPost updateJobPost(User user, Integer id, JobPostRequest request) {
+        Employer employer = employerRepository.findByUserId(user)
+                .orElseThrow(() -> new RuntimeException("Employer not found"));
+
+        JobPost jobPost = jobPostRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Job post not found"));
+
+        if (!jobPost.getEmployerId().getId().equals(employer.getId())) {
+            throw new RuntimeException("Access denied");
+        }
+
+        modelMapper.map(request, jobPost);
+        return jobPostRepository.save(jobPost);
+    }
+
+    @Override
+    public void deleteJobPost(User user, Integer id) {
+        Employer employer = employerRepository.findByUserId(user)
+                .orElseThrow(() -> new RuntimeException("Employer not found"));
+
+        JobPost jobPost = jobPostRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Job post not found"));
+
+        if (!jobPost.getEmployerId().getId().equals(employer.getId())) {
+            throw new RuntimeException("Access denied");
+        }
+
+        jobPostRepository.delete(jobPost);
+    }
+
+    
+    @Override
+    public List<JobPostResponse> getAllPublicJobPosts() {
         List<JobPost> jobPosts = (List<JobPost>) jobPostRepository.findByStatus("OPEN");
 
         return jobPosts.stream().map(job -> {
-            JobPostDTO dto = new JobPostDTO();
+            JobPostResponse dto = new JobPostResponse();
             dto.setId(job.getId());
             dto.setTitle(job.getTitle());
             dto.setDescription(truncate(job.getDescription(), 200));
