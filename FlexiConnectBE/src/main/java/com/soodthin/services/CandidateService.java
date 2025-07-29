@@ -7,14 +7,17 @@ package com.soodthin.services;
 import com.soodthin.dto.request.CandidateProfileRequest;
 import com.soodthin.dto.response.CandidateProfileResponse;
 import com.soodthin.entity.User;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
  * @author ADMIN
  */
-
 public interface CandidateService {
-      CandidateProfileResponse getProfile(User user);
-    void updateProfile(User user, CandidateProfileRequest request);
-}
 
+    CandidateProfileResponse getProfile(User user);
+
+    void updateProfile(User user, CandidateProfileRequest request);
+
+    String updateAvatar(User user, MultipartFile avatar);
+}

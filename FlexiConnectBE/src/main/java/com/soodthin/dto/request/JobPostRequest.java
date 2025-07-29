@@ -19,6 +19,8 @@ public class JobPostRequest {
     private BigDecimal salaryMax;
     private String jobType; 
     private LocalDateTime expiredAt;
+    private String status;
+    private int viewCount;
 
     /**
      * @return the title
@@ -117,4 +119,33 @@ public class JobPostRequest {
     public void setExpiredAt(LocalDateTime expiredAt) {
         this.expiredAt = expiredAt;
     }
+
+    /**
+     * @return the status
+     */
+    public String getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    /**
+     * @return the viewCount
+     */
+    public int getViewCount() {
+        return viewCount;
+    }
+
+    /**
+     * @param viewCount the viewCount to set
+     */
+    public void setViewCount(int viewCount) {
+        this.viewCount = viewCount;
+    }
 }
+   

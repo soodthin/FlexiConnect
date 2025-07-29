@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.soodthin.services.impl;
 
 import com.soodthin.dto.response.EducationHistoryResponse;
@@ -12,55 +8,50 @@ import com.soodthin.repositories.CandidateRepository;
 import com.soodthin.repositories.EducationHistoryRepository;
 import com.soodthin.services.EducationHistoryService;
 import jakarta.transaction.Transactional;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
-/**
- *
- * @author ADMIN
- */
+import java.util.List;
+
 @Service
 @Transactional
 public class EducationHistoryServiceImpl implements EducationHistoryService {
 
     @Autowired
     private EducationHistoryRepository educationHistoryRepository;
+
     @Autowired
     private CandidateRepository candidateRepository;
 
     @Override
     public List<EducationHistoryResponse> getByCandidate(User user) {
-        Candidate candidate = candidateRepository.findByUserId(user)
-                .orElseThrow(() -> new RuntimeException("Candidate not found"));
-
+        Candidate candidate = getCandidateOrThrow(user);
         return educationHistoryRepository.findByCandidate(candidate)
                 .stream()
-                .map(edu -> new EducationHistoryResponse(
-                edu.getId(), edu.getSchool(), edu.getMajor(), edu.getDegree(),
-                edu.getStartDate(), edu.getEndDate()
-        ))
+                .map(e -> new EducationHistoryResponse(
+                        e.getId(), e.getSchool(), e.getMajor(),
+                        e.getDegree(), e.getStartDate(), e.getEndDate()))
                 .toList();
     }
 
     @Override
     public EducationHistory save(User user, EducationHistory edu) {
-        Candidate candidate = candidateRepository.findByUserId(user)
-                .orElseThrow(() -> new RuntimeException("Candidate not found"));
+        Candidate candidate = getCandidateOrThrow(user);
         edu.setCandidate(candidate);
         return educationHistoryRepository.save(edu);
     }
 
     @Override
     public EducationHistory update(User user, Integer id, EducationHistory edu) {
-        Candidate candidate = candidateRepository.findByUserId(user)
-                .orElseThrow(() -> new RuntimeException("Candidate not found"));
+        Candidate candidate = getCandidateOrThrow(user);
 
         EducationHistory existing = educationHistoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Education history not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy học vấn"));
 
         if (!existing.getCandidate().getId().equals(candidate.getId())) {
-            throw new RuntimeException("Access denied");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền sửa học vấn này");
         }
 
         existing.setSchool(edu.getSchool());
@@ -74,6 +65,14 @@ public class EducationHistoryServiceImpl implements EducationHistoryService {
 
     @Override
     public void delete(Integer id) {
+        if (!educationHistoryRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy học vấn để xóa");
+        }
         educationHistoryRepository.deleteById(id);
+    }
+
+    private Candidate getCandidateOrThrow(User user) {
+        return candidateRepository.findByUserId(user)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy ứng viên"));
     }
 }

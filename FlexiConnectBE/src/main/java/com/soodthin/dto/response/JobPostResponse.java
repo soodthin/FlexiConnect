@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
  * @author ADMIN
  */
 public class JobPostResponse {
-     private Integer id;
+
+    private Integer id;
     private String title;
     private String description;
     private String location;
@@ -22,7 +23,11 @@ public class JobPostResponse {
     private LocalDateTime createdAt;
     private LocalDateTime expiredAt;
     private String status;
-     private String companyName;
+    
+    private String companyName;
+    private String avatar;
+    private String companyAddress;
+    private String website; 
     private int viewCount;
 
     /**
@@ -191,5 +196,47 @@ public class JobPostResponse {
      */
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
+    }
+
+    /**
+     * @return the avatar
+     */
+    public String getAvatar() {
+        return avatar;
+    }
+
+    /**
+     * @param avatar the avatar to set
+     */
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    /**
+     * @return the companyAddress
+     */
+    public String getCompanyAddress() {
+        return companyAddress;
+    }
+
+    /**
+     * @param companyAddress the companyAddress to set
+     */
+    public void setCompanyAddress(String companyAddress) {
+        this.companyAddress = companyAddress;
+    }
+
+    /**
+     * @return the website
+     */
+    public String getWebsite() {
+        return website;
+    }
+
+    /**
+     * @param website the website to set
+     */
+    public void setWebsite(String website) {
+        this.website = website;
     }
 }

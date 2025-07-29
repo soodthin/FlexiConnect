@@ -25,6 +25,10 @@ export default function Header() {
   }, [isDark]);
 
   useEffect(() => {
+  setShowUserMenu(false); 
+}, [user]);
+
+  useEffect(() => {
     const handleClickOutside = (e) => {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
         setShowUserMenu(false);
@@ -134,7 +138,7 @@ export default function Header() {
                   {/* ROLE_EMPLOYER */}
                   {user.role === "EMPLOYER" && (
                     <>
-                      <li onClick={() => navigate("/employer-dashboard")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Quản lý tuyển dụng</li>
+                      <li onClick={() => navigate("/employer-jobposts-management")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Quản lý tuyển dụng</li>
                       <li onClick={() => navigate("/employer-profile")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Hồ sơ công ty</li>
                     </>
                   )}

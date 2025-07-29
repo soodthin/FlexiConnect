@@ -14,7 +14,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-
 @RestController
 @RequestMapping("/api")
 public class JobPostController {
@@ -22,9 +21,14 @@ public class JobPostController {
     @Autowired
     private JobPostService jobPostService;
 
-   @GetMapping("/job-posts")
+    @GetMapping("/job-posts")
     public List<JobPostResponse> getAllPublicJobPosts() {
         return jobPostService.getAllPublicJobPosts();
+    }
+
+   @GetMapping("/job-posts/{id}")
+    public JobPostResponse getJobPostById(@PathVariable Integer id) {
+        return jobPostService.viewJobPost(id); 
     }
 
 }

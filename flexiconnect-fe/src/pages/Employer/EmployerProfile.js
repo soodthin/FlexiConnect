@@ -4,6 +4,7 @@ import { authApis, endpoints } from "../../configs/APIs";
 import CompanyInfo from "./CompanyInfo";
 import CompanyIntro from "./CompanyIntro";
 import classNames from "classnames";
+import { toast } from "sonner";
 
 const SECTIONS = [
   { id: "profile", label: "Thông tin cá nhân", icon: "👤" },
@@ -15,21 +16,47 @@ export default function EmployerProfilePage() {
   const [profile, setProfile] = useState(null);
   const [scrollTarget, setScrollTarget] = useState("");
   const [currentSection, setCurrentSection] = useState("profile");
+  const [avatarTimestamp, setAvatarTimestamp] = useState(Date.now());
   const navigate = useNavigate();
   const sectionRefs = useRef({});
   const profileCompletion = 85;
 
+  const loadProfile = async () => {
+    try {
+      const res = await authApis().get(endpoints["employer-profile"]);
+      setProfile(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        const res = await authApis().get(endpoints["employer-profile"]);
-        setProfile(res.data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
     loadProfile();
   }, []);
+
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("avatar", file);
+
+    try {
+      await authApis().post(endpoints["employer-avatar"], formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      await loadProfile();
+      setAvatarTimestamp(Date.now()); 
+
+      toast.success("✅ Ảnh đại diện đã được cập nhật!");
+    } catch (err) {
+      console.error(err);
+      toast.error("❌ Lỗi khi cập nhật ảnh đại diện.");
+    }
+  };
 
   useEffect(() => {
     if (scrollTarget) {
@@ -71,15 +98,15 @@ export default function EmployerProfilePage() {
               "flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition text-sm focus:outline-none",
               currentSection === sec.id
                 ? "bg-black dark:bg-beige text-beige dark:text-black shadow"
-                : "bg-gray-100 dark:bg-[#353535] text-gray-600 dark:text-beige hover:bg-beige-light hover:text-black"
+                : "bg-gray-100 dark:bg-[#353535] text-gray-600 dark:text-beige hover:bg-beige-light hover:text-black dark:hover:bg-[#3a3a3a]"
             )}
           >
             <span>{sec.icon}</span> {sec.label}
           </button>
         ))}
       </aside>
+
       <main className="flex-1 overflow-y-auto px-4 sm:px-8 py-8">
-        {/* Các tiện ích và tiến độ */}
         <div className="flex flex-wrap gap-3 items-center mb-6">
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-500 dark:text-gray-300">Hoàn thiện hồ sơ</span>
@@ -91,25 +118,35 @@ export default function EmployerProfilePage() {
             </div>
             <span className="text-xs text-blue-600 font-bold ml-1">{profileCompletion}%</span>
           </div>
-          {/* ...Các nút chia sẻ, xem trước, PDF, AI Score... */}
         </div>
 
         {profile ? (
           <div className="flex flex-col gap-8">
-            {/* Thông tin cá nhân, giữ ngay trong file này */}
             <section
               id="profile"
               ref={(el) => (sectionRefs.current["profile"] = el)}
               className="bg-white dark:bg-[#232323] rounded-xl shadow p-4 sm:p-6 flex flex-col sm:flex-row items-center gap-6"
             >
-              <img
-                src={
-                  profile.avatarUrl ||
-                  "https://ui-avatars.com/api/?name=" + encodeURIComponent(profile.fullName || "Employer")
-                }
-                alt="avatar"
-                className="w-20 h-20 rounded-full object-cover border-4 border-beige dark:border-beige"
-              />
+              <div className="relative w-20 h-20">
+                <img
+                  src={
+                    profile.avatar
+                      ? `${profile.avatar}?t=${avatarTimestamp}`
+                      : "https://ui-avatars.com/api/?name=" + encodeURIComponent(profile.fullName || "Employer")
+                  }
+                  alt="avatar"
+                  className="w-full h-full rounded-full object-cover border-4 border-beige dark:border-beige"
+                />
+                <label className="absolute bottom-0 right-0 p-1 bg-white dark:bg-[#333] rounded-full shadow cursor-pointer text-sm">
+                  📷
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleAvatarChange}
+                  />
+                </label>
+              </div>
               <div className="flex-1 space-y-1">
                 <h2 className="text-2xl font-bold text-[#111] dark:text-beige">{profile.fullName}</h2>
                 <div className="flex flex-wrap gap-x-8 text-gray-600 dark:text-gray-300 text-sm">
@@ -118,16 +155,30 @@ export default function EmployerProfilePage() {
                 </div>
               </div>
             </section>
-            {/* Thông tin công ty và giới thiệu: import section riêng */}
-            <section id="company" ref={(el) => (sectionRefs.current["company"] = el)} className="section-block">
-              <CompanyInfo profile={profile} />
+
+            <section
+              id="company"
+              ref={(el) => (sectionRefs.current["company"] = el)}
+              className="bg-white dark:bg-[#232323] rounded-xl shadow p-4 sm:p-6"
+            >
+              <CompanyInfo
+                profile={profile}
+                onUpdated={(newProfile) => setProfile(newProfile)}
+              />
             </section>
-            <section id="intro" ref={(el) => (sectionRefs.current["intro"] = el)} className="section-block">
+
+            <section
+              id="intro"
+              ref={(el) => (sectionRefs.current["intro"] = el)}
+              className="bg-white dark:bg-[#232323] rounded-xl shadow p-4 sm:p-6"
+            >
               <CompanyIntro profile={profile} />
             </section>
           </div>
         ) : (
-          <div className="text-center text-gray-500 py-16">Đang tải thông tin hồ sơ nhà tuyển dụng...</div>
+          <div className="text-center text-gray-500 dark:text-gray-400 py-16">
+            Đang tải thông tin hồ sơ nhà tuyển dụng...
+          </div>
         )}
       </main>
     </div>

@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,6 +36,8 @@ public class JobPostServiceImpl implements JobPostService {
 
         JobPost jobPost = modelMapper.map(request, JobPost.class);
         jobPost.setEmployerId(employer);
+        jobPost.setViewCount(0);
+        jobPost.setStatus((request.getStatus() == null || request.getStatus().isBlank()) ? "OPEN" : request.getStatus());
 
         return jobPostRepository.save(jobPost);
     }
@@ -46,10 +47,8 @@ public class JobPostServiceImpl implements JobPostService {
         Employer employer = employerRepository.findByUserId(user)
                 .orElseThrow(() -> new RuntimeException("Employer not found"));
 
-        List<JobPost> jobPosts = jobPostRepository.findByEmployer(employer);
-
-        return jobPosts.stream()
-                .map(job -> modelMapper.map(job, JobPostResponse.class))
+        return jobPostRepository.findByEmployer(employer).stream()
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
@@ -65,7 +64,11 @@ public class JobPostServiceImpl implements JobPostService {
             throw new RuntimeException("Access denied");
         }
 
+        int currentViewCount = jobPost.getViewCount() == null ? 0 : jobPost.getViewCount();
         modelMapper.map(request, jobPost);
+        jobPost.setViewCount(currentViewCount);
+        jobPost.setStatus((request.getStatus() == null || request.getStatus().isBlank()) ? "OPEN" : request.getStatus());
+
         return jobPostRepository.save(jobPost);
     }
 
@@ -84,38 +87,53 @@ public class JobPostServiceImpl implements JobPostService {
         jobPostRepository.delete(jobPost);
     }
 
-    
     @Override
     public List<JobPostResponse> getAllPublicJobPosts() {
-        List<JobPost> jobPosts = (List<JobPost>) jobPostRepository.findByStatus("OPEN");
+        return jobPostRepository.findByStatus("OPEN").stream()
+                .map(job -> {
+                    JobPostResponse dto = mapToResponse(job);
+                    dto.setDescription(truncate(job.getDescription(), 200));
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
 
-        return jobPosts.stream().map(job -> {
-            JobPostResponse dto = new JobPostResponse();
-            dto.setId(job.getId());
-            dto.setTitle(job.getTitle());
-            dto.setDescription(truncate(job.getDescription(), 200));
-            dto.setLocation(job.getLocation());
-            dto.setSalaryMin(job.getSalaryMin());
-            dto.setSalaryMax(job.getSalaryMax());
-            dto.setJobType(job.getJobType());
-            dto.setExpiredAt(job.getExpiredAt());
-            dto.setViewCount(job.getViewCount());
-            dto.setCreatedAt(job.getCreatedAt());
+    @Override
+    public JobPostResponse viewJobPost(Integer id) {
+        JobPost jobPost = jobPostRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Job post not found"));
 
-            if (job.getEmployerId()!= null) {
-                dto.setCompanyName(job.getEmployerId().getCompanyName());
-            } else {
-                dto.setCompanyName("Không rõ công ty");
+        jobPost.setViewCount(jobPost.getViewCount() + 1);
+        jobPostRepository.save(jobPost);
+
+        return mapToResponse(jobPost);
+    }
+
+    private JobPostResponse mapToResponse(JobPost job) {
+        JobPostResponse dto = modelMapper.map(job, JobPostResponse.class);
+        if (job.getEmployerId() != null) {
+            Employer employer = job.getEmployerId();
+
+            dto.setCompanyName(
+                    employer.getCompanyName() != null ? employer.getCompanyName() : "Không rõ công ty"
+            );
+            
+            dto.setWebsite(employer.getWebsite());
+            dto.setCompanyAddress(employer.getCompanyAddress());
+
+            if (employer.getUserId() != null) {
+                dto.setAvatar(employer.getUserId().getAvatar());
             }
-
-            return dto;
-        }).collect(Collectors.toList());
+        } else {
+            dto.setCompanyName("Không rõ công ty");
+        }
+        return dto;
     }
 
     private String truncate(String text, int maxLength) {
-        if (text == null || text.length() <= maxLength) return text;
+        if (text == null || text.length() <= maxLength) {
+            return text;
+        }
         return text.substring(0, maxLength) + "...";
     }
 }
-
-

@@ -33,7 +33,7 @@ import java.util.Set;
     @NamedQuery(name = "Employer.findAll", query = "SELECT e FROM Employer e"),
     @NamedQuery(name = "Employer.findById", query = "SELECT e FROM Employer e WHERE e.id = :id"),
     @NamedQuery(name = "Employer.findByCompanyName", query = "SELECT e FROM Employer e WHERE e.companyName = :companyName"),
-    @NamedQuery(name = "Employer.findByTaxId", query = "SELECT e FROM Employer e WHERE e.taxId = :taxId"),
+    @NamedQuery(name = "Employer.findByTaxCode", query = "SELECT e FROM Employer e WHERE e.taxCode= :taxCode"),
     @NamedQuery(name = "Employer.findByWebsite", query = "SELECT e FROM Employer e WHERE e.website = :website"),
     @NamedQuery(name = "Employer.findByIsVerified", query = "SELECT e FROM Employer e WHERE e.isVerified = :isVerified")})
 public class Employer implements Serializable {
@@ -50,8 +50,8 @@ public class Employer implements Serializable {
     @Column(name = "company_name")
     private String companyName;
     @Size(max = 20)
-    @Column(name = "tax_id")
-    private String taxId;
+    @Column(name = "tax_code")
+    private String taxCode;
     @Size(max = 100)
     @Column(name = "website")
     private String website;
@@ -103,14 +103,7 @@ public class Employer implements Serializable {
         this.companyName = companyName;
     }
 
-    public String getTaxId() {
-        return taxId;
-    }
-
-    public void setTaxId(String taxId) {
-        this.taxId = taxId;
-    }
-
+   
     public String getWebsite() {
         return website;
     }
@@ -206,6 +199,20 @@ public class Employer implements Serializable {
      */
     public void setCompanyAddress(String companyAddress) {
         this.companyAddress = companyAddress;
+    }
+
+    /**
+     * @return the taxCode
+     */
+    public String getTaxCode() {
+        return taxCode;
+    }
+
+    /**
+     * @param taxCode the taxCode to set
+     */
+    public void setTaxCode(String taxCode) {
+        this.taxCode = taxCode;
     }
     
 }

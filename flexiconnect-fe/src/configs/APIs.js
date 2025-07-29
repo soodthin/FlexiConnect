@@ -20,6 +20,7 @@ export const endpoints = {
 
     /* Employer */
     'employer-profile': "/users/employer/profile",
+    'employer-avatar': "/users/employer/profile/avatar",
     'jobposts': "/users/employer/job-posts",
     'jobpost': "/users/employer/job-post",
     'jobpost-id': (id) => `/users/employer/job-post/${id}`,

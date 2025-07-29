@@ -25,12 +25,23 @@ export default function MainLayout({ children }) {
     loadUser();
   }, [dispatch]);
 
+  useEffect(() => {
+    const theme = localStorage.getItem("theme");
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, []);
+
   if (loading) return <div className="text-center mt-10">Đang tải...</div>;
 
   return (
     <>
       <Header />
-      <main>{children}</main>
+      <main className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+        {children}
+      </main>
     </>
   );
 }

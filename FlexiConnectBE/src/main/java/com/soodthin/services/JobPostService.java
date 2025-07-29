@@ -22,7 +22,9 @@ public interface JobPostService {
 
     JobPost updateJobPost(User user, Integer id, JobPostRequest request);
 
+    JobPostResponse viewJobPost(Integer id);
+
     void deleteJobPost(User user, Integer id);
 
-   List<JobPostResponse> getAllPublicJobPosts();
+    List<JobPostResponse> getAllPublicJobPosts();
 }

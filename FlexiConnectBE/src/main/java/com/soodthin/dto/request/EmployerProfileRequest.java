@@ -10,13 +10,13 @@ package com.soodthin.dto.request;
  */
 public class EmployerProfileRequest {
 
-     private String name;
+    private String name;
     private String phoneNumber;
-    private String avatarUrl;
+    private String avatar;
 
     private String companyName;
     private String companyAddress; 
-    private String taxId;
+    private String taxCode;
     private String website;
     private String companyIntro;
 
@@ -49,17 +49,17 @@ public class EmployerProfileRequest {
     }
 
     /**
-     * @return the avatarUrl
+     * @return the avatar
      */
-    public String getAvatarUrl() {
-        return avatarUrl;
+    public String getAvatar() {
+        return avatar;
     }
 
     /**
-     * @param avatarUrl the avatarUrl to set
+     * @param avatar the avatar to set
      */
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 
     /**
@@ -90,19 +90,8 @@ public class EmployerProfileRequest {
         this.companyAddress = companyAddress;
     }
 
-    /**
-     * @return the taxId
-     */
-    public String getTaxId() {
-        return taxId;
-    }
 
-    /**
-     * @param taxId the taxId to set
-     */
-    public void setTaxId(String taxId) {
-        this.taxId = taxId;
-    }
+    
 
     /**
      * @return the website
@@ -130,6 +119,20 @@ public class EmployerProfileRequest {
      */
     public void setCompanyIntro(String companyIntro) {
         this.companyIntro = companyIntro;
+    }
+
+    /**
+     * @return the taxCode
+     */
+    public String getTaxCode() {
+        return taxCode;
+    }
+
+    /**
+     * @param taxCode the taxCode to set
+     */
+    public void setTaxCode(String taxCode) {
+        this.taxCode = taxCode;
     }
 
 }

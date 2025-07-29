@@ -28,7 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service("userDetailsService")
 @Transactional
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
@@ -44,21 +44,20 @@ public class UserServiceImpl implements UserService{
 
     @Autowired
     private ModelMapper modelMapper;
-    
+
     @Autowired
     private Cloudinary cloudinary;
-    
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public User registerCandidate(CandidateRegisterDTO userRegisterDTO) {
-        if (userRepository.findByEmail(userRegisterDTO.getEmail()).isPresent()) {
+    public User registerCandidate(CandidateRegisterDTO dto) {
+        if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email đã được sử dụng.");
         }
 
-        User user = modelMapper.map(userRegisterDTO, User.class);
-
+        User user = modelMapper.map(dto, User.class);
         Role candidateRole = roleRepository.findByRoleName("CANDIDATE")
                 .orElseThrow(() -> new IllegalArgumentException("Vai trò 'CANDIDATE' không tồn tại."));
 
@@ -66,7 +65,6 @@ public class UserServiceImpl implements UserService{
         user.setStatus("ACTIVE");
         user.setCreatedAt(LocalDateTime.now());
         user.setRoleSet(Set.of(candidateRole));
-
         user = userRepository.save(user);
 
         Candidate candidate = new Candidate();
@@ -78,12 +76,11 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public User registerEmployer(EmployerRegisterDTO employerDTO, MultipartFile[] images) {
-         if (userRepository.findByEmail(employerDTO.getUser().getEmail()).isPresent()) {
+        if (userRepository.findByEmail(employerDTO.getUser().getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email đã được sử dụng.");
         }
 
         User user = modelMapper.map(employerDTO.getUser(), User.class);
-
         Role employerRole = roleRepository.findByRoleName("EMPLOYER")
                 .orElseThrow(() -> new IllegalArgumentException("Vai trò 'EMPLOYER' không tồn tại."));
 
@@ -91,9 +88,22 @@ public class UserServiceImpl implements UserService{
         user.setStatus("ACTIVE");
         user.setCreatedAt(LocalDateTime.now());
         user.setRoleSet(Set.of(employerRole));
+        user = userRepository.save(user);
 
+        Employer employer = modelMapper.map(employerDTO, Employer.class);
+        employer.setUserId(user);
+        employer.setIsVerified(false);
+        employer.setCompanyIntro(buildCompanyIntro(employerDTO.getCompanyIntro(), images));
+        employerRepository.save(employer);
+
+        return user;
+    }
+
+    private String buildCompanyIntro(String introText, MultipartFile[] images) {
         StringBuilder intro = new StringBuilder();
-        intro.append(employerDTO.getCompanyIntro() == null ? "" : employerDTO.getCompanyIntro());
+        if (introText != null) {
+            intro.append(introText);
+        }
         intro.append("<div class='company-gallery'>");
 
         for (MultipartFile file : images) {
@@ -102,21 +112,14 @@ public class UserServiceImpl implements UserService{
                 String imageUrl = uploadResult.get("secure_url").toString();
                 intro.append("<img src='").append(imageUrl).append("' alt='company image' />");
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new RuntimeException("Tải ảnh lên thất bại: " + file.getOriginalFilename(), e);
             }
         }
+
         intro.append("</div>");
-
-        Employer employer = modelMapper.map(employerDTO, Employer.class);
-        employer.setUserId(userRepository.save(user));
-        employer.setCompanyIntro(intro.toString());
-        employer.setIsVerified(false);
-
-        employerRepository.save(employer);
-
-        return user;
+        return intro.toString();
     }
-    
+
     @Override
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
@@ -128,7 +131,7 @@ public class UserServiceImpl implements UserService{
         User user = getUserByEmail(email);
         return passwordEncoder.matches(rawPassword, user.getPassword());
     }
-    
+
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = getUserByEmail(email);

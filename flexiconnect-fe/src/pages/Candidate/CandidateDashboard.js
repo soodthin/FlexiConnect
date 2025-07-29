@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { authApis, endpoints } from "../../configs/APIs";
 import { FaRobot } from "react-icons/fa";
-import JobPostList from "../../components/JobPostList";
+import JobPostList from "../Public/JobPostList";
 
 export default function CandidateDashboard() {
   const [user, setUser] = useState(null);
@@ -34,9 +34,7 @@ export default function CandidateDashboard() {
         const res = await authApis().get(endpoints["current-user"]);
         setUser(res.data);
       } catch (err) {
-        console.error(err);
-        // Cho phép public vẫn xem được không chuyển hướng nữa
-      }
+        console.error(err);      }
     };
     loadUser();
   }, [navigate]);

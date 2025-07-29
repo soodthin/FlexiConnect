@@ -14,11 +14,13 @@ import com.soodthin.repositories.UserRepository;
 import com.soodthin.services.EmployerService;
 import com.soodthin.services.JobPostService;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -55,7 +57,18 @@ public class EmployerController {
         return ResponseEntity.ok("Cập nhật hồ sơ thành công!");
     }
 
-     @PostMapping("/job-post")
+    @PostMapping("/profile/avatar")
+    public ResponseEntity<?> uploadAvatar(
+            Authentication authentication,
+            @RequestParam("avatar") MultipartFile avatar
+    ) {
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email).orElseThrow();
+        String url = employerService.updateAvatar(user, avatar);
+        return ResponseEntity.ok("Cập nhật avatar thành công! URL: " + url);
+    }
+
+    @PostMapping("/job-post")
     public ResponseEntity<JobPost> createJobPost(
             Authentication authentication,
             @RequestBody JobPostRequest request
@@ -66,7 +79,7 @@ public class EmployerController {
         return ResponseEntity.ok(jobPost);
     }
 
-        @GetMapping("/job-posts")
+    @GetMapping("/job-posts")
     public ResponseEntity<List<JobPostResponse>> getJobPostsByEmployer(Authentication authentication) {
         String email = authentication.getName();
         User user = userRepository.findByEmail(email).orElseThrow();
@@ -96,9 +109,5 @@ public class EmployerController {
         jobPostService.deleteJobPost(user, id);
         return ResponseEntity.ok("Xóa bài tuyển dụng thành công!");
     }
-
-
-
-    
 
 }

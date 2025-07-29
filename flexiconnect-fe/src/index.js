@@ -4,6 +4,7 @@ import './index.css';
 import App from './App';
 
 import { MyUserContext, MyDispatcherContext } from './configs/MyContexts';
+import DarkModeProvider from './configs/DarkModeProvider';
 
 const initialState = null;
 
@@ -31,7 +32,9 @@ function AppWrapper() {
   return (
     <MyUserContext.Provider value={user}>
       <MyDispatcherContext.Provider value={dispatch}>
-        <App />
+        <DarkModeProvider>
+          <App />
+        </DarkModeProvider>
       </MyDispatcherContext.Provider>
     </MyUserContext.Provider>
   );

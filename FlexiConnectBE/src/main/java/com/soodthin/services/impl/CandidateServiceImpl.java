@@ -4,6 +4,8 @@
  */
 package com.soodthin.services.impl;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.soodthin.dto.request.CandidateProfileRequest;
 import com.soodthin.dto.response.CandidateProfileResponse;
 import com.soodthin.entity.Candidate;
@@ -12,9 +14,11 @@ import com.soodthin.repositories.CandidateRepository;
 import com.soodthin.repositories.UserRepository;
 import com.soodthin.services.CandidateService;
 import jakarta.transaction.Transactional;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
@@ -23,12 +27,16 @@ import org.springframework.web.server.ResponseStatusException;
  */
 @Service
 @Transactional
-public class CandidateServiceImpl implements CandidateService{
-     
+public class CandidateServiceImpl implements CandidateService {
+
     @Autowired
     private CandidateRepository candidateRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private Cloudinary cloudinary;
 
-        @Override
+    @Override
     public CandidateProfileResponse getProfile(User user) {
         Candidate candidate = candidateRepository.findByUserId(user)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy hồ sơ ứng viên!"));
@@ -60,5 +68,17 @@ public class CandidateServiceImpl implements CandidateService{
         candidateRepository.save(candidate);
     }
 
+    @Override
+    public String updateAvatar(User user, MultipartFile avatar) {
+        try {
+            Map uploadResult = cloudinary.uploader().upload(avatar.getBytes(), ObjectUtils.emptyMap());
+            String url = uploadResult.get("secure_url").toString();
+            user.setAvatar(url);
+            userRepository.save(user);
+            return url;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Lỗi khi cập nhật ảnh đại diện!");
+        }
+    }
+
 }
-    

@@ -13,11 +13,11 @@ public class EmployerProfileResponse {
     private String fullName;
     private String email;
     private String phoneNumber;
-    private String avatarUrl;
+    private String avatar;
 
     private String companyName;
     private String companyAddress;
-    private String taxId;
+    private String taxCode;
     private String website;
     private String companyIntro;
 
@@ -63,19 +63,7 @@ public class EmployerProfileResponse {
         this.phoneNumber = phoneNumber;
     }
 
-    /**
-     * @return the avatarUrl
-     */
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
-
-    /**
-     * @param avatarUrl the avatarUrl to set
-     */
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
-    }
+   
 
     /**
      * @return the companyName
@@ -105,19 +93,6 @@ public class EmployerProfileResponse {
         this.companyAddress = companyAddress;
     }
 
-    /**
-     * @return the taxId
-     */
-    public String getTaxId() {
-        return taxId;
-    }
-
-    /**
-     * @param taxId the taxId to set
-     */
-    public void setTaxId(String taxId) {
-        this.taxId = taxId;
-    }
 
     /**
      * @return the website
@@ -145,6 +120,34 @@ public class EmployerProfileResponse {
      */
     public void setCompanyIntro(String companyIntro) {
         this.companyIntro = companyIntro;
+    }
+
+    /**
+     * @return the taxCode
+     */
+    public String getTaxCode() {
+        return taxCode;
+    }
+
+    /**
+     * @param taxCode the taxCode to set
+     */
+    public void setTaxCode(String taxCode) {
+        this.taxCode = taxCode;
+    }
+
+    /**
+     * @return the avatar
+     */
+    public String getAvatar() {
+        return avatar;
+    }
+
+    /**
+     * @param avatar the avatar to set
+     */
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 
 }

@@ -12,6 +12,8 @@ public class CandidateProfileRequest {
      private String title;
     private String bio;
     private String resumeFile;
+    private String avatar;
+
 
     /**
      * @return the title
@@ -54,4 +56,20 @@ public class CandidateProfileRequest {
     public void setResumeFile(String resumeFile) {
         this.resumeFile = resumeFile;
     }
+
+   /**
+     * @return the avatar
+     */
+    public String getAvatar() {
+        return avatar;
+    }
+
+    /**
+     * @param avatar the avatar to set
+     */
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+   
 }

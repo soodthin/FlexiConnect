@@ -1,17 +1,26 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useReducer } from "react";
+import { MyUserContext, MyDispatcherContext } from "./configs/MyContexts";
 import MainLayout from "./layouts/MainLayout";
+import PrivateRoute from "./configs/PrivateRoute";
+import Unauthorized from "./pages/Auth/Unauthorized";
+import Dashboard from "./layouts/Dashboard";
+import { Toaster } from "sonner";
+
+
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
-import CandidateDashboard from "./pages/Candidate/CandidateDashboard";
+import JobDetails from "./pages/Public/JobDetails"; 
+
 import EmployerDashboard from "./pages/Employer/EmployerDashboard";
-import CandidateProfile from "./pages/Candidate/CandidateProfile";
 import EmployerProfile from "./pages/Employer/EmployerProfile";
 import EmployerRegister from "./pages/Auth/EmployerRegister";
-import PrivateRoute from "./layouts/PrivateRoute";
-import Unauthorized from "./pages/Auth/Unauthorized";
-import Dashboard from "./components/JobPostList";
-import { MyUserContext, MyDispatcherContext } from "./configs/MyContexts";
-import { useReducer } from "react";
+
+import CandidateDashboard from "./pages/Candidate/CandidateDashboard";
+import CandidateProfile from "./pages/Candidate/CandidateProfile";
+
+
+import JobPostsManagement from "./pages/Employer/JobPostsManagement";
 
 const userReducer = (current, action) => {
   switch (action.type) {
@@ -32,6 +41,7 @@ function App() {
       <MyDispatcherContext.Provider value={dispatch}>
         <BrowserRouter>
           <MainLayout>
+            <Toaster richColors position="top-center" />
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/login" element={<Login />} />
@@ -62,6 +72,14 @@ function App() {
                 }
               />
               <Route
+                path="/employer-jobposts-management"
+                element={
+                  <PrivateRoute allowedRoles={["EMPLOYER"]}>
+                    <JobPostsManagement />
+                  </PrivateRoute>
+                }
+              />
+              <Route
                 path="/employer-dashboard"
                 element={
                   <PrivateRoute allowedRoles={["EMPLOYER"]}>
@@ -70,6 +88,8 @@ function App() {
                 }
               />
               <Route path="/unauthorized" element={<Unauthorized />} />
+
+              <Route path="/job-posts/:id" element={<JobDetails />} />
             </Routes>
           </MainLayout>
         </BrowserRouter>

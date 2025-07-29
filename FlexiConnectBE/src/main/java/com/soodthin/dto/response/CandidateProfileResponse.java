@@ -13,7 +13,7 @@ public class CandidateProfileResponse {
     private String email;
     private String phoneNumber;
     private String address;
-    private String avatarUrl;
+    private String avatar;
 
     private String title;
     private String bio;
@@ -77,17 +77,17 @@ public class CandidateProfileResponse {
     }
 
     /**
-     * @return the avatarUrl
+     * @return the avatar
      */
-    public String getAvatarUrl() {
-        return avatarUrl;
+    public String getAvatar() {
+        return avatar;
     }
 
     /**
-     * @param avatarUrl the avatarUrl to set
+     * @param avatar the avatar to set
      */
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
+    public void setAvatarUrl(String avatar) {
+        this.avatar = avatar;
     }
 
     /**
