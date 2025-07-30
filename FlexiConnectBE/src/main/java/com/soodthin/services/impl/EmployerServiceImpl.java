@@ -78,4 +78,5 @@ public class EmployerServiceImpl implements EmployerService {
         response.setCompanyIntro(employer.getCompanyIntro());
         return response;
     }
+    
 }

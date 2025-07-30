@@ -4,18 +4,26 @@
  */
 package com.soodthin.dto.request;
 
+import java.time.LocalDate;
+
 /**
  *
  * @author ADMIN
  */
 public class CandidateProfileRequest {
-     private String title;
+
+    private String fullName;
+    private String phoneNumber;
+    private String address;
+    private String avatar;
+    private LocalDate dateOfBirth;
+    private String gender;
+
+    private String title;
     private String bio;
     private String resumeFile;
-    private String avatar;
 
-
-    /**
+    /*  *
      * @return the title
      */
     public String getTitle() {
@@ -57,7 +65,7 @@ public class CandidateProfileRequest {
         this.resumeFile = resumeFile;
     }
 
-   /**
+    /**
      * @return the avatar
      */
     public String getAvatar() {
@@ -71,5 +79,74 @@ public class CandidateProfileRequest {
         this.avatar = avatar;
     }
 
-   
+    /**
+     * @return the fullName
+     */
+    public String getFullName() {
+        return fullName;
+    }
+
+    /**
+     * @param fullName the fullName to set
+     */
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    /**
+     * @return the phoneNumber
+     */
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    /**
+     * @param phoneNumber the phoneNumber to set
+     */
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    /**
+     * @return the address
+     */
+    public String getAddress() {
+        return address;
+    }
+
+    /**
+     * @param address the address to set
+     */
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    /**
+     * @return the dateOfBirth
+     */
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    /**
+     * @param dateOfBirth the dateOfBirth to set
+     */
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    /**
+     * @return the gender
+     */
+    public String getGender() {
+        return gender;
+    }
+
+    /**
+     * @param gender the gender to set
+     */
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
 }

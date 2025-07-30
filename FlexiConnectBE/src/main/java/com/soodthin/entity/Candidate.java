@@ -4,6 +4,7 @@
  */
 package com.soodthin.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -72,7 +73,8 @@ public class Candidate implements Serializable {
     private Set<SavedJob> savedJobSet;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "candidate")
     private Set<CandidateSkill> candidateSkillSet;
-    @OneToMany(mappedBy = "candidateId")
+    @OneToMany(mappedBy = "candidate")
+    @JsonIgnore
     private Set<Application> applicationSet;
     @OneToMany(mappedBy = "candidateId")
     private Set<WorkExperience> workExperienceSet;

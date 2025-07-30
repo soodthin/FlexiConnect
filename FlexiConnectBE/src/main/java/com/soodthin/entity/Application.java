@@ -17,11 +17,9 @@ import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 /**
@@ -47,9 +45,11 @@ public class Application implements Serializable {
     @Size(max = 65535)
     @Column(name = "cover_letter")
     private String coverLetter;
+    @Size(max = 255)
+    @Column(name = "resume_file")
+    private String resumeFile;
     @Column(name = "applied_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date appliedAt;
+    private LocalDateTime appliedAt;
     @Size(max = 8)
     @Column(name = "status")
     private String status;
@@ -61,10 +61,10 @@ public class Application implements Serializable {
     private Set<Rating> ratingSet;
     @JoinColumn(name = "candidate_id", referencedColumnName = "id")
     @ManyToOne
-    private Candidate candidateId;
+    private Candidate candidate;
     @JoinColumn(name = "job_post_id", referencedColumnName = "id")
     @ManyToOne
-    private JobPost jobPostId;
+    private JobPost jobPost;
 
     public Application() {
     }
@@ -89,11 +89,11 @@ public class Application implements Serializable {
         this.coverLetter = coverLetter;
     }
 
-    public Date getAppliedAt() {
+    public LocalDateTime getAppliedAt() {
         return appliedAt;
     }
 
-    public void setAppliedAt(Date appliedAt) {
+    public void setAppliedAt(LocalDateTime appliedAt) {
         this.appliedAt = appliedAt;
     }
 
@@ -122,19 +122,19 @@ public class Application implements Serializable {
     }
 
     public Candidate getCandidateId() {
-        return candidateId;
+        return candidate;
     }
 
     public void setCandidateId(Candidate candidateId) {
-        this.candidateId = candidateId;
+        this.candidate = candidateId;
     }
 
     public JobPost getJobPostId() {
-        return jobPostId;
+        return jobPost;
     }
 
     public void setJobPostId(JobPost jobPostId) {
-        this.jobPostId = jobPostId;
+        this.jobPost = jobPostId;
     }
 
     @Override
@@ -161,5 +161,19 @@ public class Application implements Serializable {
     public String toString() {
         return "com.soodthin.pojo.Application[ id=" + id + " ]";
     }
-    
+
+    /**
+     * @return the resumeFile
+     */
+    public String getResumeFile() {
+        return resumeFile;
+    }
+
+    /**
+     * @param resumeFile the resumeFile to set
+     */
+    public void setResumeFile(String resumeFile) {
+        this.resumeFile = resumeFile;
+    }
+
 }

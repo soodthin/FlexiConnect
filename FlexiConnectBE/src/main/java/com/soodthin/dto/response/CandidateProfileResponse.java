@@ -4,6 +4,8 @@
  */
 package com.soodthin.dto.response;
 
+import java.time.LocalDate;
+
 /**
  *
  * @author ADMIN
@@ -12,9 +14,11 @@ public class CandidateProfileResponse {
     private String fullName;
     private String email;
     private String phoneNumber;
+    private LocalDate dateOfBirth;
+    private String gender;
     private String address;
     private String avatar;
-
+   
     private String title;
     private String bio;
     private String bioAiSuggestion;
@@ -86,7 +90,7 @@ public class CandidateProfileResponse {
     /**
      * @param avatar the avatar to set
      */
-    public void setAvatarUrl(String avatar) {
+    public void setAvatar(String avatar) {
         this.avatar = avatar;
     }
 
@@ -144,6 +148,34 @@ public class CandidateProfileResponse {
      */
     public void setResumeFile(String resumeFile) {
         this.resumeFile = resumeFile;
+    }
+
+    /**
+     * @return the dateOfBirth
+     */
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    /**
+     * @param dateOfBirth the dateOfBirth to set
+     */
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    /**
+     * @return the gender
+     */
+    public String getGender() {
+        return gender;
+    }
+
+    /**
+     * @param gender the gender to set
+     */
+    public void setGender(String gender) {
+        this.gender = gender;
     }
     
 }

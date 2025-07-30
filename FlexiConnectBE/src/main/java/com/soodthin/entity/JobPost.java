@@ -97,7 +97,7 @@ public class JobPost implements Serializable {
     private Set<InterviewSession> interviewSessionSet;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "jobPost")
     private Set<SavedJob> savedJobSet;
-    @OneToMany(mappedBy = "jobPostId")
+    @OneToMany(mappedBy = "jobPost")
     private Set<Application> applicationSet;
     @JoinColumn(name = "employer_id", referencedColumnName = "id")
     @ManyToOne

@@ -1,17 +1,134 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Dialog, Transition } from "@headlessui/react";
+import { Fragment } from "react";
+import { authApis, endpoints } from "../../configs/APIs";
 
-// Utility: format salary
 const getSalaryText = (min, max) => {
     if (min && max) return `${min} - ${max} triệu`;
     return "Thương lượng";
 };
 
+function ApplyDialog({ isOpen, onClose, jobPostId }) {
+    const [coverLetter, setCoverLetter] = useState("");
+    const [resumeFile, setResumeFile] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+    const handleSubmit = async () => {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            alert("Bạn cần đăng nhập để ứng tuyển.");
+            return;
+        }
+
+        if (!resumeFile) return alert("Vui lòng chọn file CV!");
+
+        const formData = new FormData();
+        formData.append("jobPostId", jobPostId);
+        formData.append("resumeFile", resumeFile);
+        formData.append("coverLetter", coverLetter);
+
+        try {
+            setLoading(true);
+            await authApis().post(endpoints["apply-job"], formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    Authorization: `Bearer ${token}`, // Bắt buộc cần có
+                },
+            });
+
+            alert("Ứng tuyển thành công!");
+            onClose();
+        } catch (err) {
+            console.error(err);
+            if (err.response?.status === 409) {
+                alert("Bạn đã ứng tuyển tin này rồi.");
+            } else if (err.response?.status === 401) {
+                alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+            } else {
+                alert("Lỗi khi ứng tuyển. Vui lòng thử lại.");
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+    return (
+        <Transition appear show={isOpen} as={Fragment}>
+            <Dialog as="div" className="relative z-10" onClose={onClose}>
+                <Transition.Child
+                    as={Fragment}
+                    enter="ease-out duration-300"
+                    enterFrom="opacity-0"
+                    enterTo="opacity-100"
+                    leave="ease-in duration-200"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                >
+                    <div className="fixed inset-0 bg-black bg-opacity-25" />
+                </Transition.Child>
+
+                <div className="fixed inset-0 overflow-y-auto">
+                    <div className="flex min-h-full items-center justify-center p-4">
+                        <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white dark:bg-neutral-800 p-6 text-left align-middle shadow-xl transition-all">
+                            <Dialog.Title
+                                as="h3"
+                                className="text-lg font-medium leading-6 text-gray-900 dark:text-white"
+                            >
+                                Ứng tuyển vào công việc
+                            </Dialog.Title>
+                            <div className="mt-4">
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+                                    Thư giới thiệu (tùy chọn)
+                                </label>
+                                <textarea
+                                    rows={4}
+                                    className="w-full border border-gray-300 dark:border-gray-600 rounded-md p-2 dark:bg-neutral-700 dark:text-white"
+                                    value={coverLetter}
+                                    onChange={(e) => setCoverLetter(e.target.value)}
+                                />
+                            </div>
+                            <div className="mt-4">
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+                                    Tải lên CV
+                                </label>
+                                <input
+                                    type="file"
+                                    accept=".pdf,.doc,.docx"
+                                    onChange={(e) => setResumeFile(e.target.files[0])}
+                                />
+                            </div>
+                            <div className="mt-6 flex justify-end gap-3">
+                                <button
+                                    type="button"
+                                    className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md"
+                                    onClick={onClose}
+                                >
+                                    Hủy
+                                </button>
+                                <button
+                                    type="button"
+                                    disabled={loading}
+                                    className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 disabled:opacity-50"
+                                    onClick={handleSubmit}
+                                >
+                                    {loading ? "Đang gửi..." : "Gửi CV"}
+                                </button>
+                            </div>
+                        </Dialog.Panel>
+                    </div>
+                </div>
+            </Dialog>
+        </Transition>
+    );
+}
 export default function JobDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
     const [job, setJob] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [openApply, setOpenApply] = useState(false);
 
     useEffect(() => {
         fetch(`http://localhost:8080/api/job-posts/${id}`)
@@ -48,9 +165,7 @@ export default function JobDetail() {
     return (
         <div className="flex w-full justify-center py-8 bg-neutral-100 dark:bg-neutral-900 min-h-screen">
             <div className="flex w-full max-w-6xl gap-8">
-                {/* Main Content */}
                 <div className="flex-1 space-y-6">
-                    {/* Job Header Card */}
                     <div className="bg-white dark:bg-neutral-800 rounded-2xl shadow-lg px-10 py-8">
                         <div className="flex items-start justify-between">
                             <div>
@@ -82,9 +197,21 @@ export default function JobDetail() {
                             </button>
                         </div>
                         <div className="flex gap-3 mt-5">
-                            <button className="flex-1 bg-orange-500 hover:bg-orange-600 text-white rounded-lg py-3 font-semibold text-lg transition">
+                            <button
+                                className="flex-1 bg-orange-500 hover:bg-orange-600 text-white rounded-lg py-3 font-semibold text-lg transition"
+                                onClick={() => {
+                                    const token = localStorage.getItem("token");
+                                    if (!token) {
+                                        alert("Vui lòng đăng nhập trước khi ứng tuyển.");
+                                        navigate("/login");
+                                    } else {
+                                        setOpenApply(true);
+                                    }
+                                }}
+                            >
                                 Apply job
                             </button>
+
                             <button className="flex-1 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-neutral-700 text-gray-700 dark:text-white rounded-lg py-3 font-semibold text-lg flex items-center justify-center gap-2 transition">
                                 <i className="fa-regular fa-heart" /> Save this job
                             </button>
@@ -216,6 +343,12 @@ export default function JobDetail() {
                                     </a>
                                 </div>
                             )}
+                            {/* ApplyDialog integration */}
+                            <ApplyDialog
+                                isOpen={openApply}
+                                onClose={() => setOpenApply(false)}
+                                jobPostId={job.id}
+                            />
                         </div>
                     </div>
                 </div>

@@ -24,6 +24,7 @@ import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Set;
@@ -76,7 +77,7 @@ public class User implements Serializable {
     private String phone;
     @Column(name = "date_of_birth")
     @Temporal(TemporalType.DATE)
-    private Date dateOfBirth;
+    private LocalDate dateOfBirth;
     @Size(max = 6)
     @Column(name = "gender")
     private String gender;
@@ -176,11 +177,11 @@ public class User implements Serializable {
         this.phone = phone;
     }
 
-    public Date getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
@@ -352,5 +353,5 @@ public class User implements Serializable {
     public String toString() {
         return "com.soodthin.pojo.User[ id=" + id + " ]";
     }
-    
+
 }

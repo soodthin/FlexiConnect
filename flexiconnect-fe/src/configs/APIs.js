@@ -13,10 +13,12 @@ export const endpoints = {
     /* Candidate */
     'candidate-profile': "/users/candidate/profile",
     'update-profile': "/users/candidate/profile",
+    'candidate-avatar': "/users/candidate/profile/avatar",
     'education': "/candidate/education",
     'education-id': (id) => `/candidate/education/${id}`,
     'skills': "/candidate/skills",
     'workexperience': "/candidate/workexperience",
+    'apply-job': "/users/candidate/apply",
 
     /* Employer */
     'employer-profile': "/users/employer/profile",

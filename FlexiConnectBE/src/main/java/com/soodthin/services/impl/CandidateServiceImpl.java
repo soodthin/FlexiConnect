@@ -15,6 +15,7 @@ import com.soodthin.repositories.UserRepository;
 import com.soodthin.services.CandidateService;
 import jakarta.transaction.Transactional;
 import java.util.Map;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -35,23 +36,21 @@ public class CandidateServiceImpl implements CandidateService {
     private UserRepository userRepository;
     @Autowired
     private Cloudinary cloudinary;
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     public CandidateProfileResponse getProfile(User user) {
         Candidate candidate = candidateRepository.findByUserId(user)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy hồ sơ ứng viên!"));
 
-        CandidateProfileResponse response = new CandidateProfileResponse();
+        CandidateProfileResponse response = modelMapper.map(candidate, CandidateProfileResponse.class);
+
         response.setFullName(user.getFullName());
         response.setEmail(user.getEmail());
         response.setPhoneNumber(user.getPhone());
         response.setAddress(user.getAddress());
-        response.setAvatarUrl(user.getAvatar());
-
-        response.setTitle(candidate.getTitle());
-        response.setBio(candidate.getBio());
-        response.setBioAiSuggestion(candidate.getBioAiSuggestion());
-        response.setResumeFile(candidate.getResumeFile());
+        response.setAvatar(user.getAvatar());
 
         return response;
     }
@@ -61,11 +60,16 @@ public class CandidateServiceImpl implements CandidateService {
         Candidate candidate = candidateRepository.findByUserId(user)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy hồ sơ ứng viên!"));
 
-        candidate.setTitle(request.getTitle());
-        candidate.setBio(request.getBio());
-        candidate.setResumeFile(request.getResumeFile());
-
+        modelMapper.map(request, candidate);
         candidateRepository.save(candidate);
+
+        user.setFullName(request.getFullName());
+        user.setPhone(request.getPhoneNumber());
+        user.setAddress(request.getAddress());
+        user.setAvatar(request.getAvatar());
+        user.setDateOfBirth(request.getDateOfBirth());
+        user.setGender(request.getGender());
+        userRepository.save(user);
     }
 
     @Override
