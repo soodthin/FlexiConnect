@@ -14,6 +14,7 @@ export default function CandidateDashboard() {
     }
     return false;
   });
+
   const userMenuRef = useRef();
   const aiMenuRef = useRef();
   const navigate = useNavigate();
@@ -31,10 +32,18 @@ export default function CandidateDashboard() {
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const res = await authApis().get(endpoints["current-user"]);
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        const res = await authApis().get(endpoints["current-user"], {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setUser(res.data);
       } catch (err) {
-        console.error(err);      }
+        console.error("Failed to load user:", err);
+      }
     };
     loadUser();
   }, [navigate]);
@@ -54,7 +63,6 @@ export default function CandidateDashboard() {
 
   return (
     <div className="min-h-screen bg-[#f7f6f3] dark:bg-[#181818] px-6 py-6 font-inter text-[#222222] dark:text-[#f5efe6] transition-all">
-      {/* Main Content */}
       <main className="text-[#222222] dark:text-[#f5efe6] max-w-6xl mx-auto">
         {user?.role === "CANDIDATE" && (
           <div className="mb-10">
@@ -66,12 +74,9 @@ export default function CandidateDashboard() {
             </p>
           </div>
         )}
-
-        {/* Job Listing Section (public + candidate) */}
         <JobPostList />
       </main>
 
-      {/* Floating AI Assistant Button (chỉ cho candidate) */}
       {user?.role === "CANDIDATE" && (
         <div className="fixed bottom-8 right-8 z-50" ref={aiMenuRef}>
           <button

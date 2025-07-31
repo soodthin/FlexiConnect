@@ -4,7 +4,6 @@
  */
 package com.soodthin.dto.response;
 
-import com.soodthin.entity.Candidate;
 import java.time.LocalDateTime;
 
 /**
@@ -12,7 +11,8 @@ import java.time.LocalDateTime;
  * @author ADMIN
  */
 public class ApplicationResponseDTO {
-     private Integer id;
+
+    private Integer id;
     private Integer jobPostId;
     private String jobPostTitle;
     private Integer candidateId;
@@ -20,7 +20,10 @@ public class ApplicationResponseDTO {
     private String coverLetter;
     private String resumeFile;
     private String status;
+    private String rejectionReason;
     private LocalDateTime appliedAt;
+    
+     private String jobTitle;
 
     /**
      * @return the id
@@ -146,6 +149,34 @@ public class ApplicationResponseDTO {
      */
     public void setResumeFile(String resumeFile) {
         this.resumeFile = resumeFile;
+    }
+
+    /**
+     * @return the rejectionReason
+     */
+    public String getRejectionReason() {
+        return rejectionReason;
+    }
+
+    /**
+     * @param rejectionReason the rejectionReason to set
+     */
+    public void setRejectionReason(String rejectionReason) {
+        this.rejectionReason = rejectionReason;
+    }
+
+    /**
+     * @return the jobTitle
+     */
+    public String getJobTitle() {
+        return jobTitle;
+    }
+
+    /**
+     * @param jobTitle the jobTitle to set
+     */
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
     }
 
 }

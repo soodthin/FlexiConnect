@@ -4,28 +4,31 @@ import cookie from 'react-cookies'
 const BASE_URL = 'http://localhost:8080/api';
 
 export const endpoints = {
-    /* Auth */
-    'register': '/auth/register/candidate',
-    'register-employer': '/auth/register/employer',
-    'login': '/auth/login',
-    'current-user': '/auth/current-user',
+  /* Public*/
+  'register': '/auth/register/candidate',
+  'register-employer': '/auth/register/employer',
+  'login': '/auth/login',
+  'current-user': '/auth/current-user',
+  'jobpost-id': (id) => `/job-posts/${id}`,
 
-    /* Candidate */
-    'candidate-profile': "/users/candidate/profile",
-    'update-profile': "/users/candidate/profile",
-    'candidate-avatar': "/users/candidate/profile/avatar",
-    'education': "/candidate/education",
-    'education-id': (id) => `/candidate/education/${id}`,
-    'skills': "/candidate/skills",
-    'workexperience': "/candidate/workexperience",
-    'apply-job': "/users/candidate/apply",
+  /* Candidate */
+  'candidate-profile': "/users/candidate/profile",
+  'update-profile': "/users/candidate/profile",
+  'candidate-avatar': "/users/candidate/profile/avatar",
+  'education': "/candidate/education",
+  'education-id': (id) => `/candidate/education/${id}`,
+  'skills': "/candidate/skills",
+  'workexperience': "/candidate/workexperience",
+  'apply-job': "/users/candidate/apply",
 
-    /* Employer */
-    'employer-profile': "/users/employer/profile",
-    'employer-avatar': "/users/employer/profile/avatar",
-    'jobposts': "/users/employer/job-posts",
-    'jobpost': "/users/employer/job-post",
-    'jobpost-id': (id) => `/users/employer/job-post/${id}`,
+  /* Employer */
+  'employer-profile': "/users/employer/profile",
+  'employer-avatar': "/users/employer/profile/avatar",
+  'jobposts': "/users/employer/job-posts",
+  'jobpost': "/users/employer/job-post",
+  'employer-jobpost-id': (id) => `/users/employer/job-post/${id}`,
+  'applications': "/users/employer/applications",
+  'review-application': (applicationId) => `/users/employer/applications/${applicationId}/review`,
 
 }
 
@@ -49,5 +52,5 @@ export const authApis = () => {
 
 
 export default axios.create({
-    baseURL: BASE_URL
+  baseURL: BASE_URL
 });

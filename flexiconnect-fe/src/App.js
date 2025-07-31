@@ -18,6 +18,7 @@ import EmployerRegister from "./pages/Auth/EmployerRegister";
 
 import CandidateDashboard from "./pages/Candidate/CandidateDashboard";
 import CandidateProfile from "./pages/Candidate/CandidateProfile";
+import JobApplications from "./pages/Employer/JobApplications";
 
 
 import JobPostsManagement from "./pages/Employer/JobPostsManagement";
@@ -87,6 +88,14 @@ function App() {
                   </PrivateRoute>
                 }
               />
+              <Route
+                path="/employer-job-applications"
+                element={
+                  <PrivateRoute allowedRoles={["EMPLOYER"]}>
+                    <JobApplications />
+                  </PrivateRoute>
+                }
+                />
               <Route path="/unauthorized" element={<Unauthorized />} />
 
               <Route path="/job-posts/:id" element={<JobDetails />} />

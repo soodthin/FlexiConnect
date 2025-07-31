@@ -4,21 +4,24 @@
  */
 package com.soodthin.controllers;
 
+import com.soodthin.dto.request.ApplicationReviewRequest;
 import com.soodthin.dto.request.EmployerProfileRequest;
 import com.soodthin.dto.request.JobPostRequest;
+import com.soodthin.dto.response.ApplicationResponseDTO;
 import com.soodthin.dto.response.EmployerProfileResponse;
 import com.soodthin.dto.response.JobPostResponse;
 import com.soodthin.entity.JobPost;
 import com.soodthin.entity.User;
 import com.soodthin.repositories.UserRepository;
+import com.soodthin.services.ApplicationService;
 import com.soodthin.services.EmployerService;
 import com.soodthin.services.JobPostService;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,6 +40,9 @@ public class EmployerController {
     private UserRepository userRepository;
     @Autowired
     private JobPostService jobPostService;
+
+    @Autowired
+    private ApplicationService applicationService;
 
     @GetMapping("/profile")
     public ResponseEntity<EmployerProfileResponse> getProfile(Authentication authentication) {
@@ -108,6 +114,32 @@ public class EmployerController {
         User user = userRepository.findByEmail(email).orElseThrow();
         jobPostService.deleteJobPost(user, id);
         return ResponseEntity.ok("Xóa bài tuyển dụng thành công!");
+    }
+
+    @GetMapping("/applications")
+    public ResponseEntity<List<ApplicationResponseDTO>> getAllApplicationsByEmployer(
+            Authentication authentication
+    ) {
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<ApplicationResponseDTO> responses = applicationService.getAllApplicationsByEmployer(user);
+        return ResponseEntity.ok(responses);
+    }
+
+    @PutMapping("/applications/{applicationId}/review")
+    public ResponseEntity<ApplicationResponseDTO> reviewApplication(
+            @PathVariable Integer applicationId,
+            @RequestBody ApplicationReviewRequest request,
+            Authentication authentication
+    ) {
+        String email = authentication.getName();
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        ApplicationResponseDTO response = applicationService.reviewApplication(applicationId, request, currentUser);
+        return ResponseEntity.ok(response);
     }
 
 }

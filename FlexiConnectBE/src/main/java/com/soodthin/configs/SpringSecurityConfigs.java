@@ -51,7 +51,8 @@ public class SpringSecurityConfigs {
                 .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/job-posts/**").permitAll()
-                .requestMatchers("/api/users/candidate/**").permitAll()
+                .requestMatchers("/api/users/candidate/**").hasRole("CANDIDATE")
+                .requestMatchers("/api/users/employer/**").hasRole("EMPLOYER")
                 .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex.authenticationEntryPoint((req, res, authEx) -> {

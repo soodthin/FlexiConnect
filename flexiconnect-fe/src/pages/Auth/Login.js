@@ -34,17 +34,15 @@ export default function Login() {
       const { token, role } = res.data;
 
       cookie.save("token", token);
+      localStorage.setItem("token", token);
 
-      // Sau khi có token, gọi API lấy thông tin user chi tiết
+
       const userInfoRes = await Apis.get(endpoints["current-user"], {
         headers: { Authorization: `Bearer ${token}` },
       });
       const userInfo = userInfoRes.data;
 
-      // Lưu user vào cookie nếu cần (tuỳ app), chủ yếu là dispatch context
-      // cookie.save("user", JSON.stringify(userInfo));
 
-      // Đưa user vào context để Header hiện ngay tên user
       dispatch({ type: "login", payload: userInfo });
 
       setMsg("✅ Đăng nhập thành công!");

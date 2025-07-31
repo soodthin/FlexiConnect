@@ -138,8 +138,9 @@ export default function Header() {
                   {/* ROLE_EMPLOYER */}
                   {user.role === "EMPLOYER" && (
                     <>
-                      <li onClick={() => navigate("/employer-jobposts-management")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Quản lý tuyển dụng</li>
-                      <li onClick={() => navigate("/employer-profile")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Hồ sơ công ty</li>
+                    <li onClick={() => navigate("/employer-profile")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Hồ sơ công ty</li>
+                      <li onClick={() => navigate("/employer-jobposts-management")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Quản lý tin tuyển dụng</li>
+                      <li onClick={() => navigate("/employer-job-applications")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Ứng viên đã ứng tuyển</li>
                     </>
                   )}
 

@@ -7,6 +7,7 @@ package com.soodthin.repositories;
 import com.soodthin.entity.Application;
 import com.soodthin.entity.Candidate;
 import com.soodthin.entity.JobPost;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
@@ -16,5 +17,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ApplicationRepository extends JpaRepository<Application, Integer> {
 
     boolean existsByCandidateAndJobPost(Candidate candidate, JobPost jobPost);
+
+    List<Application> findByJobPost_Id(Integer jobPostId);
+
+    List<Application> findByJobPostIn(List<JobPost> jobPosts);
 
 }

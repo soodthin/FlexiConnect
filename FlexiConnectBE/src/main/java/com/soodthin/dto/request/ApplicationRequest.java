@@ -8,7 +8,7 @@ package com.soodthin.dto.request;
  *
  * @author ADMIN
  */
-public class ApplicationRequestDTO {
+public class ApplicationRequest {
 
     private Integer jobPostId;
     private String coverLetter;

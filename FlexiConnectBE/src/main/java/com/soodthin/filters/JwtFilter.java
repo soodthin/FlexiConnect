@@ -36,7 +36,6 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-
         String header = request.getHeader("Authorization");
         if (header == null || !header.startsWith("Bearer ")) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Thiếu hoặc sai token.");

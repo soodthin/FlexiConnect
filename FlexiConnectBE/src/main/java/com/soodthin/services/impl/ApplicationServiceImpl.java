@@ -6,22 +6,21 @@ package com.soodthin.services.impl;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.soodthin.dto.request.ApplicationReviewRequest;
 import com.soodthin.dto.response.ApplicationResponseDTO;
-
-/**
- *
- * @author ADMIN
- */
 import com.soodthin.entity.Application;
 import com.soodthin.entity.Candidate;
+import com.soodthin.entity.Employer;
 import com.soodthin.entity.JobPost;
 import com.soodthin.entity.User;
 import com.soodthin.repositories.ApplicationRepository;
 import com.soodthin.repositories.CandidateRepository;
+import com.soodthin.repositories.EmployerRepository;
 import com.soodthin.repositories.JobPostRepository;
 import com.soodthin.services.ApplicationService;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +43,8 @@ public class ApplicationServiceImpl implements ApplicationService {
     private Cloudinary cloudinary;
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private EmployerRepository employerRepository;
 
     @Override
     public ApplicationResponseDTO applyToJob(Integer jobPostId, MultipartFile cvFile, User user) {
@@ -77,14 +78,59 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         application = applicationRepository.save(application);
 
-        ApplicationResponseDTO responseDTO = modelMapper.map(application, ApplicationResponseDTO.class);
-responseDTO.setCandidateId(application.getCandidateId().getId());
-        responseDTO.setCandidateName(user.getFullName());
-        responseDTO.setJobPostId(jobPost.getId());
-        responseDTO.setJobPostTitle(jobPost.getTitle());
-        responseDTO.setStatus(application.getStatus());
+        return mapToResponseDTO(application);
+    }
+    
+     @Override
+    public List<ApplicationResponseDTO> getAllApplicationsByEmployer(User user) {
+        Employer employer = employerRepository.findByUserId(user)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy employer"));
 
-        return responseDTO;
+        List<JobPost> jobPosts = jobPostRepository.findByEmployer(employer);
+
+        if (jobPosts.isEmpty()) {
+            return List.of();
+        }
+
+        List<Application> applications = applicationRepository.findByJobPostIn(jobPosts);
+
+        return applications.stream()
+                .map(this::mapToResponseDTO)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    @Override
+    public ApplicationResponseDTO reviewApplication(Integer applicationId, ApplicationReviewRequest request, User currentUser) {
+        Application application = applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Hồ sơ không tồn tại."));
+
+        // Kiểm tra xem employer có sở hữu job này không
+        Integer employerUserId = application.getJobPostId().getEmployerId().getUserId().getId();
+        if (!employerUserId.equals(currentUser.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền duyệt hồ sơ này.");
+        }
+
+        String newStatus = request.getStatus().toUpperCase();
+        if (!newStatus.equals("ACCEPTED") && !newStatus.equals("REJECTED")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Trạng thái không hợp lệ.");
+        }
+
+        application.setStatus(newStatus);
+        application.setRejectionReason("REJECTED".equals(newStatus) ? request.getReason() : null);
+        applicationRepository.save(application);
+
+        return mapToResponseDTO(application);
+    }
+
+   
+
+    private ApplicationResponseDTO mapToResponseDTO(Application application) {
+        ApplicationResponseDTO dto = modelMapper.map(application, ApplicationResponseDTO.class);
+        dto.setCandidateId(application.getCandidateId().getId());
+        dto.setCandidateName(application.getCandidateId().getUserId().getFullName());
+        dto.setJobPostId(application.getJobPostId().getId());
+        dto.setJobPostTitle(application.getJobPostId().getTitle());
+        dto.setStatus(application.getStatus());
+        return dto;
     }
 }
-
