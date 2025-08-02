@@ -5,6 +5,7 @@
 package com.soodthin.services.impl;
 
 import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
 import com.soodthin.dto.request.ApplicationReviewRequest;
 import com.soodthin.dto.response.ApplicationResponseDTO;
@@ -18,6 +19,7 @@ import com.soodthin.repositories.CandidateRepository;
 import com.soodthin.repositories.EmployerRepository;
 import com.soodthin.repositories.JobPostRepository;
 import com.soodthin.services.ApplicationService;
+import java.util.UUID;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,6 +28,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -80,8 +83,8 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         return mapToResponseDTO(application);
     }
-    
-     @Override
+
+    @Override
     public List<ApplicationResponseDTO> getAllApplicationsByEmployer(User user) {
         Employer employer = employerRepository.findByUserId(user)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy employer"));
@@ -120,12 +123,12 @@ public class ApplicationServiceImpl implements ApplicationService {
         applicationRepository.save(application);
 
         return mapToResponseDTO(application);
+
     }
 
-   
-
     private ApplicationResponseDTO mapToResponseDTO(Application application) {
-        ApplicationResponseDTO dto = modelMapper.map(application, ApplicationResponseDTO.class);
+        ApplicationResponseDTO dto = modelMapper.map(application, ApplicationResponseDTO.class
+        );
         dto.setCandidateId(application.getCandidateId().getId());
         dto.setCandidateName(application.getCandidateId().getUserId().getFullName());
         dto.setJobPostId(application.getJobPostId().getId());

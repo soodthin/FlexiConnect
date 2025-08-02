@@ -48,6 +48,8 @@ public class Application implements Serializable {
     @Size(max = 255)
     @Column(name = "resume_file")
     private String resumeFile;
+    @Column(name = "download_url")
+    private String downloadUrl;
     @Column(name = "applied_at")
     private LocalDateTime appliedAt;
     @Size(max = 8)
@@ -174,6 +176,20 @@ public class Application implements Serializable {
      */
     public void setResumeFile(String resumeFile) {
         this.resumeFile = resumeFile;
+    }
+
+    /**
+     * @return the downloadUrl
+     */
+    public String getDownloadUrl() {
+        return downloadUrl;
+    }
+
+    /**
+     * @param downloadUrl the downloadUrl to set
+     */
+    public void setDownloadUrl(String downloadUrl) {
+        this.downloadUrl = downloadUrl;
     }
 
 }

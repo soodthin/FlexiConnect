@@ -19,11 +19,12 @@ public class ApplicationResponseDTO {
     private String candidateName;
     private String coverLetter;
     private String resumeFile;
+    private String downloadUrl;
     private String status;
     private String rejectionReason;
     private LocalDateTime appliedAt;
-    
-     private String jobTitle;
+
+    private String jobTitle;
 
     /**
      * @return the id
@@ -177,6 +178,20 @@ public class ApplicationResponseDTO {
      */
     public void setJobTitle(String jobTitle) {
         this.jobTitle = jobTitle;
+    }
+
+    /**
+     * @return the downloadUrl
+     */
+    public String getDownloadUrl() {
+        return downloadUrl;
+    }
+
+    /**
+     * @param downloadUrl the downloadUrl to set
+     */
+    public void setDownloadUrl(String downloadUrl) {
+        this.downloadUrl = downloadUrl;
     }
 
 }
