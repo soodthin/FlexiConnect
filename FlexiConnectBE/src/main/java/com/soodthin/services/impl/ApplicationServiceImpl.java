@@ -51,6 +51,10 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public ApplicationResponseDTO applyToJob(Integer jobPostId, MultipartFile cvFile, User user) {
+        System.out.println("Tên file: " + cvFile.getOriginalFilename());
+        System.out.println("Kích thước: " + cvFile.getSize() + " bytes");
+        System.out.println("Loại: " + cvFile.getContentType());
+
         Candidate candidate = candidateRepository.findByUserId(user)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bạn không phải là ứng viên."));
 
@@ -63,10 +67,17 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         String resumeFile;
         try {
+            String safeFilename = UUID.randomUUID().toString();
+
             Map uploadResult = cloudinary.uploader().upload(cvFile.getBytes(), ObjectUtils.asMap(
                     "resource_type", "auto",
-                    "folder", "cv_applications"
+                    "folder", "cv_applications",
+                    "public_id", safeFilename,
+                    "type", "upload" // Đảm bảo file là public
             ));
+
+            System.out.println("Cloudinary upload result: " + uploadResult);
+
             resumeFile = uploadResult.get("secure_url").toString();
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Không thể upload CV.");
@@ -133,6 +144,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         dto.setCandidateName(application.getCandidateId().getUserId().getFullName());
         dto.setJobPostId(application.getJobPostId().getId());
         dto.setJobPostTitle(application.getJobPostId().getTitle());
+        dto.setDownloadUrl(application.getResumeFile() + "?fl_attachment=true");
         dto.setStatus(application.getStatus());
         return dto;
     }

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import ApplicationsList from '@applicationForms/ApplicationsList';
-import ReviewApplicationModal from '@applicationForms/ReviewApplicationModal';
 import { authApis, endpoints } from '@configs/APIs';
 
 
@@ -17,17 +16,6 @@ const JobApplicationsPage = () => {
       .catch((e) => console.error(e));
   }, []);
 
-  const handleReviewSubmit = async (id, data) => {
-    try {
-      const res = await authApis().put(endpoints['review-application'](id), data);
-      setApplications((prev) =>
-        prev.map((app) => (app.id === id ? res.data : app))
-      );
-      setSelectedApp(null);
-    } catch (e) {
-      alert('Xét duyệt lỗi');
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-8 sm:px-6 lg:px-12">
@@ -48,13 +36,7 @@ const JobApplicationsPage = () => {
         </div>
       </div>
 
-      {selectedApp && (
-        <ReviewApplicationModal
-          application={selectedApp}
-          onClose={() => setSelectedApp(null)}
-          onSubmit={handleReviewSubmit}
-        />
-      )}
+      
     </div>
   );
 };
