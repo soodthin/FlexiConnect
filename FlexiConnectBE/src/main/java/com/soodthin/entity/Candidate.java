@@ -36,12 +36,6 @@ import java.util.Set;
     @NamedQuery(name = "Candidate.findByResumeFile", query = "SELECT c FROM Candidate c WHERE c.resumeFile = :resumeFile")})
 public class Candidate implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Integer id;
     @Size(max = 150)
     @Column(name = "title")
     private String title;
@@ -60,6 +54,15 @@ public class Candidate implements Serializable {
     @Size(max = 65535)
     @Column(name = "profile_vector")
     private String profileVector;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "candidateId")
+    private Set<CvSuggestion> cvSuggestionsSet;
+
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Integer id;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "candidate")
     private Set<FollowEmployer> followEmployerSet;
     @OneToMany(mappedBy = "candidateId")
@@ -76,7 +79,7 @@ public class Candidate implements Serializable {
     @OneToMany(mappedBy = "candidate")
     @JsonIgnore
     private Set<Application> applicationSet;
-    @OneToMany(mappedBy = "candidateId")
+    @OneToMany(mappedBy = "candidate")
     private Set<WorkExperience> workExperienceSet;
 
     public Candidate() {
@@ -92,30 +95,6 @@ public class Candidate implements Serializable {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getBio() {
-        return bio;
-    }
-
-    public void setBio(String bio) {
-        this.bio = bio;
-    }
-
-    public String getBioAiSuggestion() {
-        return bioAiSuggestion;
-    }
-
-    public void setBioAiSuggestion(String bioAiSuggestion) {
-        this.bioAiSuggestion = bioAiSuggestion;
     }
 
     public String getResumeFile() {
@@ -222,5 +201,37 @@ public class Candidate implements Serializable {
     public String toString() {
         return "com.soodthin.pojo.Candidate[ id=" + id + " ]";
     }
-    
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
+    public String getBioAiSuggestion() {
+        return bioAiSuggestion;
+    }
+
+    public void setBioAiSuggestion(String bioAiSuggestion) {
+        this.bioAiSuggestion = bioAiSuggestion;
+    }
+
+    public Set<CvSuggestion> getCvSuggestionsSet() {
+        return cvSuggestionsSet;
+    }
+
+    public void setCvSuggestionsSet(Set<CvSuggestion> cvSuggestionsSet) {
+        this.cvSuggestionsSet = cvSuggestionsSet;
+    }
+
 }

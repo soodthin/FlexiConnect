@@ -48,6 +48,7 @@
     <class>com.soodthin.configs.User</class>
     <class>com.soodthin.configs.PaymentTransaction</class>
     <class>com.soodthin.configs.Notification</class>
+    <class>com.soodthin.entity.CvSuggestion</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/flexiconnectdb?zeroDateTimeBehavior=CONVERT_TO_NULL"/>
       <property name="javax.persistence.jdbc.user" value="root"/>

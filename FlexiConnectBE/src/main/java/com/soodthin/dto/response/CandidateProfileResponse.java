@@ -21,7 +21,6 @@ public class CandidateProfileResponse {
    
     private String title;
     private String bio;
-    private String bioAiSuggestion;
     private String resumeFile;
 
     /**
@@ -121,21 +120,7 @@ public class CandidateProfileResponse {
     public void setBio(String bio) {
         this.bio = bio;
     }
-
-    /**
-     * @return the bioAiSuggestion
-     */
-    public String getBioAiSuggestion() {
-        return bioAiSuggestion;
-    }
-
-    /**
-     * @param bioAiSuggestion the bioAiSuggestion to set
-     */
-    public void setBioAiSuggestion(String bioAiSuggestion) {
-        this.bioAiSuggestion = bioAiSuggestion;
-    }
-
+    
     /**
      * @return the resumeFile
      */

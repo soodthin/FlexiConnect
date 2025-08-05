@@ -42,7 +42,7 @@ public class WorkExperienceServiceImpl implements WorkExperienceService {
     public WorkExperience save(User user, WorkExperience workExp) {
         Candidate candidate = candidateRepository.findByUserId(user)
                 .orElseThrow(() -> new IllegalArgumentException("Candidate not found"));
-        workExp.setCandidateId(candidate);
+        workExp.setCandidate(candidate);
         return workExperienceRepository.save(workExp);
     }
 
@@ -54,7 +54,7 @@ public class WorkExperienceServiceImpl implements WorkExperienceService {
         WorkExperience existing = workExperienceRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Work experience not found"));
 
-        if (!existing.getCandidateId().getId().equals(candidate.getId())) {
+        if (!existing.getCandidate().getId().equals(candidate.getId())) {
             throw new IllegalArgumentException("Access denied");
         }
 
@@ -63,7 +63,6 @@ public class WorkExperienceServiceImpl implements WorkExperienceService {
         existing.setStartDate(workExp.getStartDate());
         existing.setEndDate(workExp.getEndDate());
         existing.setDescription(workExp.getDescription());
-        existing.setDescriptionAiSuggestion(workExp.getDescriptionAiSuggestion());
 
         return workExperienceRepository.save(existing);
     }
@@ -76,7 +75,7 @@ public class WorkExperienceServiceImpl implements WorkExperienceService {
         WorkExperience existing = workExperienceRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Work experience not found"));
 
-        if (!existing.getCandidateId().getId().equals(candidate.getId())) {
+        if (!existing.getCandidate().getId().equals(candidate.getId())) {
             throw new IllegalArgumentException("Access denied");
         }
 

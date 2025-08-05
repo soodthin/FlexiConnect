@@ -7,7 +7,6 @@ package com.soodthin.repositories;
 import com.soodthin.entity.Candidate;
 import com.soodthin.entity.CandidateSkill;
 import com.soodthin.entity.Skill;
-import com.soodthin.entity.User;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,5 +19,7 @@ public interface CandidateSkillRepository extends JpaRepository<CandidateSkill, 
     List<CandidateSkill> findByCandidate(Candidate candidate);
 Optional<CandidateSkill> findById(Long id);
 long countBySkillId(Skill skillId);
+    void deleteByCandidate(Candidate candidate);
+
 
 }
