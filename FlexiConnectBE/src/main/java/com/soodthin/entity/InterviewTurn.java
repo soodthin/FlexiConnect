@@ -20,19 +20,25 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
+
 
 /**
  *
  * @author ADMIN
  */
+
 @Entity
 @Table(name = "interview_turn")
 @NamedQueries({
     @NamedQuery(name = "InterviewTurn.findAll", query = "SELECT i FROM InterviewTurn i"),
     @NamedQuery(name = "InterviewTurn.findById", query = "SELECT i FROM InterviewTurn i WHERE i.id = :id"),
     @NamedQuery(name = "InterviewTurn.findByTurnOrder", query = "SELECT i FROM InterviewTurn i WHERE i.turnOrder = :turnOrder"),
-    @NamedQuery(name = "InterviewTurn.findByCreatedAt", query = "SELECT i FROM InterviewTurn i WHERE i.createdAt = :createdAt")})
+    @NamedQuery(name = "InterviewTurn.findByCreatedAt", query = "SELECT i FROM InterviewTurn i WHERE i.createdAt = :createdAt"),
+    @NamedQuery(name = "InterviewTurn.findByAnswerStatus", query = "SELECT i FROM InterviewTurn i WHERE i.answerStatus = :answerStatus"),
+    @NamedQuery(name = "InterviewTurn.findByQuestionType", query = "SELECT i FROM InterviewTurn i WHERE i.questionType = :questionType"),
+    @NamedQuery(name = "InterviewTurn.findByManualScore", query = "SELECT i FROM InterviewTurn i WHERE i.manualScore = :manualScore"),
+    @NamedQuery(name = "InterviewTurn.findByAnswerTimeSeconds", query = "SELECT i FROM InterviewTurn i WHERE i.answerTimeSeconds = :answerTimeSeconds")})
 public class InterviewTurn implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -55,12 +61,28 @@ public class InterviewTurn implements Serializable {
     private String aiFeedback;
     @Column(name = "turn_order")
     private Integer turnOrder;
+    @Column(name = "ai_score")
+    private Integer aiScore;
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
+    private LocalDateTime createdAt;
+    @Size(max = 8)
+    @Column(name = "answer_status")
+    private String answerStatus;
+    @Size(max = 10)
+    @Column(name = "question_type")
+    private String questionType;
+    @Column(name = "manual_score")
+    private Integer manualScore;
+    @Lob
+    @Size(max = 65535)
+    @Column(name = "manual_feedback")
+    private String manualFeedback;
+    @Column(name = "answer_time_seconds")
+    private Integer answerTimeSeconds;
     @JoinColumn(name = "session_id", referencedColumnName = "id")
     @ManyToOne
-    private InterviewSession sessionId;
+    private InterviewSession session;
 
     public InterviewTurn() {
     }
@@ -109,20 +131,60 @@ public class InterviewTurn implements Serializable {
         this.turnOrder = turnOrder;
     }
 
-    public Date getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
+    public String getAnswerStatus() {
+        return answerStatus;
+    }
+
+    public void setAnswerStatus(String answerStatus) {
+        this.answerStatus = answerStatus;
+    }
+
+    public String getQuestionType() {
+        return questionType;
+    }
+
+    public void setQuestionType(String questionType) {
+        this.questionType = questionType;
+    }
+
+    public Integer getManualScore() {
+        return manualScore;
+    }
+
+    public void setManualScore(Integer manualScore) {
+        this.manualScore = manualScore;
+    }
+
+    public String getManualFeedback() {
+        return manualFeedback;
+    }
+
+    public void setManualFeedback(String manualFeedback) {
+        this.manualFeedback = manualFeedback;
+    }
+
+    public Integer getAnswerTimeSeconds() {
+        return answerTimeSeconds;
+    }
+
+    public void setAnswerTimeSeconds(Integer answerTimeSeconds) {
+        this.answerTimeSeconds = answerTimeSeconds;
+    }
+
     public InterviewSession getSessionId() {
-        return sessionId;
+        return session;
     }
 
     public void setSessionId(InterviewSession sessionId) {
-        this.sessionId = sessionId;
+        this.session = sessionId;
     }
 
     @Override
@@ -147,7 +209,21 @@ public class InterviewTurn implements Serializable {
 
     @Override
     public String toString() {
-        return "com.soodthin.pojo.InterviewTurn[ id=" + id + " ]";
+        return "com.soodthin.entity.InterviewTurn[ id=" + id + " ]";
+    }
+
+    /**
+     * @return the aiScore
+     */
+    public Integer getAiScore() {
+        return aiScore;
+    }
+
+    /**
+     * @param aiScore the aiScore to set
+     */
+    public void setAiScore(Integer aiScore) {
+        this.aiScore = aiScore;
     }
     
 }

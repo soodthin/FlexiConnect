@@ -9,7 +9,8 @@ import JobPostList from '@public/JobPostList';
 
     useEffect(() => {
       if (user) {
-        if (user.role === "CANDIDATE") navigate("/candidate-dashboard");
+        if( user.role === "ADMIN") navigate("/admin-dashboard");
+        else if (user.role === "CANDIDATE") navigate("/candidate-dashboard");
         else if (user.role === "EMPLOYER") navigate("/employer-dashboard");
       }
       else navigate("/");

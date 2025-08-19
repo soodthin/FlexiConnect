@@ -15,8 +15,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author ADMIN
  */
 public interface WorkExperienceRepository extends JpaRepository<WorkExperience, Integer> {
-    List<WorkExperience> findByCandidateId(Candidate candidate);
+
+    List<WorkExperience> findByCandidate(Candidate candidate);
+
     Optional<WorkExperience> findById(Integer id);
-        void deleteByCandidate(Candidate candidate);
+
+    void deleteByCandidate(Candidate candidate);
 
 }

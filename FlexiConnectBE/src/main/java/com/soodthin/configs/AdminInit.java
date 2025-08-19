@@ -8,11 +8,10 @@ import com.soodthin.entity.Role;
 import com.soodthin.entity.User;
 import com.soodthin.repositories.RoleRepository;
 import com.soodthin.repositories.UserRepository;
-import com.soodthin.services.UserService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
+import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
@@ -25,13 +24,13 @@ import java.util.Set;
 public class AdminInit {
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private RoleRepository roleRepository;
 
     @Autowired
     private UserRepository userRepository;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @PostConstruct
     public void initAdminAccount() {
@@ -40,8 +39,8 @@ public class AdminInit {
             User admin = new User();
             admin.setEmail("admin@example.com");
             admin.setFullName("Administrator");
-            admin.setPassword("admin123"); 
-            admin.setStatus("ACTIVE");
+            admin.setPassword(passwordEncoder.encode("Admin123"));
+            admin.setStatus(User.UserStatus.ACTIVE);
             admin.setCreatedAt(LocalDateTime.now());
 
             Role adminRole = roleRepository.findByRoleName("ADMIN")

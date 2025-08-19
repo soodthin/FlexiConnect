@@ -6,6 +6,7 @@ package com.soodthin.services.impl;
 
 import com.soodthin.dto.request.CvSuggestionRequest;
 import com.soodthin.dto.request.CvSuggestionSubmitRequest;
+import com.soodthin.dto.response.CvSuggestionResponse;
 import com.soodthin.entity.Candidate;
 import com.soodthin.entity.CandidateSkill;
 import com.soodthin.entity.CvSuggestion;
@@ -28,6 +29,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -54,16 +56,24 @@ public class CvSuggestionServiceImpl implements CvSuggestionService {
         Candidate candidate = candidateRepo.findById(candidateId)
                 .orElseThrow(() -> new EntityNotFoundException("Candidate not found"));
 
-        String suggestion = aiService.getSuggestionFromAI(
-                request.getOriginalInput(),
-                request.getSection().name()
-        );
+        CvSuggestionResponse aiResult = aiService.getSuggestionFromAI(request.getOriginalInput());
+
+        String suggestion = aiResult.getSuggestion();
+        String sectionStr = aiResult.getSection();
+        System.out.println("AI Suggestion: " + suggestion);
+        System.out.println("Section: " + sectionStr);
+        CvSuggestion.SectionType section;
+        try {
+            section = CvSuggestion.SectionType.valueOf(sectionStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid section returned from AI: " + sectionStr);
+        }
 
         CvSuggestion suggestionEntity = new CvSuggestion();
         suggestionEntity.setCandidateId(candidate);
         suggestionEntity.setOriginalInput(request.getOriginalInput());
         suggestionEntity.setAiSuggestion(suggestion);
-        suggestionEntity.setSection(request.getSection());
+        suggestionEntity.setSection(section);
         suggestionEntity.setStatus(CvSuggestion.SuggestionStatus.SUGGESTED);
         suggestionEntity.setCreatedAt(LocalDateTime.now());
         suggestionEntity.setUpdatedAt(LocalDateTime.now());
@@ -91,13 +101,13 @@ public class CvSuggestionServiceImpl implements CvSuggestionService {
 
             case SKILLS:
                 List<CandidateSkill> skills = parseSkills(candidate, request.getEditedVersion());
-                candSkillRepo.deleteByCandidate(candidate); 
+                candSkillRepo.deleteByCandidate(candidate);
                 candSkillRepo.saveAll(skills);
                 break;
 
             case EXPERIENCE:
                 List<WorkExperience> experiences = parseExperience(candidate, request.getEditedVersion());
-                workExpRepo.deleteByCandidate(candidate); 
+                workExpRepo.deleteByCandidate(candidate);
                 workExpRepo.saveAll(experiences);
                 break;
 

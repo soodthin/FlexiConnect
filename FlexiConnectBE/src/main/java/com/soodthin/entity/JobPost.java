@@ -4,10 +4,13 @@
  */
 package com.soodthin.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -47,12 +50,11 @@ import java.util.Set;
     @NamedQuery(name = "JobPost.findByViewCount", query = "SELECT j FROM JobPost j WHERE j.viewCount = :viewCount")})
 public class JobPost implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Integer id;
+    public enum JobStatus {
+        OPEN,
+        CLOSED,
+        HIDDEN,
+    }
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 150)
@@ -67,33 +69,41 @@ public class JobPost implements Serializable {
     @Size(max = 150)
     @Column(name = "location")
     private String location;
+    @Size(max = 100)
+    @Column(name = "job_type")
+    private String jobType;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+    @Column(name = "expired_at")
+    private LocalDateTime expiredAt;
+    @Enumerated(EnumType.STRING) 
+    @Column(name = "status", nullable = false)
+    private JobStatus status;
+    @Lob
+    @Size(max = 65535)
+    @Column(name = "job_vector")
+    private String jobVector;
+
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Integer id;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "salary_min")
     private BigDecimal salaryMin;
     @Column(name = "salary_max")
     private BigDecimal salaryMax;
-    @Size(max = 100)
-    @Column(name = "job_type")
-    private String jobType;
-    @Column(name = "created_at")
-    private LocalDateTime  createdAt;
-    @Column(name = "expired_at")
-    private LocalDateTime  expiredAt;
-    @Size(max = 6)
-    @Column(name = "status")
-    private String status;
     @Column(name = "view_count")
     private Integer viewCount;
-    @Lob
-    @Size(max = 65535)
-    @Column(name = "job_vector")
-    private String jobVector;
     @JoinTable(name = "job_post_skill", joinColumns = {
         @JoinColumn(name = "job_post_id", referencedColumnName = "id")}, inverseJoinColumns = {
         @JoinColumn(name = "skill_id", referencedColumnName = "id")})
     @ManyToMany
     private Set<Skill> skillSet;
-    @OneToMany(mappedBy = "jobPostId")
+    @OneToMany(mappedBy = "jobPost")
+    @JsonIgnore
     private Set<InterviewSession> interviewSessionSet;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "jobPost")
     private Set<SavedJob> savedJobSet;
@@ -124,30 +134,6 @@ public class JobPost implements Serializable {
         this.id = id;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
     public BigDecimal getSalaryMin() {
         return salaryMin;
     }
@@ -172,28 +158,20 @@ public class JobPost implements Serializable {
         this.jobType = jobType;
     }
 
-    public LocalDateTime  getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime  createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime  getExpiredAt() {
+    public LocalDateTime getExpiredAt() {
         return expiredAt;
     }
 
-    public void setExpiredAt(LocalDateTime  expiredAt) {
+    public void setExpiredAt(LocalDateTime expiredAt) {
         this.expiredAt = expiredAt;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public Integer getViewCount() {
@@ -276,5 +254,37 @@ public class JobPost implements Serializable {
     public String toString() {
         return "com.soodthin.pojo.JobPost[ id=" + id + " ]";
     }
-    
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public JobStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(JobStatus status) {
+        this.status = status;
+    }
+
 }

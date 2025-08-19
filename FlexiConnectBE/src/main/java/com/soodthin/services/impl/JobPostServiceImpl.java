@@ -37,7 +37,17 @@ public class JobPostServiceImpl implements JobPostService {
         JobPost jobPost = modelMapper.map(request, JobPost.class);
         jobPost.setEmployerId(employer);
         jobPost.setViewCount(0);
-        jobPost.setStatus((request.getStatus() == null || request.getStatus().isBlank()) ? "OPEN" : request.getStatus());
+
+        // Xử lý enum JobStatus
+        if (request.getStatus() == null || request.getStatus().isBlank()) {
+            jobPost.setStatus(JobPost.JobStatus.OPEN);
+        } else {
+            try {
+                jobPost.setStatus(JobPost.JobStatus.valueOf(request.getStatus().toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException("Invalid job status: " + request.getStatus());
+            }
+        }
 
         return jobPostRepository.save(jobPost);
     }
@@ -67,7 +77,17 @@ public class JobPostServiceImpl implements JobPostService {
         int currentViewCount = jobPost.getViewCount() == null ? 0 : jobPost.getViewCount();
         modelMapper.map(request, jobPost);
         jobPost.setViewCount(currentViewCount);
-        jobPost.setStatus((request.getStatus() == null || request.getStatus().isBlank()) ? "OPEN" : request.getStatus());
+
+        // Xử lý enum JobStatus
+        if (request.getStatus() == null || request.getStatus().isBlank()) {
+            jobPost.setStatus(JobPost.JobStatus.OPEN);
+        } else {
+            try {
+                jobPost.setStatus(JobPost.JobStatus.valueOf(request.getStatus().toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException("Invalid job status: " + request.getStatus());
+            }
+        }
 
         return jobPostRepository.save(jobPost);
     }
@@ -88,15 +108,16 @@ public class JobPostServiceImpl implements JobPostService {
     }
 
     @Override
-    public List<JobPostResponse> getAllPublicJobPosts() {
-        return jobPostRepository.findByStatus("OPEN").stream()
-                .map(job -> {
-                    JobPostResponse dto = mapToResponse(job);
-                    dto.setDescription(truncate(job.getDescription(), 200));
-                    return dto;
-                })
-                .collect(Collectors.toList());
-    }
+public List<JobPostResponse> getAllPublicJobPosts() {
+    return jobPostRepository.findByStatus(JobPost.JobStatus.OPEN).stream()
+            .map(job -> {
+                JobPostResponse dto = mapToResponse(job);
+                dto.setDescription(truncate(job.getDescription(), 200));
+                return dto;
+            })
+            .collect(Collectors.toList());
+}
+
 
     @Override
     public JobPostResponse viewJobPost(Integer id) {
@@ -117,7 +138,7 @@ public class JobPostServiceImpl implements JobPostService {
             dto.setCompanyName(
                     employer.getCompanyName() != null ? employer.getCompanyName() : "Không rõ công ty"
             );
-            
+
             dto.setWebsite(employer.getWebsite());
             dto.setCompanyAddress(employer.getCompanyAddress());
 

@@ -15,17 +15,21 @@ public class WorkExperienceResponse {
     private String company;
     private String position;
     private String description;
+    private String  descriptionAiSuggestion;
     private LocalDate startDate;
     private LocalDate endDate;
 
-    public WorkExperienceResponse(int id, String company, String position, String description, LocalDate startDate, LocalDate endDate) {
+    public WorkExperienceResponse(int id, String company, String position, String description, String descriptionAiSuggestion, LocalDate startDate, LocalDate endDate) {
         this.id = id;
         this.company = company;
         this.position = position;
         this.description = description;
+        this.descriptionAiSuggestion = descriptionAiSuggestion;
         this.startDate = startDate;
         this.endDate = endDate;
     }
+
+    
 
     /**
      * @return the id
@@ -109,5 +113,19 @@ public class WorkExperienceResponse {
      */
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    /**
+     * @return the descriptionAiSuggestion
+     */
+    public String getDescriptionAiSuggestion() {
+        return descriptionAiSuggestion;
+    }
+
+    /**
+     * @param descriptionAiSuggestion the descriptionAiSuggestion to set
+     */
+    public void setDescriptionAiSuggestion(String descriptionAiSuggestion) {
+        this.descriptionAiSuggestion = descriptionAiSuggestion;
     }
 }

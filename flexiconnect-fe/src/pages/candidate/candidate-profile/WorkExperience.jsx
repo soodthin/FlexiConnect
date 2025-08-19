@@ -1,241 +1,236 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { authApis, endpoints } from "@configs/APIs";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Cross2Icon, Pencil2Icon, TrashIcon, PlusCircledIcon } from "@radix-ui/react-icons";
+import { Cross2Icon, Pencil2Icon, TrashIcon, PlusCircledIcon, MagicWandIcon } from "@radix-ui/react-icons";
+import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 const formatDate = (dateStr) => {
-  if (!dateStr) return "??";
-  const date = new Date(dateStr);
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
+    if (!dateStr) return "Hiện tại";
+    const date = new Date(dateStr);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
 };
 
-export default function WorkExperience() {
-  const [experiences, setExperiences] = useState([]);
-  const [company, setCompany] = useState("");
-  const [position, setPosition] = useState("");
-  const [description, setDescription] = useState("");
-  const [descriptionAiSuggestion, setDescriptionAiSuggestion] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [editingExp, setEditingExp] = useState(null);
-  const [open, setOpen] = useState(false);
-  const [reload, setReload] = useState(0);
-
-  const loadExperiences = async () => {
-    try {
-      let res = await authApis().get(endpoints["workexperience"]);
-      setExperiences(Array.isArray(res.data) ? res.data : []);
-    } catch (err) {
-      setExperiences([]);
-    }
-  };
-
-  useEffect(() => {
-    loadExperiences();
-  }, [reload]);
-
-  const resetForm = () => {
-    setCompany("");
-    setPosition("");
-    setDescription("");
-    setDescriptionAiSuggestion("");
-    setStartDate("");
-    setEndDate("");
-    setEditingExp(null);
-    setOpen(false);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      if (editingExp) {
-        await authApis().put(`${endpoints["workexperience"]}/${editingExp.id}`, {
-          company,
-          position,
-          description,
-          descriptionAiSuggestion,
-          startDate,
-          endDate,
-        });
-      } else {
-        await authApis().post(endpoints["workexperience"], {
-          company,
-          position,
-          description,
-          descriptionAiSuggestion,
-          startDate,
-          endDate,
-        });
-      }
-      resetForm();
-      setReload((prev) => prev + 1);
-    } catch (err) { }
-  };
-
-  const deleteExperience = async (id) => {
-    try {
-      await authApis().delete(`${endpoints["workexperience"]}/${id}`);
-      setReload((prev) => prev + 1);
-    } catch (err) { }
-  };
-
-  const startEdit = (exp) => {
-    setCompany(exp.company || "");
-    setPosition(exp.position || "");
-    setDescription(exp.description || "");
-    setDescriptionAiSuggestion(exp.descriptionAiSuggestion || "");
-    setStartDate(exp.startDate ? exp.startDate.slice(0, 10) : "");
-    setEndDate(exp.endDate ? exp.endDate.slice(0, 10) : "");
-    setEditingExp(exp);
-    setOpen(true);
-  };
-
-  return (
-  <div className="w-full bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white rounded-xl shadow p-6 text-[16px] leading-relaxed">
-    <Dialog.Root open={open} onOpenChange={setOpen}>
-      <Dialog.Trigger asChild>
-        <button className="flex items-center gap-2 bg-neutral-900 dark:bg-beige dark:text-black text-white px-5 py-3 rounded-xl font-semibold shadow hover:bg-neutral-800 dark:hover:bg-[#f5f5dc] mb-4">
-          <PlusCircledIcon className="w-5 h-5" />
-          Thêm kinh nghiệm
-        </button>
-      </Dialog.Trigger>
-      <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-black/40 z-40" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 max-h-[95vh] w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white p-8 shadow-xl border border-neutral-200 dark:border-neutral-700 z-50 focus:outline-none">
-          <Dialog.Title className="text-2xl font-bold mb-2">Kinh nghiệm</Dialog.Title>
-          <Dialog.Description className="mb-5 text-neutral-500 dark:text-neutral-400">
-            {editingExp ? "Chỉnh sửa kinh nghiệm làm việc." : "Thêm mới kinh nghiệm làm việc."}
-          </Dialog.Description>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="flex gap-3">
-              <input
-                placeholder="Công ty"
-                className="w-1/2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white px-4 py-2 focus:ring-2 focus:ring-neutral-900"
-                value={company}
-                onChange={(e) => setCompany(e.target.value)}
-                required
-              />
-              <input
-                placeholder="Vị trí"
-                className="w-1/2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white px-4 py-2 focus:ring-2 focus:ring-neutral-900"
-                value={position}
-                onChange={(e) => setPosition(e.target.value)}
-                required
-              />
+const ExperienceCard = ({ exp, onEdit, onDelete }) => (
+    <div className="bg-white dark:bg-[#232323] rounded-xl shadow p-5 border border-transparent dark:border-neutral-700/50">
+        <div className="flex justify-between items-start">
+            <div>
+                <h4 className="font-bold text-lg">{exp.company}</h4>
+                <p className="text-sm text-neutral-500 dark:text-neutral-400">{exp.position}</p>
             </div>
-            <div className="flex gap-3">
-              <input
-                type="date"
-                placeholder="Ngày bắt đầu"
-                className="w-1/2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white px-4 py-2 focus:ring-2 focus:ring-neutral-900"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                required
-              />
-              <input
-                type="date"
-                placeholder="Ngày kết thúc"
-                className="w-1/2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white px-4 py-2 focus:ring-2 focus:ring-neutral-900"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-              />
-            </div>
-            <textarea
-              placeholder="Mô tả công việc"
-              className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white px-4 py-3 focus:ring-2 focus:ring-neutral-900 min-h-[80px]"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-            <textarea
-              placeholder="Gợi ý AI"
-              className="w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white px-4 py-3 focus:ring-2 focus:ring-neutral-900 min-h-[60px]"
-              value={descriptionAiSuggestion}
-              onChange={(e) => setDescriptionAiSuggestion(e.target.value)}
-            />
-            <div className="flex gap-2 mt-2">
-              <button
-                type="submit"
-                className="flex-1 bg-neutral-900 text-white py-2 rounded-lg font-semibold hover:bg-neutral-800"
-              >
-                {editingExp ? "Cập nhật" : "Thêm mới"}
-              </button>
-              {editingExp && (
-                <button
-                  type="button"
-                  onClick={resetForm}
-                  className="flex-1 bg-neutral-100 dark:bg-neutral-700 text-neutral-900 dark:text-white py-2 rounded-lg font-semibold hover:bg-neutral-200 dark:hover:bg-neutral-600"
-                >
-                  Huỷ
-                </button>
-              )}
-            </div>
-          </form>
-          <Dialog.Close asChild>
-            <button className="absolute right-4 top-4 p-2 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700">
-              <Cross2Icon />
-            </button>
-          </Dialog.Close>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
-
-    <div className="space-y-5 w-full">
-      {experiences.length === 0 && (
-        <div className="text-center text-neutral-400 rounded-xl py-10 text-base w-full bg-neutral-50 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700">
-          Chưa có kinh nghiệm nào.
+            <p className="text-xs text-neutral-500 dark:text-neutral-400">{formatDate(exp.startDate)} - {formatDate(exp.endDate)}</p>
         </div>
-      )}
-      {experiences.map((exp) => (
-        <div
-          key={exp.id}
-          className="bg-neutral-50 dark:bg-neutral-800 rounded-xl shadow-sm px-6 py-5 border border-neutral-200 dark:border-neutral-700 hover:shadow-md hover:border-neutral-300 dark:hover:border-neutral-500 transition flex flex-col gap-3"
-        >
-          <div className="flex justify-between items-start">
-            <div className="flex flex-col gap-2">
-              <h4 className="text-lg font-semibold text-neutral-900 dark:text-white">{exp.company}</h4>
-              <span className="inline-block px-3 py-0.5 bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-white rounded-full text-sm w-fit">
-                {exp.position}
-              </span>
-            </div>
-            <div className="text-sm text-neutral-500 dark:text-neutral-400 whitespace-nowrap font-roboto">
-              {formatDate(exp.startDate)} - {formatDate(exp.endDate)}
-            </div>
-          </div>
-
-          {exp.description && (
-            <p className="text-[15px] text-neutral-700 dark:text-neutral-300 leading-6">
-              {exp.description}
+        {exp.description && (
+            <p className="text-sm mt-3 pt-3 border-t border-neutral-200 dark:border-neutral-700/50 whitespace-pre-wrap">
+                {exp.description}
             </p>
-          )}
-          {exp.descriptionAiSuggestion && (
-            <div className="text-[15px] text-blue-600 dark:text-blue-400 italic flex items-center gap-2">
-              <span>🤖</span> {exp.descriptionAiSuggestion}
+        )}
+        {/* ✨ PHẦN HIỂN THỊ GỢI Ý AI TRONG CARD ĐƯỢC GIỮ LẠI */}
+        {exp.descriptionAiSuggestion && (
+            <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded-md">
+                <p className="text-sm text-blue-800 dark:text-blue-300 italic whitespace-pre-wrap"><span className="font-semibold not-italic">🤖 Gợi ý từ AI:</span> {exp.descriptionAiSuggestion}</p>
             </div>
-          )}
-
-          <div className="flex justify-end gap-2">
-            <button
-              title="Sửa"
-              className="p-2 rounded-lg bg-neutral-100 dark:bg-neutral-700 hover:bg-yellow-200 dark:hover:bg-yellow-600 text-neutral-800 dark:text-white border border-neutral-200 dark:border-neutral-600"
-              onClick={() => startEdit(exp)}
-            >
-              <Pencil2Icon className="w-4 h-4" />
-            </button>
-            <button
-              title="Xoá"
-              className="p-2 rounded-lg bg-neutral-100 dark:bg-neutral-700 hover:bg-red-400 dark:hover:bg-red-600 hover:text-white text-neutral-800 dark:text-white border border-neutral-200 dark:border-neutral-600"
-              onClick={() => deleteExperience(exp.id)}
-            >
-              <TrashIcon className="w-4 h-4" />
-            </button>
-          </div>
+        )}
+        <div className="flex justify-end gap-2 mt-4">
+            <button onClick={onEdit} className="p-2 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-600"><Pencil2Icon /></button>
+            <button onClick={onDelete} className="p-2 rounded-md hover:bg-red-100 dark:hover:bg-red-500/50"><TrashIcon /></button>
         </div>
-      ))}
     </div>
-  </div>
 );
 
+export default function WorkExperience() {
+    const [experiences, setExperiences] = useState([]);
+    const [company, setCompany] = useState("");
+    const [position, setPosition] = useState("");
+    const [description, setDescription] = useState("");
+    const [descriptionAiSuggestion, setDescriptionAiSuggestion] = useState("");
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
+    const [editingExp, setEditingExp] = useState(null);
+    const [open, setOpen] = useState(false);
+    const [reload, setReload] = useState(0);
+    const [isSuggesting, setIsSuggesting] = useState(false);
+    const firstInputRef = useRef(null);
+
+    useEffect(() => {
+        const loadExperiences = async () => {
+            try {
+                const res = await authApis().get(endpoints["workexperience"]);
+                setExperiences(Array.isArray(res.data) ? res.data : []);
+            } catch (err) { setExperiences([]); }
+        };
+        loadExperiences();
+    }, [reload]);
+
+    const resetForm = () => {
+        setCompany(""); setPosition(""); setDescription("");
+        setDescriptionAiSuggestion(""); setStartDate(""); setEndDate("");
+        setEditingExp(null); setOpen(false);
+    };
+
+    const handleGetSuggestion = async () => {
+        if (!description) {
+            toast.info("Vui lòng nhập mô tả công việc.");
+            return;
+        }
+        setIsSuggesting(true);
+        try {
+            const res = await authApis().post(endpoints["cv-suggestion"], { originalInput: description });
+            if (res.data?.aiSuggestion) {
+                setDescriptionAiSuggestion(res.data.aiSuggestion);
+                toast.success("✅ AI đã tạo gợi ý!");
+            }
+        } catch (err) {
+            toast.error("❌ Lỗi tạo gợi ý.");
+        } finally {
+            setIsSuggesting(false);
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const data = { company, position, description, descriptionAiSuggestion, startDate, endDate };
+        try {
+            if (editingExp) {
+                await authApis().put(`${endpoints["workexperience"]}/${editingExp.id}`, data);
+                toast.success("Cập nhật thành công!");
+            } else {
+                await authApis().post(endpoints["workexperience"], data);
+                toast.success("Thêm mới thành công!");
+            }
+            setReload((prev) => prev + 1);
+            // ✨ THAY ĐỔI CHÍNH: Đóng dialog ngay sau khi submit
+            resetForm();
+        } catch (err) {
+            toast.error("Thao tác thất bại.");
+        }
+    };
+
+    const startEdit = (exp) => {
+        setCompany(exp.company || ""); setPosition(exp.position || "");
+        setDescription(exp.description || ""); setDescriptionAiSuggestion(exp.descriptionAiSuggestion || "");
+        setStartDate(exp.startDate?.slice(0, 10) || ""); setEndDate(exp.endDate?.slice(0, 10) || "");
+        setEditingExp(exp); 
+        setOpen(true);
+    };
+
+    const deleteExperience = (id) => {
+        if (window.confirm("Bạn có chắc muốn xóa kinh nghiệm này?")) {
+            authApis().delete(`${endpoints["workexperience"]}/${id}`)
+                .then(() => {
+                    toast.success("Đã xóa kinh nghiệm.");
+                    setReload(prev => prev + 1);
+                })
+                .catch(() => toast.error("Xóa thất bại."));
+        }
+    };
+
+    return (
+        <div className="w-full">
+            <Dialog.Root open={open} onOpenChange={(isOpen) => !isOpen && resetForm()}>
+                <Dialog.Trigger asChild>
+                    <button onClick={() => setOpen(true)} className="flex items-center gap-2 bg-black dark:bg-white text-white dark:text-black px-4 py-2 rounded-lg font-semibold shadow hover:bg-gray-800 dark:hover:bg-gray-200 transition">
+                        <PlusCircledIcon /> Thêm kinh nghiệm
+                    </button>
+                </Dialog.Trigger>
+                <Dialog.Portal>
+                    <Dialog.Overlay className="fixed inset-0 bg-black/40 z-40" />
+                    <Dialog.Content
+                        className="fixed left-1/2 top-1/2 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white dark:bg-[#2d2d2d] text-black dark:text-white p-8 shadow-xl z-50 max-h-[90vh] overflow-y-auto"
+                    >
+                        {/* ✨ THAY ĐỔI CHÍNH: Bỏ AnimatePresence và logic 2 bước */}
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <Dialog.Title className="text-2xl font-bold mb-4">Kinh nghiệm làm việc</Dialog.Title>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <input ref={firstInputRef} placeholder="Công ty" className="w-full px-4 py-2 rounded-lg border dark:border-neutral-600 bg-white dark:bg-[#3a3a3a]" value={company} onChange={(e) => setCompany(e.target.value)} required />
+                                <input placeholder="Vị trí" className="w-full px-4 py-2 rounded-lg border dark:border-neutral-600 bg-white dark:bg-[#3a3a3a]" value={position} onChange={(e) => setPosition(e.target.value)} required />
+                                <input type="date" className="w-full px-4 py-2 rounded-lg border dark:border-neutral-600 bg-white dark:bg-[#3a3a3a]" value={startDate} onChange={(e) => setStartDate(e.target.value)} required />
+                                <input type="date" className="w-full px-4 py-2 rounded-lg border dark:border-neutral-600 bg-white dark:bg-[#3a3a3a]" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="block text-sm font-medium">Mô tả công việc</label>
+                                <textarea
+                                    placeholder="Nhập các ý chính về công việc và thành tựu của bạn..."
+                                    rows={4}
+                                    className="w-full px-4 py-2 rounded-lg border dark:border-neutral-600 bg-white dark:bg-[#3a3a3a]"
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={handleGetSuggestion}
+                                    disabled={isSuggesting}
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white hover:opacity-90 disabled:opacity-60 transition shadow"
+                                >
+                                    {isSuggesting ? (
+                                        <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Đang xử lý...</>
+                                    ) : (
+                                        <><MagicWandIcon /> ✨ Viết lại với AI</>
+                                    )}
+                                </button>
+                                {/* ✨ GIỮ LẠI: Box gợi ý với 2 nút "Dùng gợi ý" và "Bỏ qua" */}
+                                {descriptionAiSuggestion && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className="mt-3 bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/20 dark:to-[#2d2d2d] border border-blue-300 dark:border-blue-700 rounded-xl p-4 shadow-inner"
+                                    >
+                                        <p className="text-sm text-blue-900 dark:text-blue-200 font-medium mb-2 flex items-center gap-2">
+                                            <MagicWandIcon className="text-blue-600 dark:text-blue-300" /> Gợi ý từ AI
+                                        </p>
+                                        <p className="text-sm italic text-blue-800 dark:text-blue-300 whitespace-pre-wrap">
+                                            {descriptionAiSuggestion}
+                                        </p>
+                                        <div className="mt-2 flex gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setDescription(descriptionAiSuggestion);
+                                                    setDescriptionAiSuggestion("");
+                                                }}
+                                                className="flex-1 bg-blue-600 text-white text-xs py-1 rounded-lg hover:bg-blue-700"
+                                            >
+                                                Dùng gợi ý
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setDescriptionAiSuggestion("")}
+                                                className="flex-1 bg-gray-200 dark:bg-[#444] text-black dark:text-white text-xs py-1 rounded-lg hover:bg-gray-300"
+                                            >
+                                                Bỏ qua
+                                            </button>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </div>
+                            <div className="flex gap-2">
+                                <button type="submit" className="flex-1 bg-blue-600 text-white py-2.5 rounded-lg font-semibold hover:bg-blue-700">
+                                    {editingExp ? "Cập nhật" : "Thêm mới"}
+                                </button>
+                                <Dialog.Close asChild>
+                                    <button type="button" className="flex-1 bg-gray-200 dark:bg-[#444] py-2.5 rounded-lg font-semibold">Huỷ</button>
+                                </Dialog.Close>
+                            </div>
+                        </form>
+                        <Dialog.Close asChild>
+                            <button className="absolute right-4 top-4 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-[#444]"><Cross2Icon /></button>
+                        </Dialog.Close>
+                    </Dialog.Content>
+                </Dialog.Portal>
+            </Dialog.Root>
+
+            <div className="space-y-4 mt-6">
+                <AnimatePresence>
+                    {experiences.map((exp) => (
+                        <motion.div key={exp.id} layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                            <ExperienceCard exp={exp} onEdit={() => startEdit(exp)} onDelete={() => deleteExperience(exp.id)} />
+                        </motion.div>
+                    ))}
+                </AnimatePresence>
+            </div>
+        </div>
+    );
 }

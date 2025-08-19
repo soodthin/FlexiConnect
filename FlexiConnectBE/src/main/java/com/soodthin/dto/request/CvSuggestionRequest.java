@@ -11,8 +11,8 @@ import com.soodthin.entity.CvSuggestion.SectionType;
  * @author ADMIN
  */
 public class CvSuggestionRequest {
+
     private String originalInput;
-    private SectionType section;
 
     /**
      * @return the originalInput
@@ -28,19 +28,4 @@ public class CvSuggestionRequest {
         this.originalInput = originalInput;
     }
 
-    /**
-     * @return the section
-     */
-    public SectionType getSection() {
-        return section;
-    }
-
-    /**
-     * @param section the section to set
-     */
-    public void setSection(SectionType section) {
-        this.section = section;
-    }
-
-   
 }

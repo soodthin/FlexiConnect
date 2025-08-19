@@ -25,13 +25,14 @@ public class WorkExperienceServiceImpl implements WorkExperienceService {
     public List<WorkExperienceResponse> getByCandidate(User user) {
         Candidate candidate = candidateRepository.findByUserId(user)
                 .orElseThrow(() -> new IllegalArgumentException("Candidate not found"));
-        return workExperienceRepository.findByCandidateId(candidate)
+        return workExperienceRepository.findByCandidate(candidate)
                 .stream()
                 .map(e -> new WorkExperienceResponse(
                 e.getId(),
                 e.getCompany(),
                 e.getPosition(),
                 e.getDescription(),
+                e.getDescriptionAiSuggestion(),
                 e.getStartDate(),
                 e.getEndDate()
         ))
@@ -63,6 +64,7 @@ public class WorkExperienceServiceImpl implements WorkExperienceService {
         existing.setStartDate(workExp.getStartDate());
         existing.setEndDate(workExp.getEndDate());
         existing.setDescription(workExp.getDescription());
+        existing.setDescriptionAiSuggestion(workExp.getDescriptionAiSuggestion());
 
         return workExperienceRepository.save(existing);
     }

@@ -38,12 +38,6 @@ import java.util.Set;
     @NamedQuery(name = "Employer.findByIsVerified", query = "SELECT e FROM Employer e WHERE e.isVerified = :isVerified")})
 public class Employer implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Integer id;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 100)
@@ -63,6 +57,13 @@ public class Employer implements Serializable {
     @Size(max = 65535)
     @Column(name = "company_intro")
     private String companyIntro;
+
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Basic(optional = false)
+    @Column(name = "id")
+    private Integer id;
     @Column(name = "is_verified")
     private Boolean isVerified;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "employer")
@@ -104,13 +105,6 @@ public class Employer implements Serializable {
     }
 
    
-    public String getWebsite() {
-        return website;
-    }
-
-    public void setWebsite(String website) {
-        this.website = website;
-    }
 
    
 
@@ -214,5 +208,15 @@ public class Employer implements Serializable {
     public void setTaxCode(String taxCode) {
         this.taxCode = taxCode;
     }
-    
+
+   
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
+    }
+
+  
 }

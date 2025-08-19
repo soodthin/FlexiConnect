@@ -65,7 +65,8 @@ public class Candidate implements Serializable {
     private Integer id;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "candidate")
     private Set<FollowEmployer> followEmployerSet;
-    @OneToMany(mappedBy = "candidateId")
+    @OneToMany(mappedBy = "candidate")
+    @JsonIgnore
     private Set<InterviewSession> interviewSessionSet;
     @OneToMany(mappedBy = "candidate")
     private Set<EducationHistory> educationHistorySet;
@@ -202,22 +203,6 @@ public class Candidate implements Serializable {
         return "com.soodthin.pojo.Candidate[ id=" + id + " ]";
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getBio() {
-        return bio;
-    }
-
-    public void setBio(String bio) {
-        this.bio = bio;
-    }
-
     public String getBioAiSuggestion() {
         return bioAiSuggestion;
     }
@@ -232,6 +217,22 @@ public class Candidate implements Serializable {
 
     public void setCvSuggestionsSet(Set<CvSuggestion> cvSuggestionsSet) {
         this.cvSuggestionsSet = cvSuggestionsSet;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
     }
 
 }

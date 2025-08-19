@@ -3,6 +3,7 @@ package com.soodthin.configs;
 import com.soodthin.entity.Employer;
 import com.soodthin.entity.JobPost;
 import com.soodthin.entity.User;
+import com.soodthin.entity.User.UserStatus;
 import com.soodthin.repositories.EmployerRepository;
 import com.soodthin.repositories.JobPostRepository;
 import com.soodthin.repositories.UserRepository;
@@ -69,7 +70,7 @@ public class JobDataInit implements CommandLineRunner {
                         User u = new User();
                         u.setEmail(fakeEmail);
                         u.setPassword(encoder.encode("123456"));
-                        u.setStatus("ACTIVE");
+                        u.setStatus(UserStatus.ACTIVE);
                         u.setCreatedAt(LocalDateTime.now());
                         return userRepo.save(u);
                     });
@@ -97,7 +98,7 @@ public class JobDataInit implements CommandLineRunner {
                             + "\n💼 Skills: " + skills
                             + "\n🏷️ Fields: " + jobFields
                     );
-                    job.setStatus("OPEN");
+                    job.setStatus(JobPost.JobStatus.OPEN);
                     job.setViewCount(0);
 
                     LocalDateTime now = LocalDateTime.now();

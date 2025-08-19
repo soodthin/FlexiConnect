@@ -7,8 +7,10 @@ package com.soodthin.controllers;
 import com.soodthin.dto.request.CandidateProfileRequest;
 import com.soodthin.dto.request.CvSuggestionRequest;
 import com.soodthin.dto.request.CvSuggestionSubmitRequest;
+
 import com.soodthin.dto.response.ApplicationResponseDTO;
 import com.soodthin.dto.response.CandidateProfileResponse;
+
 import com.soodthin.entity.CvSuggestion;
 import com.soodthin.entity.User;
 import com.soodthin.repositories.UserRepository;
@@ -44,6 +46,7 @@ public class CandidateController {
     private ApplicationService applicationService;
     @Autowired
     private CvSuggestionService cvSuggestionService;
+
 
     @GetMapping("/profile")
     public ResponseEntity<CandidateProfileResponse> getProfile(Authentication authentication) {

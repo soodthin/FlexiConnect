@@ -26,8 +26,8 @@ export default function Header() {
   }, [isDark]);
 
   useEffect(() => {
-  setShowUserMenu(false); 
-}, [user]);
+    setShowUserMenu(false);
+  }, [user]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -56,7 +56,7 @@ export default function Header() {
           if (!user) return navigate("/");
           if (user.role === "CANDIDATE") navigate("/candidate-dashboard");
           else if (user.role === "EMPLOYER") navigate("/employer-dashboard");
-          else if (user.role === "ADMIN") navigate("/admin");
+          else if (user.role === "ADMIN") navigate("/admin-dashboard");
           else navigate("/");
         }}
       >
@@ -127,6 +127,14 @@ export default function Header() {
             {showUserMenu && (
               <div className="absolute right-0 mt-3 w-60 bg-white dark:bg-[#232323] border border-gray-100 dark:border-[#444] rounded-2xl shadow-xl z-30 overflow-hidden">
                 <ul className="text-base text-gray-700 dark:text-[#f5efe6]">
+                  {/*ROLE_ADMIN*/}
+                  {user.role === "ADMIN" && (
+                    <>
+                      <li onClick={() => navigate("/admin-dashboard")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Bảng điều khiển Admin</li>
+                      <li onClick={() => navigate("/admin-users-management")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Quản lý người dùng</li>
+                      <li onClick={() => navigate("/admin-jobposts-management")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Quản lý tin tuyển dụng</li>
+                    </>
+                  )}
                   {/* ROLE_CANDIDATE */}
                   {user.role === "CANDIDATE" && (
                     <>
@@ -139,16 +147,13 @@ export default function Header() {
                   {/* ROLE_EMPLOYER */}
                   {user.role === "EMPLOYER" && (
                     <>
-                    <li onClick={() => navigate("/employer-profile")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Hồ sơ công ty</li>
+                      <li onClick={() => navigate("/employer-profile")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Hồ sơ công ty</li>
                       <li onClick={() => navigate("/employer-jobposts-management")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Quản lý tin tuyển dụng</li>
                       <li onClick={() => navigate("/employer-job-applications")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Ứng viên đã ứng tuyển</li>
                     </>
                   )}
 
-                  {/* ROLE_ADMIN */}
-                  {user.role === "ADMIN" && (
-                    <li onClick={() => navigate("/admin")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Trang quản trị</li>
-                  )}
+
 
                   {/* Common: Logout */}
                   <li

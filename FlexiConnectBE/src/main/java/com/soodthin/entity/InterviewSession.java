@@ -11,22 +11,23 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Set;
+
 
 /**
  *
  * @author ADMIN
  */
+
 @Entity
 @Table(name = "interview_session")
 @NamedQueries({
@@ -34,9 +35,14 @@ import java.util.Set;
     @NamedQuery(name = "InterviewSession.findById", query = "SELECT i FROM InterviewSession i WHERE i.id = :id"),
     @NamedQuery(name = "InterviewSession.findByStatus", query = "SELECT i FROM InterviewSession i WHERE i.status = :status"),
     @NamedQuery(name = "InterviewSession.findByStartedAt", query = "SELECT i FROM InterviewSession i WHERE i.startedAt = :startedAt"),
-    @NamedQuery(name = "InterviewSession.findByCompletedAt", query = "SELECT i FROM InterviewSession i WHERE i.completedAt = :completedAt")})
+    @NamedQuery(name = "InterviewSession.findByCompletedAt", query = "SELECT i FROM InterviewSession i WHERE i.completedAt = :completedAt"),
+    @NamedQuery(name = "InterviewSession.findByTotalScore", query = "SELECT i FROM InterviewSession i WHERE i.totalScore = :totalScore")})
 public class InterviewSession implements Serializable {
 
+    public enum InterviewStatus {
+    IN_PROGRESS,
+    COMPLETED
+}
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,21 +51,25 @@ public class InterviewSession implements Serializable {
     private Integer id;
     @Size(max = 11)
     @Column(name = "status")
-    private String status;
+    private InterviewStatus status;
     @Column(name = "started_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date startedAt;
+    private LocalDateTime startedAt;
     @Column(name = "completed_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date completedAt;
-    @OneToMany(mappedBy = "sessionId")
+    private LocalDateTime completedAt;
+    @Column(name = "total_score")
+    private Integer totalScore;
+    @Lob
+    @Size(max = 65535)
+    @Column(name = "note")
+    private String note;
+    @OneToMany(mappedBy = "session")
     private Set<InterviewTurn> interviewTurnSet;
     @JoinColumn(name = "candidate_id", referencedColumnName = "id")
     @ManyToOne
-    private Candidate candidateId;
+    private Candidate candidate;
     @JoinColumn(name = "job_post_id", referencedColumnName = "id")
     @ManyToOne
-    private JobPost jobPostId;
+    private JobPost jobPost;
 
     public InterviewSession() {
     }
@@ -76,28 +86,44 @@ public class InterviewSession implements Serializable {
         this.id = id;
     }
 
-    public String getStatus() {
+    public InterviewStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(InterviewStatus status) {
         this.status = status;
     }
 
-    public Date getStartedAt() {
+    public LocalDateTime getStartedAt() {
         return startedAt;
     }
 
-    public void setStartedAt(Date startedAt) {
+    public void setStartedAt(LocalDateTime startedAt) {
         this.startedAt = startedAt;
     }
 
-    public Date getCompletedAt() {
+    public LocalDateTime getCompletedAt() {
         return completedAt;
     }
 
-    public void setCompletedAt(Date completedAt) {
+    public void setCompletedAt(LocalDateTime completedAt) {
         this.completedAt = completedAt;
+    }
+
+    public Integer getTotalScore() {
+        return totalScore;
+    }
+
+    public void setTotalScore(Integer totalScore) {
+        this.totalScore = totalScore;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 
     public Set<InterviewTurn> getInterviewTurnSet() {
@@ -108,20 +134,20 @@ public class InterviewSession implements Serializable {
         this.interviewTurnSet = interviewTurnSet;
     }
 
-    public Candidate getCandidateId() {
-        return candidateId;
+    public void setCandidate(Candidate candidate) {
+        this.candidate = candidate;
     }
 
-    public void setCandidateId(Candidate candidateId) {
-        this.candidateId = candidateId;
+    public void setJobPost(JobPost jobPost) {
+        this.jobPost = jobPost;
     }
 
-    public JobPost getJobPostId() {
-        return jobPostId;
+    public Candidate getCandidate() {
+        return candidate;
     }
 
-    public void setJobPostId(JobPost jobPostId) {
-        this.jobPostId = jobPostId;
+    public JobPost getJobPost() {
+        return jobPost;
     }
 
     @Override
@@ -146,7 +172,7 @@ public class InterviewSession implements Serializable {
 
     @Override
     public String toString() {
-        return "com.soodthin.pojo.InterviewSession[ id=" + id + " ]";
+        return "com.soodthin.entity.InterviewSession[ id=" + id + " ]";
     }
-    
+
 }

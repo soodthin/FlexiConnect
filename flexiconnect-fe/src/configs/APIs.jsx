@@ -11,6 +11,9 @@ export const endpoints = {
   'current-user': '/auth/current-user',
   'jobpost-id': (id) => `/job-posts/${id}`,
 
+  /*Admnin*/
+  'admin-dashboard': '/users/admin/dashboard/stats',
+  
   /* Candidate */
   'candidate-profile': "/users/candidate/profile",
   'update-profile': "/users/candidate/profile",
@@ -20,6 +23,7 @@ export const endpoints = {
   'skills': "/candidate/skills",
   'workexperience': "/candidate/workexperience",
   'apply-job': "/users/candidate/apply",
+  "cv-suggestion": "/users/candidate/cv-suggestion",
 
   /* Employer */
   'employer-profile': "/users/employer/profile",

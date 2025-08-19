@@ -4,6 +4,7 @@
  */
 package com.soodthin.dto.response;
 
+import com.soodthin.entity.JobPost.JobStatus;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -22,12 +23,12 @@ public class JobPostResponse {
     private String jobType;
     private LocalDateTime createdAt;
     private LocalDateTime expiredAt;
-    private String status;
-    
+    private JobStatus status;
+
     private String companyName;
     private String avatar;
     private String companyAddress;
-    private String website; 
+    private String website;
     private int viewCount;
 
     /**
@@ -159,29 +160,15 @@ public class JobPostResponse {
     /**
      * @return the status
      */
-    public String getStatus() {
+    public JobStatus getStatus() {
         return status;
     }
 
     /**
      * @param status the status to set
      */
-    public void setStatus(String status) {
+    public void setStatus(JobStatus status) {
         this.status = status;
-    }
-
-    /**
-     * @return the viewCount
-     */
-    public int getViewCount() {
-        return viewCount;
-    }
-
-    /**
-     * @param viewCount the viewCount to set
-     */
-    public void setViewCount(int viewCount) {
-        this.viewCount = viewCount;
     }
 
     /**
@@ -239,4 +226,19 @@ public class JobPostResponse {
     public void setWebsite(String website) {
         this.website = website;
     }
+
+    /**
+     * @return the viewCount
+     */
+    public int getViewCount() {
+        return viewCount;
+    }
+
+    /**
+     * @param viewCount the viewCount to set
+     */
+    public void setViewCount(int viewCount) {
+        this.viewCount = viewCount;
+    }
+    
 }

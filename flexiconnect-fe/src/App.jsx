@@ -24,6 +24,7 @@ import JobPostsManagement from '@jobPosts/JobPostsManagement';
 
 import CandidateDashboard from '@candidate/CandidateDashboard';
 import CandidateProfile from '@candidateProfile/CandidateProfile';
+import AdminDashboard from "./pages/admin/AdminDashboard";
 
 
 const userReducer = (current, action) => {
@@ -52,6 +53,14 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/employer-register" element={<EmployerRegister />} />
+              <Route
+                path="/admin-dashboard"
+                element={
+                  <PrivateRoute allowedRoles={["ADMIN"]}>
+                    <AdminDashboard/>
+                  </PrivateRoute>
+                }
+              />
               <Route
                 path="/candidate-dashboard"
                 element={

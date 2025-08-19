@@ -8,6 +8,7 @@ import com.soodthin.entity.Candidate;
 import com.soodthin.entity.Employer;
 import com.soodthin.entity.Role;
 import com.soodthin.entity.User;
+import com.soodthin.entity.User.UserStatus;
 import com.soodthin.repositories.CandidateRepository;
 import com.soodthin.repositories.EmployerRepository;
 import com.soodthin.repositories.RoleRepository;
@@ -62,7 +63,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new IllegalArgumentException("Vai trò 'CANDIDATE' không tồn tại."));
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setStatus("ACTIVE");
+        user.setStatus(UserStatus.ACTIVE);
         user.setCreatedAt(LocalDateTime.now());
         user.setRoleSet(Set.of(candidateRole));
         user = userRepository.save(user);
@@ -85,7 +86,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new IllegalArgumentException("Vai trò 'EMPLOYER' không tồn tại."));
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setStatus("ACTIVE");
+        user.setStatus(UserStatus.ACTIVE);
         user.setCreatedAt(LocalDateTime.now());
         user.setRoleSet(Set.of(employerRole));
         user = userRepository.save(user);

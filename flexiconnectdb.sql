@@ -16,6 +16,7 @@ CREATE TABLE user (
     phone VARCHAR(20),
     date_of_birth DATE,
     gender ENUM('MALE', 'FEMALE', 'OTHER'),
+    address VARCHAR(100),
     avatar VARCHAR(255),
     status ENUM('ACTIVE', 'INACTIVE', 'BANNED') DEFAULT 'ACTIVE',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -46,7 +47,6 @@ CREATE TABLE candidate (
     user_id INT UNIQUE NOT NULL,
     title VARCHAR(150),
     bio TEXT,
-    bio_ai_suggestion TEXT,
     resume_file VARCHAR(255),
     profile_vector TEXT,
     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
@@ -56,9 +56,9 @@ CREATE TABLE employer (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT UNIQUE NOT NULL,
     company_name VARCHAR(100) NOT NULL,
-    tax_id VARCHAR(20) UNIQUE,
+    tax_code VARCHAR(20) UNIQUE,
     website VARCHAR(100),
-    address TEXT,
+    company_address TEXT,
     company_intro TEXT,
     is_verified BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
@@ -95,6 +95,8 @@ CREATE TABLE application (
     job_post_id INT,
     candidate_id INT,
     cover_letter TEXT,
+	resume_file VARCHAR(255),
+    download_url VARCHAR(512),
     applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status ENUM('PENDING', 'VIEWED', 'ACCEPTED', 'REJECTED') DEFAULT 'PENDING',
     rejection_reason TEXT,
@@ -102,18 +104,21 @@ CREATE TABLE application (
     FOREIGN KEY (candidate_id) REFERENCES candidate(id) ON DELETE CASCADE
 );
 
+
 CREATE TABLE skill (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    skill_name VARCHAR(50) UNIQUE NOT NULL
+    skill_name VARCHAR(100) UNIQUE NOT NULL COLLATE utf8mb4_unicode_ci 
 );
 
+
 CREATE TABLE candidate_skill (
-    candidate_id INT,
-    skill_id INT,
-    level ENUM('BEGINNER', 'INTERMEDIATE', 'ADVANCED'),
-    PRIMARY KEY (candidate_id, skill_id),
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    candidate_id INT NOT NULL,
+    skill_id INT NOT NULL,
+    level VARCHAR(50) NOT NULL,
     FOREIGN KEY (candidate_id) REFERENCES candidate(id) ON DELETE CASCADE,
-    FOREIGN KEY (skill_id) REFERENCES skill(id) ON DELETE CASCADE
+    FOREIGN KEY (skill_id) REFERENCES skill(id) ON DELETE CASCADE,
+    UNIQUE (candidate_id, skill_id)
 );
 
 CREATE TABLE job_post_skill (
@@ -127,11 +132,11 @@ CREATE TABLE job_post_skill (
 CREATE TABLE education_history (
     id INT AUTO_INCREMENT PRIMARY KEY,
     candidate_id INT,
-    school VARCHAR(100),
-    major VARCHAR(100),
+    school VARCHAR(50),
+    major VARCHAR(50),
+    degree VARCHAR(50),
     start_date DATE,
     end_date DATE,
-    description TEXT,
     FOREIGN KEY (candidate_id) REFERENCES candidate(id) ON DELETE CASCADE
 );
 
@@ -141,12 +146,24 @@ CREATE TABLE work_experience (
     company VARCHAR(100),
     position VARCHAR(100),
     description TEXT,
-    description_ai_suggestion TEXT,
     start_date DATE,
     end_date DATE,
     FOREIGN KEY (candidate_id) REFERENCES candidate(id) ON DELETE CASCADE
 );
 
+
+CREATE TABLE cv_suggestion (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    candidate_id INT NOT NULL,
+    section ENUM('INTRODUCTION', 'SKILLS', 'EXPERIENCE') NOT NULL,
+    original_input TEXT NOT NULL,
+    ai_suggestion TEXT NOT NULL,
+    edited_version TEXT,
+    status ENUM('SUGGESTED', 'EDITED', 'SUBMITTED') DEFAULT 'SUGGESTED',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (candidate_id) REFERENCES candidate(id) ON DELETE CASCADE
+);
 CREATE TABLE follow_employer (
     candidate_id INT,
     employer_id INT,
@@ -178,6 +195,8 @@ CREATE TABLE rating (
     FOREIGN KEY (to_user_id) REFERENCES user(id) ON DELETE CASCADE
 );
 
+
+
 CREATE TABLE interview_session (
     id INT AUTO_INCREMENT PRIMARY KEY,
     candidate_id INT,
@@ -196,6 +215,7 @@ CREATE TABLE interview_turn (
     answer TEXT,
     ai_feedback TEXT,
     turn_order INT,
+    ai_score INT CHECK (ai_score BETWEEN 0 AND 100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (session_id) REFERENCES interview_session(id) ON DELETE CASCADE
 );
