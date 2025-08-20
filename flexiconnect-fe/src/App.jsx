@@ -18,9 +18,9 @@ import EmployerRegister from '@auth/EmployerRegister';
 import JobDetails from '@public/JobDetails';
 
 import AdminDashboard from "@admin/AdminDashboard";
-import PendingEmployers from "@admin/PendingEmployers";
+import EmployerManagement from "@admin/EmployerManagement";
 import UserManagement from "@admin/UserManagement";
-import AdminJobPostList from "@admin/AdminJobPostList";
+import JobPostManagement from "@admin/JobPostManagement";
 
 import EmployerDashboard from '@employer/EmployerDashboard';
 import EmployerProfile from '@employerProfile/EmployerProfile';
@@ -73,7 +73,7 @@ function App() {
                   path="/admin-pending-employers"
                   element={
                     <PrivateRoute allowedRoles={["ADMIN"]}>
-                      <PendingEmployers />
+                      <EmployerManagement />
                     </PrivateRoute>
                   }
                 />
@@ -89,7 +89,7 @@ function App() {
                   path="/admin-jobposts-management"
                   element={
                     <PrivateRoute allowedRoles={["ADMIN"]}>
-                      <AdminJobPostList />
+                      <JobPostManagement />
                     </PrivateRoute>
                   }
                 />

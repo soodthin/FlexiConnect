@@ -36,24 +36,20 @@ export default function Register() {
       setMsg("❌ Vui lòng nhập đầy đủ các trường.");
       return;
     }
-
     if (user.password !== user.confirmPassword) {
       setMsg("❌ Mật khẩu KHÔNG khớp!");
       return;
     }
-
     if (strength.label !== "Khá" && strength.label !== "Mạnh") {
       setMsg("❌ Mật khẩu phải đủ mạnh để đăng ký.");
       return;
     }
-
     try {
       await Apis.post(endpoints["register"], {
         email: user.email,
         password: user.password,
         fullName: user.fullName,
       });
-
       setMsg("✅ Đăng ký thành công!");
       setTimeout(() => navigate("/login"), 1500);
     } catch (err) {
@@ -62,120 +58,129 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-gray-100 to-gray-200 p-4">
-      <form
-        onSubmit={register}
-        className="bg-white shadow-xl border border-gray-200 rounded-3xl p-8 w-full max-w-md space-y-4"
-      >
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-2">Đăng ký Ứng Viên</h2>
-
-        {msg && (
-          <div className={`text-sm text-center p-2 rounded-md font-medium ${msg.includes("✅") ? "bg-green-100 text-green-800" : "bg-red-100 text-red-700"
-            }`}>
-            {msg}
-          </div>
-        )}
-
-        <div className="space-y-1">
-          <label className="block text-sm font-medium text-gray-700">Họ và tên</label>
-          <div className="flex items-center gap-2 rounded-md border border-gray-300 bg-gray-100 px-3 h-10 hover:border-black focus-within:ring-2 focus-within:ring-black">
-            <input
-              type="text"
-              className="flex-1 bg-transparent outline-none text-sm text-gray-800 placeholder-gray-400"
-              placeholder="Nhập họ và tên..."
-              value={user.fullName || ""}
-              onChange={(e) => setState(e.target.value, "fullName")}
-              required
-            />
-          </div>
+    <div className="min-h-screen flex flex-col md:flex-row bg-beige-50 dark:bg-[#181818]">
+      {/* Left illustration + AI info */}
+      <div className="hidden md:flex flex-[0.45] relative items-center justify-center overflow-hidden bg-beige-100 dark:bg-[#1e1e1e] p-8">
+        <img
+          src="https://images.unsplash.com/photo-1556155092-490a1ba16284?q=80&w=708&auto=format&fit=crop"
+          alt="Job search illustration"
+          className="absolute inset-0 w-full h-full object-cover opacity-30"
+        />
+        <div className="relative z-10 text-left space-y-6 max-w-sm">
+          <h2 className="text-4xl font-bold text-gray-800 dark:text-gray-50">
+            Bắt đầu hành trình sự nghiệp!
+          </h2>
+          <p className="text-gray-700 dark:text-gray-200">
+            Tạo tài khoản ứng viên và tìm việc mơ ước nhanh chóng với <strong>FlexiConnect AI</strong>.
+          </p>
         </div>
+      </div>
 
-        <div className="space-y-1">
-          <label className="block text-sm font-medium text-gray-700">Email</label>
-          <div className="flex items-center gap-2 rounded-md border border-gray-300 bg-gray-100 px-3 h-10 hover:border-black focus-within:ring-2 focus-within:ring-black">
-            <input
-              type="email"
-              className="flex-1 bg-transparent outline-none text-sm text-gray-800 placeholder-gray-400"
-              placeholder="Nhập email..."
-              value={user.email || ""}
-              onChange={(e) => setState(e.target.value, "email")}
-              required
-            />
-          </div>
-        </div>
-
-        <div className="space-y-1">
-          <label className="block text-sm font-medium text-gray-700">Mật khẩu</label>
-          <PasswordToggleField.Root>
-            <div className="flex items-center gap-2 rounded-md border border-gray-300 bg-gray-100 px-3 h-10 hover:border-black focus-within:ring-2 focus-within:ring-black">
-              <PasswordToggleField.Input
-                className="flex-1 bg-transparent outline-none text-sm text-gray-800 placeholder-gray-400"
-                placeholder="Nhập mật khẩu..."
-                value={user.password || ""}
-                onChange={(e) => setState(e.target.value, "password")}
-                required
-              />
-              <PasswordToggleField.Toggle className="outline-none flex items-center justify-center w-5 h-5 text-gray-500">
-                <PasswordToggleField.Icon
-                  visible={<EyeOpenIcon />}
-                  hidden={<EyeClosedIcon />}
-                />
-              </PasswordToggleField.Toggle>
-            </div>
-          </PasswordToggleField.Root>
-          {/* Password strength bar */}
-          {user.password && (
-            <div className="w-full h-2 rounded bg-gray-200 mt-1">
-              <div
-                className={`h-2 rounded transition-all duration-300 ${strength.color}`}
-                style={{ width: `${strength.percent || 0}%` }}
-              ></div>
-            </div>
-          )}
-          {strength.label && (
-            <div className={`text-xs mt-1 font-medium ${strength.color.replace("bg-", "text-")}`}>
-              Độ mạnh mật khẩu: {strength.label}
-            </div>
-          )}
-        </div>
-
-        <div className="space-y-1">
-          <label className="block text-sm font-medium text-gray-700">Xác nhận mật khẩu</label>
-          <PasswordToggleField.Root>
-            <div className="flex items-center gap-2 rounded-md border border-gray-300 bg-gray-100 px-3 h-10 hover:border-black focus-within:ring-2 focus-within:ring-black">
-              <PasswordToggleField.Input
-                className="flex-1 bg-transparent outline-none text-sm text-gray-800 placeholder-gray-400"
-                placeholder="Xác nhận mật khẩu..."
-                value={user.confirmPassword || ""}
-                onChange={(e) => setState(e.target.value, "confirmPassword")}
-                required
-              />
-              <PasswordToggleField.Toggle className="outline-none flex items-center justify-center w-5 h-5 text-gray-500">
-                <PasswordToggleField.Icon
-                  visible={<EyeOpenIcon />}
-                  hidden={<EyeClosedIcon />}
-                />
-              </PasswordToggleField.Toggle>
-            </div>
-          </PasswordToggleField.Root>
-        </div>
-
-        <button
-          type="submit"
-          className="w-full bg-gradient-to-r from-gray-700 to-gray-900 text-white py-2 rounded-xl font-semibold shadow hover:opacity-90 transition flex items-center justify-center gap-2"
+      {/* Right form */}
+      <div className="flex-1 flex items-center justify-center p-6">
+        <form
+          onSubmit={register}
+          className="relative bg-white dark:bg-[#232323] shadow-2xl border border-gray-200 dark:border-neutral-700 rounded-3xl p-8 w-full max-w-md space-y-4 z-20"
         >
-          <FaUserPlus /> Đăng ký
-        </button>
-        <div className="text-center text-gray-600 text-sm">
+          <div className="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-gray-700 to-gray-900 text-white px-4 py-1 rounded-full shadow-md text-sm font-medium">
+            FlexiConnect AI
+          </div>
+
+          <h2 className="text-3xl font-bold text-center text-gray-800 dark:text-gray-100 mb-2">
+            Đăng ký Ứng Viên
+          </h2>
+
+          {msg && (
+            <div
+              className={`text-sm text-center p-2 rounded-md font-medium ${
+                msg.includes("✅")
+                  ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                  : "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200"
+              }`}
+            >
+              {msg}
+            </div>
+          )}
+
+          {["fullName", "email", "password", "confirmPassword"].map((field) => (
+            <div className="space-y-1" key={field}>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 capitalize">
+                {field === "fullName"
+                  ? "Họ và tên"
+                  : field === "confirmPassword"
+                  ? "Xác nhận mật khẩu"
+                  : field.charAt(0).toUpperCase() + field.slice(1)}
+              </label>
+
+              <PasswordToggleField.Root>
+                <div className="flex items-center gap-2 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 px-3 h-10 hover:border-blue-400 focus-within:ring-2 focus-within:ring-blue-400 transition">
+                  <PasswordToggleField.Input
+                    type={field.includes("password") ? "password" : "text"}
+                    className="flex-1 bg-transparent outline-none text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300"
+                    placeholder={`Nhập ${
+                      field === "fullName"
+                        ? "họ và tên"
+                        : field === "confirmPassword"
+                        ? "xác nhận mật khẩu"
+                        : field
+                    }...`}
+                    value={user[field] || ""}
+                    onChange={(e) => setState(e.target.value, field)}
+                    required
+                  />
+                  {field.includes("password") && (
+                    <PasswordToggleField.Toggle className="outline-none flex items-center justify-center w-5 h-5 text-gray-500 dark:text-gray-300">
+                      <PasswordToggleField.Icon
+                        visible={<EyeOpenIcon />}
+                        hidden={<EyeClosedIcon />}
+                      />
+                    </PasswordToggleField.Toggle>
+                  )}
+                </div>
+
+                {/* Password strength bar */}
+                {field === "password" && user.password && (
+                  <>
+                    <div className="w-full h-2 rounded bg-gray-200 dark:bg-gray-600 mt-1">
+                      <div
+                        className={`h-2 rounded transition-all duration-300 ${strength.color}`}
+                        style={{ width: `${strength.percent || 0}%` }}
+                      ></div>
+                    </div>
+                    {strength.label && (
+                      <div
+                        className={`text-xs mt-1 font-medium ${strength.color.replace(
+                          "bg-",
+                          "text-"
+                        )}`}
+                      >
+                        Độ mạnh mật khẩu: {strength.label}
+                      </div>
+                    )}
+                  </>
+                )}
+              </PasswordToggleField.Root>
+            </div>
+          ))}
+
           <button
-            type="button"
-            onClick={() => navigate("/employer-register")}
-            className="text-sm text-gray-600 hover:text-black hover:underline transition mt-2"
+            type="submit"
+            className="w-full bg-gradient-to-r from-gray-700 to-gray-900 text-white py-2 rounded-xl font-semibold shadow hover:opacity-90 transition flex items-center justify-center gap-2"
           >
-            <span className="font-semibold">Bạn là nhà tuyển dụng?</span>
+            <FaUserPlus /> Đăng ký
           </button>
-        </div>
-      </form>
+
+          <div className="text-center text-gray-600 dark:text-gray-300 text-sm">
+            <button
+              type="button"
+              onClick={() => navigate("/employer-register")}
+              className="text-sm hover:text-black dark:hover:text-white hover:underline transition mt-2"
+            >
+              <span className="font-semibold">Bạn là nhà tuyển dụng?</span>
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

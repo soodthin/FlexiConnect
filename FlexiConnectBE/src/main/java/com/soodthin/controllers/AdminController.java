@@ -32,17 +32,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.logging.Logger;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  *
  * @author ADMIN
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/users/admin")
 public class AdminController {
 
-    private static final Logger log = Logger.getLogger(AdminController.class.getName());
 
     @Autowired
     private AdminService adminService;
@@ -81,7 +81,7 @@ public class AdminController {
             AdminDashboardResponse stats = adminService.getDashboardStats(year);
             return ResponseEntity.ok(stats);
         } catch (Exception e) {
-            log.severe("Error retrieving dashboard stats: " + e.getMessage());
+            log.error("Error retrieving dashboard stats: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -100,7 +100,7 @@ public class AdminController {
             Page<UserManagementResponse> users = adminService.getUsers(role, search, page, size);
             return ResponseEntity.ok(users);
         } catch (Exception e) {
-            log.severe("Error retrieving users: " + e.getMessage());
+            log.error("Error retrieving users: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -116,10 +116,10 @@ public class AdminController {
             UserManagementResponse user = adminService.updateUserStatus(userId, request);
             return ResponseEntity.ok(user);
         } catch (RuntimeException e) {
-            log.severe("Error updating user status: " + e.getMessage());
+            log.error("Error updating user status: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
-            log.severe("Error updating user status: " + e.getMessage());
+            log.error("Error updating user status: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -132,10 +132,10 @@ public class AdminController {
             adminService.deleteUser(userId);
             return ResponseEntity.ok().build();
         } catch (RuntimeException e) {
-            log.severe("Error deleting user: " + e.getMessage());
+            log.error("Error deleting user: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
-            log.severe("Error deleting user: " + e.getMessage());
+            log.error("Error deleting user: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

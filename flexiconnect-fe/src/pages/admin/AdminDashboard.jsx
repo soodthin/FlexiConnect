@@ -12,23 +12,17 @@ import {
   Legend,
 } from "chart.js";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear()); // default năm hiện tại
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
+    document.documentElement.classList.toggle("dark", localStorage.getItem("theme") === "dark");
+
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -37,15 +31,12 @@ const AdminDashboard = () => {
           setLoading(false);
           return;
         }
-
         const res = await authApis().get(endpoints["admin-dashboard"], {
           headers: { Authorization: `Bearer ${token}` },
         });
-
-        console.log("📊 API Data:", res.data);
         setStats(res.data);
       } catch (err) {
-        console.error("Failed to load stats:", err);
+        console.error(err);
         setError("Không thể tải dữ liệu thống kê.");
       } finally {
         setLoading(false);
@@ -55,68 +46,55 @@ const AdminDashboard = () => {
     fetchStats();
   }, []);
 
-  if (loading) return <p>Đang tải dữ liệu...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (loading) return <p className="text-gray-500 dark:text-gray-300">Đang tải dữ liệu...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
 
-  // ✅ Helper: Group dữ liệu theo tháng
   const groupByMonth = (data, key) => {
     let months = Array(12).fill(0);
     data
-      ?.filter((item) => new Date(item.date).getFullYear() === selectedYear)
-      .forEach((item) => {
-        const month = new Date(item.date).getMonth(); // 0-11
+      ?.filter(item => new Date(item.date).getFullYear() === selectedYear)
+      .forEach(item => {
+        const month = new Date(item.date).getMonth();
         months[month] += item[key] || 0;
       });
     return months;
   };
 
   const labels = [
-    "Tháng 1",
-    "Tháng 2",
-    "Tháng 3",
-    "Tháng 4",
-    "Tháng 5",
-    "Tháng 6",
-    "Tháng 7",
-    "Tháng 8",
-    "Tháng 9",
-    "Tháng 10",
-    "Tháng 11",
-    "Tháng 12",
+    "Tháng 1","Tháng 2","Tháng 3","Tháng 4","Tháng 5","Tháng 6",
+    "Tháng 7","Tháng 8","Tháng 9","Tháng 10","Tháng 11","Tháng 12"
   ];
 
-  // Biểu đồ Người dùng
   const userChartData = {
     labels,
     datasets: [
       {
         label: "Ứng viên (Candidate)",
         data: groupByMonth(stats?.userRegistrationStats, "candidate"),
-        borderColor: "rgba(75,192,192,1)",
-        backgroundColor: "rgba(75,192,192,0.2)",
+        borderColor: "#22c55e",
+        backgroundColor: "rgba(34,197,94,0.2)",
         tension: 0.3,
         fill: true,
       },
       {
         label: "Nhà tuyển dụng (Employer)",
         data: groupByMonth(stats?.userRegistrationStats, "employer"),
-        borderColor: "rgba(255,99,132,1)",
-        backgroundColor: "rgba(255,99,132,0.2)",
+        borderColor: "#ef4444",
+        backgroundColor: "rgba(239,68,68,0.2)",
         tension: 0.3,
         fill: true,
       },
     ],
   };
 
-  // Biểu đồ Bài đăng việc làm
   const jobChartData = {
     labels,
     datasets: [
       {
         label: "Bài đăng việc làm",
         data: groupByMonth(stats?.jobPostStats, "count"),
-        borderColor: "rgba(54,162,235,1)",
-        backgroundColor: "rgba(54,162,235,0.2)",
+        borderColor: "#3b82f6",
+        backgroundColor: "rgba(59,130,246,0.2)",
         tension: 0.3,
         fill: true,
       },
@@ -126,105 +104,75 @@ const AdminDashboard = () => {
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: {
-      legend: { position: "top" },
-    },
-    scales: {
-      y: { beginAtZero: true },
+    plugins: { legend: { position: "top", labels: { color: "#f3f4f6" } } },
+    scales: { 
+      y: { beginAtZero: true, ticks: { color: "#f3f4f6" } }, 
+      x: { ticks: { color: "#f3f4f6" } } 
     },
   };
 
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
-      <h2 style={{ marginBottom: "20px" }}>📊 Thống kê Admin</h2>
+    <div className="p-6 min-h-screen bg-gray-50 dark:bg-[#181818] text-gray-800 dark:text-gray-100 space-y-6">
+      <h2 className="text-2xl font-bold">📊 Thống kê Admin</h2>
 
-      {/* Bộ lọc năm */}
-      <div style={{ marginBottom: "20px" }}>
-        <label htmlFor="yearFilter" style={{ marginRight: "10px" }}>
-          Chọn năm:
-        </label>
+      {/* Filter năm */}
+      <div className="flex items-center gap-3">
+        <label htmlFor="yearFilter" className="font-medium">Chọn năm:</label>
         <select
           id="yearFilter"
           value={selectedYear}
-          onChange={(e) => setSelectedYear(Number(e.target.value))}
-          style={{ padding: "5px 10px" }}
+          onChange={e => setSelectedYear(Number(e.target.value))}
+          className="p-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 dark:bg-[#2d2d2d] dark:border-neutral-600 dark:text-gray-200"
         >
-          {[2023, 2024, 2025].map((year) => (
-            <option key={year} value={year}>
-              {year}
-            </option>
+          {[2023, 2024, 2025].map(year => (
+            <option key={year} value={year}>{year}</option>
           ))}
         </select>
       </div>
 
-      {/* Card thống kê */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
-          gap: "15px",
-          marginBottom: "30px",
-        }}
-      >
-        {statCards.map((card, index) => (
-          <div key={index} style={{ ...cardStyle, background: card.bg }}>
-            <div style={{ fontSize: "22px", marginBottom: "6px" }}>
-              {card.icon}
-            </div>
-            <h4 style={{ margin: "4px 0", fontSize: "15px" }}>{card.title}</h4>
-            <p style={{ fontSize: "18px", fontWeight: "bold" }}>
-              {stats[card.key]}
-            </p>
+      {/* Stat cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5">
+  {statCards.map((card, i) => (
+    <div
+      key={i}
+      className="flex flex-col items-center justify-center p-3 bg-white dark:bg-[#232323] rounded-lg shadow-sm hover:shadow-md transition cursor-pointer"
+    >
+      <div className="text-2xl mb-1">{card.icon}</div>
+      <p className="text-lg font-semibold">{stats[card.key]}</p>
+      <span className="text-xs text-gray-500 dark:text-gray-300">{card.title}</span>
+    </div>
+  ))}
+</div>
+
+
+      {/* Biểu đồ */}
+      <div className="space-y-6">
+        <div className="bg-white dark:bg-[#232323] p-4 rounded-xl shadow hover:shadow-md transition">
+          <h3 className="font-semibold mb-2 text-gray-700 dark:text-gray-200">Người dùng đăng ký</h3>
+          <div className="h-72">
+            <Line data={userChartData} options={chartOptions} />
           </div>
-        ))}
-      </div>
-
-      {/* Biểu đồ Người dùng */}
-      <div style={chartCardStyle}>
-        <h3>📈 Người dùng đăng ký</h3>
-        <div style={{ height: "300px" }}>
-          <Line data={userChartData} options={chartOptions} />
         </div>
-      </div>
 
-      {/* Biểu đồ Bài đăng việc làm */}
-      <div style={chartCardStyle}>
-        <h3>📉 Bài đăng việc làm</h3>
-        <div style={{ height: "300px" }}>
-          <Line data={jobChartData} options={chartOptions} />
+        <div className="bg-white dark:bg-[#232323] p-4 rounded-xl shadow hover:shadow-md transition">
+          <h3 className="font-semibold mb-2 text-gray-700 dark:text-gray-200">Bài đăng việc làm</h3>
+          <div className="h-72">
+            <Line data={jobChartData} options={chartOptions} />
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-// Config thẻ thống kê
 const statCards = [
-  { title: "Tổng người dùng", key: "totalUsers", icon: "👥", bg: "linear-gradient(135deg,#e0f7fa,#80deea)" },
-  { title: "Nhà tuyển dụng", key: "totalEmployers", icon: "🏢", bg: "linear-gradient(135deg,#f1f8e9,#aed581)" },
-  { title: "Ứng viên", key: "totalCandidates", icon: "🧑‍💼", bg: "linear-gradient(135deg,#fce4ec,#f48fb1)" },
-  { title: "Bài đăng việc làm", key: "totalJobPosts", icon: "📝", bg: "linear-gradient(135deg,#e8eaf6,#9fa8da)" },
-  { title: "Đang hoạt động", key: "activeJobs", icon: "✅", bg: "linear-gradient(135deg,#f3e5f5,#ce93d8)" },
-  { title: "Chờ xác minh", key: "pendingEmployerVerifications", icon: "⏳", bg: "linear-gradient(135deg,#fff3e0,#ffb74d)" },
-  { title: "Tài khoản bị cấm", key: "bannedUsers", icon: "🚫", bg: "linear-gradient(135deg,#ffebee,#ef9a9a)" },
+  { title: "Tổng người dùng", key: "totalUsers", icon: "👥" },
+  { title: "Nhà tuyển dụng", key: "totalEmployers", icon: "🏢" },
+  { title: "Ứng viên", key: "totalCandidates", icon: "🧑‍💼" },
+  { title: "Bài đăng việc làm", key: "totalJobPosts", icon: "📝" },
+  { title: "Đang hoạt động", key: "activeJobs", icon: "✅" },
+  { title: "Chờ xác minh", key: "pendingEmployerVerifications", icon: "⏳" },
+  { title: "Tài khoản bị cấm", key: "bannedUsers", icon: "🚫" },
 ];
-
-const cardStyle = {
-  padding: "15px",
-  borderRadius: "10px",
-  textAlign: "center",
-  boxShadow: "0px 3px 8px rgba(0,0,0,0.1)",
-  color: "#333",
-  transition: "transform 0.2s",
-  cursor: "pointer",
-};
-
-const chartCardStyle = {
-  background: "#fff",
-  padding: "20px",
-  borderRadius: "10px",
-  boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
-  marginBottom: "25px",
-};
 
 export default AdminDashboard;

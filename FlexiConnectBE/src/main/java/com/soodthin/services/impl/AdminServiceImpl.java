@@ -42,15 +42,15 @@ import java.util.Set;
 import java.util.Map;
 import java.util.Comparator;
 import java.util.HashMap;
-import jakarta.persistence.criteria.Predicate;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  *
  * @author ADMIN
  */
+@Slf4j
 @Service
 @Transactional
 public class AdminServiceImpl implements AdminService {
@@ -69,8 +69,6 @@ public class AdminServiceImpl implements AdminService {
 
     @Autowired
     private ModelMapper modelMapper;
-
-    private static final Logger log = Logger.getLogger(AdminServiceImpl.class.getName());
 
     @Override
     public List<EmployerDTO> getAllEmployers() {
@@ -152,7 +150,7 @@ public class AdminServiceImpl implements AdminService {
                     .build();
 
         } catch (Exception e) {
-            log.log(Level.SEVERE, "Error fetching dashboard stats", e);
+            log.error("Error fetching dashboard stats", e);
             throw new RuntimeException("Failed to fetch dashboard statistics");
         }
     }
@@ -296,57 +294,56 @@ public class AdminServiceImpl implements AdminService {
         log.info(String.format("User deleted successfully - userId: {}", userId));
     }
 
-   @Override
-public Page<JobPostAdminResponse> getJobPosts(String status, String search, int page, int size) {
-    log.info(String.format("Fetching job posts - status: %s, search: %s, page: %d, size: %d",
-            status, search, page, size));
+    @Override
+    public Page<JobPostAdminResponse> getJobPosts(String status, String search, int page, int size) {
+        log.info(String.format("Fetching job posts - status: %s, search: %s, page: %d, size: %d",
+                status, search, page, size));
 
-    Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-    Page<JobPost> jobPosts;
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<JobPost> jobPosts;
 
-    boolean hasStatus = status != null && !status.isBlank();
-    boolean hasSearch = search != null && !search.isBlank();
+        boolean hasStatus = status != null && !status.isBlank();
+        boolean hasSearch = search != null && !search.isBlank();
 
-    if (hasStatus && hasSearch) {
-        // search theo title hoặc company name khi có status
-        Page<JobPost> postsByTitle = jobPostRepository
-                .findByStatusAndTitleContainingIgnoreCaseOrderByCreatedAtDesc(
-                        JobPost.JobStatus.valueOf(status.toUpperCase()), search, pageable);
+        if (hasStatus && hasSearch) {
+            // search theo title hoặc company name khi có status
+            Page<JobPost> postsByTitle = jobPostRepository
+                    .findByStatusAndTitleContainingIgnoreCaseOrderByCreatedAtDesc(
+                            JobPost.JobStatus.valueOf(status.toUpperCase()), search, pageable);
 
-        Page<JobPost> postsByCompany = jobPostRepository
-                .findByStatusAndEmployerCompanyNameContainingIgnoreCaseOrderByCreatedAtDesc(
-                        JobPost.JobStatus.valueOf(status.toUpperCase()), search, pageable);
+            Page<JobPost> postsByCompany = jobPostRepository
+                    .findByStatusAndEmployerCompanyNameContainingIgnoreCaseOrderByCreatedAtDesc(
+                            JobPost.JobStatus.valueOf(status.toUpperCase()), search, pageable);
 
-        jobPosts = postsByTitle.hasContent() ? postsByTitle : postsByCompany;
+            jobPosts = postsByTitle.hasContent() ? postsByTitle : postsByCompany;
 
-    } else if (hasStatus) {
-        jobPosts = jobPostRepository.findByStatusOrderByCreatedAtDesc(
-                JobPost.JobStatus.valueOf(status.toUpperCase()), pageable);
+        } else if (hasStatus) {
+            jobPosts = jobPostRepository.findByStatusOrderByCreatedAtDesc(
+                    JobPost.JobStatus.valueOf(status.toUpperCase()), pageable);
 
-    } else if (hasSearch) {
-        // search theo title hoặc company name khi không có status
-        Page<JobPost> postsByTitle = jobPostRepository
-                .findByTitleContainingIgnoreCaseOrderByCreatedAtDesc(search, pageable);
-        Page<JobPost> postsByCompany = jobPostRepository
-                .findByEmployerCompanyNameContainingIgnoreCaseOrderByCreatedAtDesc(search, pageable);
+        } else if (hasSearch) {
+            // search theo title hoặc company name khi không có status
+            Page<JobPost> postsByTitle = jobPostRepository
+                    .findByTitleContainingIgnoreCaseOrderByCreatedAtDesc(search, pageable);
+            Page<JobPost> postsByCompany = jobPostRepository
+                    .findByEmployerCompanyNameContainingIgnoreCaseOrderByCreatedAtDesc(search, pageable);
 
-        jobPosts = postsByTitle.hasContent() ? postsByTitle : postsByCompany;
+            jobPosts = postsByTitle.hasContent() ? postsByTitle : postsByCompany;
 
-    } else {
-        jobPosts = jobPostRepository.findAll(pageable);
+        } else {
+            jobPosts = jobPostRepository.findAll(pageable);
+        }
+
+        return jobPosts.map(job -> new JobPostAdminResponse(
+                job.getId(),
+                job.getTitle(),
+                job.getDescription(),
+                job.getLocation(),
+                job.getStatus(),
+                job.getEmployerId() != null ? job.getEmployerId().getCompanyName() : "Unknown",
+                job.getCreatedAt()
+        ));
     }
-
-    return jobPosts.map(job -> new JobPostAdminResponse(
-            job.getId(),
-            job.getTitle(),
-            job.getDescription(),
-            job.getLocation(),
-            job.getStatus(),
-            job.getEmployerId() != null ? job.getEmployerId().getCompanyName() : "Unknown",
-            job.getCreatedAt()
-    ));
-}
-
 
     @Override
     public JobPostAdminResponse updateJobPostStatus(Integer id, JobStatus newStatus) {
