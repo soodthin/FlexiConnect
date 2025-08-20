@@ -15,7 +15,9 @@ export const endpoints = {
   'admin-dashboard': '/users/admin/dashboard/stats',
   "admin-employers": "/users/admin/employers",
   "admin-employer-verify": (id) => `/users/admin/employers/${id}/verify`,
-  "admin-employer-reject": (id) => `/users/admin/employers/${id}/reject`,
+  "admin-employer-reject": (id) => `/users/admin/ employers/${id}/reject`,
+  'admin-users-management': "/users/admin/users",
+  'admin-jobposts': "/users/admin/jobposts",
   
   /* Candidate */
   'candidate-profile': "/users/candidate/profile",

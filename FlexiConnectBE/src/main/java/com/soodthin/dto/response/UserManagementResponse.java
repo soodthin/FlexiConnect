@@ -7,8 +7,10 @@ package com.soodthin.dto.response;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  *
@@ -16,6 +18,8 @@ import lombok.Data;
  */
 @Data
 @Builder
+@NoArgsConstructor 
+@AllArgsConstructor 
 public class UserManagementResponse {
     private Integer id;
     private String email;
@@ -30,4 +34,6 @@ public class UserManagementResponse {
     private Set<String> roles;
     private String companyName;
     private Boolean isVerified;
+
+    
 }

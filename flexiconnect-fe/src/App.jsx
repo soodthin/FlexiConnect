@@ -17,8 +17,10 @@ import EmployerRegister from '@auth/EmployerRegister';
 
 import JobDetails from '@public/JobDetails';
 
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import PendingEmployers from "./pages/admin/PendingEmployers";
+import AdminDashboard from "@admin/AdminDashboard";
+import PendingEmployers from "@admin/PendingEmployers";
+import UserManagement from "@admin/UserManagement";
+import AdminJobPostList from "@admin/AdminJobPostList";
 
 import EmployerDashboard from '@employer/EmployerDashboard';
 import EmployerProfile from '@employerProfile/EmployerProfile';
@@ -48,88 +50,105 @@ function App() {
   return (
     <MyUserContext.Provider value={user}>
       <MyDispatcherContext.Provider value={dispatch}>
-         <TooltipProvider>
-        <BrowserRouter>
-          <MainLayout>
-            <Toaster richColors position="top-center" />
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/employer-register" element={<EmployerRegister />} />
-              {/* Admin Routes */}
-              <Route
-                path="/admin-dashboard"
-                element={
-                  <PrivateRoute allowedRoles={["ADMIN"]}>
-                    <AdminDashboard/>
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/admin-pending-employers"
-                element={
-                  <PrivateRoute allowedRoles={["ADMIN"]}>
-                    <PendingEmployers/>
-                  </PrivateRoute>
-                }
-              />
-              { /* Candidate Routes */}
-              <Route
-                path="/candidate-dashboard"
-                element={
-                  <PrivateRoute allowedRoles={["CANDIDATE"]}>
-                    <CandidateDashboard />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/candidate-profile"
-                element={
-                  <PrivateRoute allowedRoles={["CANDIDATE"]}>
-                    <CandidateProfile />
-                  </PrivateRoute>
-                }
-              />
-              {/* Employer Routes */}
-              <Route
-                path="/employer-profile"
-                element={
-                  <PrivateRoute allowedRoles={["EMPLOYER"]}>
-                    <EmployerProfile />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/employer-jobposts-management"
-                element={
-                  <PrivateRoute allowedRoles={["EMPLOYER"]}>
-                    <JobPostsManagement />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/employer-dashboard"
-                element={
-                  <PrivateRoute allowedRoles={["EMPLOYER"]}>
-                    <EmployerDashboard />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/employer-job-applications"
-                element={
-                  <PrivateRoute allowedRoles={["EMPLOYER"]}>
-                    <JobApplications />
-                  </PrivateRoute>
-                }
+        <TooltipProvider>
+          <BrowserRouter>
+            <MainLayout>
+              <Toaster richColors position="top-center" />
+              {/*Public Routes*/}
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/employer-register" element={<EmployerRegister />} />
+                {/* Admin Routes */}
+                <Route
+                  path="/admin-dashboard"
+                  element={
+                    <PrivateRoute allowedRoles={["ADMIN"]}>
+                      <AdminDashboard />
+                    </PrivateRoute>
+                  }
                 />
-              <Route path="/unauthorized" element={<Unauthorized />} />
+                <Route
+                  path="/admin-pending-employers"
+                  element={
+                    <PrivateRoute allowedRoles={["ADMIN"]}>
+                      <PendingEmployers />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/admin-users-management"
+                  element={
+                    <PrivateRoute allowedRoles={["ADMIN"]}>
+                      <UserManagement />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/admin-jobposts-management"
+                  element={
+                    <PrivateRoute allowedRoles={["ADMIN"]}>
+                      <AdminJobPostList />
+                    </PrivateRoute>
+                  }
+                />
+                { /* Candidate Routes */}
+                <Route
+                  path="/candidate-dashboard"
+                  element={
+                    <PrivateRoute allowedRoles={["CANDIDATE"]}>
+                      <CandidateDashboard />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/candidate-profile"
+                  element={
+                    <PrivateRoute allowedRoles={["CANDIDATE"]}>
+                      <CandidateProfile />
+                    </PrivateRoute>
+                  }
+                />
+                {/* Employer Routes */}
+                <Route
+                  path="/employer-profile"
+                  element={
+                    <PrivateRoute allowedRoles={["EMPLOYER"]}>
+                      <EmployerProfile />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/employer-jobposts-management"
+                  element={
+                    <PrivateRoute allowedRoles={["EMPLOYER"]}>
+                      <JobPostsManagement />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/employer-dashboard"
+                  element={
+                    <PrivateRoute allowedRoles={["EMPLOYER"]}>
+                      <EmployerDashboard />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/employer-job-applications"
+                  element={
+                    <PrivateRoute allowedRoles={["EMPLOYER"]}>
+                      <JobApplications />
+                    </PrivateRoute>
+                  }
+                />
+                <Route path="/unauthorized" element={<Unauthorized />} />
 
-              <Route path="/job-posts/:id" element={<JobDetails />} />
-            </Routes>
-          </MainLayout>
-        </BrowserRouter>
+                <Route path="/job-posts/:id" element={<JobDetails />} />
+              </Routes>
+            </MainLayout>
+          </BrowserRouter>
         </TooltipProvider>
       </MyDispatcherContext.Provider>
     </MyUserContext.Provider>

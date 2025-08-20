@@ -7,6 +7,10 @@ package com.soodthin.dto.response;
 import com.soodthin.entity.JobPost.JobStatus;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+
 
 /**
  *
@@ -30,6 +34,7 @@ public class JobPostResponse {
     private String companyAddress;
     private String website;
     private int viewCount;
+
 
     /**
      * @return the id
@@ -240,5 +245,6 @@ public class JobPostResponse {
     public void setViewCount(int viewCount) {
         this.viewCount = viewCount;
     }
+
     
 }

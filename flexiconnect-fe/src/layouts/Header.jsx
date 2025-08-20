@@ -130,7 +130,6 @@ export default function Header() {
                   {/*ROLE_ADMIN*/}
                   {user.role === "ADMIN" && (
                     <>
-                      <li onClick={() => navigate("/admin-dashboard")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Bảng điều khiển Admin</li>
                       <li onClick={() => navigate("/admin-pending-employers")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Duyệt nhà tuyển dụng</li>
                       <li onClick={() => navigate("/admin-users-management")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Quản lý người dùng</li>
                       <li onClick={() => navigate("/admin-jobposts-management")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Quản lý tin tuyển dụng</li>

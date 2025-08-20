@@ -10,8 +10,11 @@ import com.soodthin.dto.response.EmployerVerificationResponse;
 import com.soodthin.dto.response.UserManagementResponse;
 import com.soodthin.dto.request.UserStatusUpdateRequest;
 import com.soodthin.dto.request.EmployerVerificationRequest;
+import com.soodthin.dto.request.JobPostAdminRequest;
+import com.soodthin.dto.response.JobPostAdminResponse;
 import com.soodthin.entity.Employer;
 import com.soodthin.services.AdminService;
+import com.soodthin.services.JobPostService;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -102,22 +105,6 @@ public class AdminController {
         }
     }
 
-    @GetMapping("/employers/pending-verifications")
-    public ResponseEntity<Page<EmployerVerificationResponse>> getPendingVerifications(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-
-        log.info(String.format("GET /api/admin/employers/pending-verifications - page: %d, size: %d", page, size));
-
-        try {
-            Page<EmployerVerificationResponse> employers = adminService.getPendingEmployerVerifications(page, size);
-            return ResponseEntity.ok(employers);
-        } catch (Exception e) {
-            log.severe("Error retrieving pending verifications: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
     @PutMapping("/users/{userId}/status")
     public ResponseEntity<UserManagementResponse> updateUserStatus(
             @PathVariable Integer userId,
@@ -137,25 +124,6 @@ public class AdminController {
         }
     }
 
-    @PutMapping("/employers/{employerId}/verification")
-    public ResponseEntity<EmployerVerificationResponse> updateEmployerVerification(
-            @PathVariable Integer employerId,
-            @RequestBody EmployerVerificationRequest request) {
-
-        log.info(String.format("PUT /api/admin/employers/%d/verification - verified: %s", employerId, request.getIsVerified()));
-
-        try {
-            EmployerVerificationResponse employer = adminService.updateEmployerVerification(employerId, request);
-            return ResponseEntity.ok(employer);
-        } catch (RuntimeException e) {
-            log.severe("Error updating employer verification: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        } catch (Exception e) {
-            log.severe("Error updating employer verification: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable Integer userId) {
         log.info(String.format("DELETE /api/admin/users/%d", userId));
@@ -168,6 +136,36 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (Exception e) {
             log.severe("Error deleting user: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/jobposts")
+public ResponseEntity<Page<JobPostAdminResponse>> getJobPosts(
+        @RequestParam(required = false) String status,
+        @RequestParam(required = false) String search,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "20") int size) {
+
+    log.info(String.format("GET /api/users/admin/jobposts - status: %s, search: %s, page: %d, size: %d",
+            status, search, page, size));
+
+    Page<JobPostAdminResponse> jobPosts = adminService.getJobPosts(status, search, page, size);
+    return ResponseEntity.ok(jobPosts);
+}
+
+
+    @PutMapping("/jobposts/{id}/status")
+    public ResponseEntity<JobPostAdminResponse> updateJobPostStatus(
+            @PathVariable Integer id,
+            @RequestBody JobPostAdminRequest request
+    ) {
+        try {
+            JobPostAdminResponse updated = adminService.updateJobPostStatus(id, request.getStatus());
+            return ResponseEntity.ok(updated);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

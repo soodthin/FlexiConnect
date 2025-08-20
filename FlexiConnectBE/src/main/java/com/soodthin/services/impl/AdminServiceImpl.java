@@ -12,8 +12,10 @@ import com.soodthin.dto.response.EmployerVerificationResponse;
 import com.soodthin.dto.response.UserManagementResponse;
 import com.soodthin.dto.request.UserStatusUpdateRequest;
 import com.soodthin.dto.request.EmployerVerificationRequest;
+import com.soodthin.dto.response.JobPostAdminResponse;
 import com.soodthin.entity.Employer;
 import com.soodthin.entity.JobPost;
+import com.soodthin.entity.JobPost.JobStatus;
 import com.soodthin.entity.Role;
 import com.soodthin.entity.User;
 import com.soodthin.entity.User.UserStatus;
@@ -34,11 +36,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.Map;
 import java.util.Comparator;
 import java.util.HashMap;
+import jakarta.persistence.criteria.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -81,7 +85,7 @@ public class AdminServiceImpl implements AdminService {
         Employer employer = employerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Employer not found"));
         employer.setIsVerified(true);
-        employer.setReasonReject(null); 
+        employer.setReasonReject(null);
         employerRepository.save(employer);
         return toDTO(employer);
     }
@@ -157,28 +161,31 @@ public class AdminServiceImpl implements AdminService {
     public Page<UserManagementResponse> getUsers(String role, String search, int page, int size) {
         log.info(String.format("Fetching users - role: %s, search: %s, page: %d, size: %d", role, search, page, size));
 
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<User> users;
 
-        if (role != null && !role.isEmpty() && search != null && !search.isEmpty()) {
-            // Both role and search filters
-            Page<User> usersByName = userRepository.findByRoleSet_RoleNameAndFullNameContainingIgnoreCaseOrderByCreatedAtDesc(
-                    role.toUpperCase(), search, pageable);
-            Page<User> usersByEmail = userRepository.findByRoleSet_RoleNameAndEmailContainingIgnoreCaseOrderByCreatedAtDesc(
-                    role.toUpperCase(), search, pageable);
+        boolean hasRole = role != null && !role.isBlank();
+        boolean hasSearch = search != null && !search.isBlank();
 
-            // Combine results (simplified approach - in production, use custom query)
-            users = usersByName.getTotalElements() > 0 ? usersByName : usersByEmail;
-        } else if (role != null && !role.isEmpty()) {
-            // Only role filter
+        if (hasRole && hasSearch) {
+            Page<User> usersByName = userRepository
+                    .findByRoleSet_RoleNameAndFullNameContainingIgnoreCaseOrderByCreatedAtDesc(
+                            role.toUpperCase(), search, pageable);
+            Page<User> usersByEmail = userRepository
+                    .findByRoleSet_RoleNameAndEmailContainingIgnoreCaseOrderByCreatedAtDesc(
+                            role.toUpperCase(), search, pageable);
+
+            users = usersByName.hasContent() ? usersByName : usersByEmail;
+
+        } else if (hasRole) {
             users = userRepository.findByRoleSet_RoleNameOrderByCreatedAtDesc(role.toUpperCase(), pageable);
-        } else if (search != null && !search.isEmpty()) {
-            // Only search filter
+
+        } else if (hasSearch) {
             users = userRepository.findByFullNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrderByCreatedAtDesc(
                     search, search, pageable);
+
         } else {
-            // No filters
-            users = userRepository.findAll(PageRequest.of(page, size, Sort.by("createdAt").descending()));
+            users = userRepository.findAll(pageable);
         }
 
         return users.map(this::convertToUserManagementResponse);
@@ -289,7 +296,77 @@ public class AdminServiceImpl implements AdminService {
         log.info(String.format("User deleted successfully - userId: {}", userId));
     }
 
-    // Private helper methods
+   @Override
+public Page<JobPostAdminResponse> getJobPosts(String status, String search, int page, int size) {
+    log.info(String.format("Fetching job posts - status: %s, search: %s, page: %d, size: %d",
+            status, search, page, size));
+
+    Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+    Page<JobPost> jobPosts;
+
+    boolean hasStatus = status != null && !status.isBlank();
+    boolean hasSearch = search != null && !search.isBlank();
+
+    if (hasStatus && hasSearch) {
+        // search theo title hoặc company name khi có status
+        Page<JobPost> postsByTitle = jobPostRepository
+                .findByStatusAndTitleContainingIgnoreCaseOrderByCreatedAtDesc(
+                        JobPost.JobStatus.valueOf(status.toUpperCase()), search, pageable);
+
+        Page<JobPost> postsByCompany = jobPostRepository
+                .findByStatusAndEmployerCompanyNameContainingIgnoreCaseOrderByCreatedAtDesc(
+                        JobPost.JobStatus.valueOf(status.toUpperCase()), search, pageable);
+
+        jobPosts = postsByTitle.hasContent() ? postsByTitle : postsByCompany;
+
+    } else if (hasStatus) {
+        jobPosts = jobPostRepository.findByStatusOrderByCreatedAtDesc(
+                JobPost.JobStatus.valueOf(status.toUpperCase()), pageable);
+
+    } else if (hasSearch) {
+        // search theo title hoặc company name khi không có status
+        Page<JobPost> postsByTitle = jobPostRepository
+                .findByTitleContainingIgnoreCaseOrderByCreatedAtDesc(search, pageable);
+        Page<JobPost> postsByCompany = jobPostRepository
+                .findByEmployerCompanyNameContainingIgnoreCaseOrderByCreatedAtDesc(search, pageable);
+
+        jobPosts = postsByTitle.hasContent() ? postsByTitle : postsByCompany;
+
+    } else {
+        jobPosts = jobPostRepository.findAll(pageable);
+    }
+
+    return jobPosts.map(job -> new JobPostAdminResponse(
+            job.getId(),
+            job.getTitle(),
+            job.getDescription(),
+            job.getLocation(),
+            job.getStatus(),
+            job.getEmployerId() != null ? job.getEmployerId().getCompanyName() : "Unknown",
+            job.getCreatedAt()
+    ));
+}
+
+
+    @Override
+    public JobPostAdminResponse updateJobPostStatus(Integer id, JobStatus newStatus) {
+        JobPost jobPost = jobPostRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Job post not found"));
+
+        jobPost.setStatus(newStatus);
+        jobPostRepository.save(jobPost);
+
+        return new JobPostAdminResponse(
+                jobPost.getId(),
+                jobPost.getTitle(),
+                jobPost.getDescription(),
+                jobPost.getLocation(),
+                jobPost.getStatus(),
+                jobPost.getEmployerId() != null ? jobPost.getEmployerId().getCompanyName() : "Unknown",
+                jobPost.getCreatedAt()
+        );
+    }
+
     private UserManagementResponse convertToUserManagementResponse(User user) {
         UserManagementResponse response = modelMapper.map(user, UserManagementResponse.class);
 

@@ -9,7 +9,9 @@ import com.soodthin.dto.request.EmployerVerificationRequest;
 import com.soodthin.dto.request.UserStatusUpdateRequest;
 import com.soodthin.dto.response.AdminDashboardResponse;
 import com.soodthin.dto.response.EmployerVerificationResponse;
+import com.soodthin.dto.response.JobPostAdminResponse;
 import com.soodthin.dto.response.UserManagementResponse;
+import com.soodthin.entity.JobPost.JobStatus;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,10 @@ public interface AdminService {
     Page<EmployerVerificationResponse> getPendingEmployerVerifications(int page, int size);
 
     Page<EmployerVerificationResponse> getEmployers(Boolean verified, String search, int page, int size);
+
+    Page<JobPostAdminResponse> getJobPosts(String status, String search, int page, int size);
+
+    JobPostAdminResponse updateJobPostStatus(Integer id, JobStatus newStatus);
 
     UserManagementResponse updateUserStatus(Integer userId, UserStatusUpdateRequest request);
 
