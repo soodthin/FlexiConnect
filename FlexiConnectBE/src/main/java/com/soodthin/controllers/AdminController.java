@@ -4,12 +4,17 @@
  */
 package com.soodthin.controllers;
 
+import com.soodthin.dto.EmployerDTO;
 import com.soodthin.dto.response.AdminDashboardResponse;
 import com.soodthin.dto.response.EmployerVerificationResponse;
 import com.soodthin.dto.response.UserManagementResponse;
 import com.soodthin.dto.request.UserStatusUpdateRequest;
 import com.soodthin.dto.request.EmployerVerificationRequest;
+import com.soodthin.entity.Employer;
 import com.soodthin.services.AdminService;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.logging.Logger;
+
 /**
  *
  * @author ADMIN
@@ -38,12 +44,38 @@ public class AdminController {
     @Autowired
     private AdminService adminService;
 
+    @GetMapping("/employers")
+    public ResponseEntity<List<EmployerDTO>> getAllEmployers() {
+        return ResponseEntity.ok(adminService.getAllEmployers());
+    }
+
+    @PutMapping("/employers/{id}/verify")
+    public ResponseEntity<EmployerDTO> verifyEmployer(@PathVariable Integer id) {
+        return ResponseEntity.ok(adminService.verifyEmployer(id));
+    }
+
+    @PutMapping("/employers/{id}/reject")
+    public ResponseEntity<EmployerDTO> rejectEmployer(
+            @PathVariable Integer id,
+            @RequestBody Map<String, String> body
+    ) {
+        return ResponseEntity.ok(
+                adminService.rejectEmployer(id, body.get("reason"))
+        );
+    }
+
     @GetMapping("/dashboard/stats")
-    public ResponseEntity<AdminDashboardResponse> getDashboardStats() {
-        log.info("GET /api/admin/dashboard/stats");
+    public ResponseEntity<AdminDashboardResponse> getDashboardStats(
+            @RequestParam(required = false) Integer year) {
+        log.info("GET /api/admin/dashboard/stats with year=" + year);
 
         try {
-            AdminDashboardResponse stats = adminService.getDashboardStats();
+            // Nếu không truyền thì mặc định lấy năm hiện tại
+            if (year == null) {
+                year = LocalDate.now().getYear();
+            }
+
+            AdminDashboardResponse stats = adminService.getDashboardStats(year);
             return ResponseEntity.ok(stats);
         } catch (Exception e) {
             log.severe("Error retrieving dashboard stats: " + e.getMessage());
@@ -140,4 +172,3 @@ public class AdminController {
         }
     }
 }
-

@@ -17,6 +17,9 @@ import EmployerRegister from '@auth/EmployerRegister';
 
 import JobDetails from '@public/JobDetails';
 
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import PendingEmployers from "./pages/admin/PendingEmployers";
+
 import EmployerDashboard from '@employer/EmployerDashboard';
 import EmployerProfile from '@employerProfile/EmployerProfile';
 import JobApplications from '@jobPosts/JobApplications';
@@ -24,7 +27,8 @@ import JobPostsManagement from '@jobPosts/JobPostsManagement';
 
 import CandidateDashboard from '@candidate/CandidateDashboard';
 import CandidateProfile from '@candidateProfile/CandidateProfile';
-import AdminDashboard from "./pages/admin/AdminDashboard";
+
+
 
 
 const userReducer = (current, action) => {
@@ -53,6 +57,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/employer-register" element={<EmployerRegister />} />
+              {/* Admin Routes */}
               <Route
                 path="/admin-dashboard"
                 element={
@@ -61,6 +66,15 @@ function App() {
                   </PrivateRoute>
                 }
               />
+              <Route
+                path="/admin-pending-employers"
+                element={
+                  <PrivateRoute allowedRoles={["ADMIN"]}>
+                    <PendingEmployers/>
+                  </PrivateRoute>
+                }
+              />
+              { /* Candidate Routes */}
               <Route
                 path="/candidate-dashboard"
                 element={
@@ -77,6 +91,7 @@ function App() {
                   </PrivateRoute>
                 }
               />
+              {/* Employer Routes */}
               <Route
                 path="/employer-profile"
                 element={

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { authApis, endpoints } from "../../configs/APIs";
+import { authApis, endpoints } from "@configs/APIs";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -12,7 +12,6 @@ import {
   Legend,
 } from "chart.js";
 
-// Đăng ký Chart.js components cho Line chart
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -27,6 +26,7 @@ const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear()); // default năm hiện tại
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -58,38 +58,63 @@ const AdminDashboard = () => {
   if (loading) return <p>Đang tải dữ liệu...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
-  // Biểu đồ người dùng (Candidate + Employer)
-// Biểu đồ người dùng (Candidate + Employer)
-const userChartData = {
-  labels: stats?.userRegistrationStats?.map((item) => item.date) || [],
-  datasets: [
-    {
-      label: "Ứng viên (Candidate)",
-      data: stats?.userRegistrationStats?.map((item) => item.candidate) || [], // 👈 đổi từ candidates -> candidate
-      borderColor: "rgba(75,192,192,1)",
-      backgroundColor: "rgba(75,192,192,0.2)",
-      tension: 0.3,
-      fill: true,
-    },
-    {
-      label: "Nhà tuyển dụng (Employer)",
-      data: stats?.userRegistrationStats?.map((item) => item.employer) || [], // 👈 đổi từ employers -> employer
-      borderColor: "rgba(255,99,132,1)",
-      backgroundColor: "rgba(255,99,132,0.2)",
-      tension: 0.3,
-      fill: true,
-    },
-  ],
-};
+  // ✅ Helper: Group dữ liệu theo tháng
+  const groupByMonth = (data, key) => {
+    let months = Array(12).fill(0);
+    data
+      ?.filter((item) => new Date(item.date).getFullYear() === selectedYear)
+      .forEach((item) => {
+        const month = new Date(item.date).getMonth(); // 0-11
+        months[month] += item[key] || 0;
+      });
+    return months;
+  };
 
+  const labels = [
+    "Tháng 1",
+    "Tháng 2",
+    "Tháng 3",
+    "Tháng 4",
+    "Tháng 5",
+    "Tháng 6",
+    "Tháng 7",
+    "Tháng 8",
+    "Tháng 9",
+    "Tháng 10",
+    "Tháng 11",
+    "Tháng 12",
+  ];
 
-  // Biểu đồ bài đăng việc làm
+  // Biểu đồ Người dùng
+  const userChartData = {
+    labels,
+    datasets: [
+      {
+        label: "Ứng viên (Candidate)",
+        data: groupByMonth(stats?.userRegistrationStats, "candidate"),
+        borderColor: "rgba(75,192,192,1)",
+        backgroundColor: "rgba(75,192,192,0.2)",
+        tension: 0.3,
+        fill: true,
+      },
+      {
+        label: "Nhà tuyển dụng (Employer)",
+        data: groupByMonth(stats?.userRegistrationStats, "employer"),
+        borderColor: "rgba(255,99,132,1)",
+        backgroundColor: "rgba(255,99,132,0.2)",
+        tension: 0.3,
+        fill: true,
+      },
+    ],
+  };
+
+  // Biểu đồ Bài đăng việc làm
   const jobChartData = {
-    labels: stats?.jobPostStats?.map((item) => item.date) || [],
+    labels,
     datasets: [
       {
         label: "Bài đăng việc làm",
-        data: stats?.jobPostStats?.map((item) => item.count) || [],
+        data: groupByMonth(stats?.jobPostStats, "count"),
         borderColor: "rgba(54,162,235,1)",
         backgroundColor: "rgba(54,162,235,0.2)",
         tension: 0.3,
@@ -105,7 +130,6 @@ const userChartData = {
       legend: { position: "top" },
     },
     scales: {
-      x: { ticks: { autoSkip: true, maxTicksLimit: 6 } },
       y: { beginAtZero: true },
     },
   };
@@ -113,6 +137,25 @@ const userChartData = {
   return (
     <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
       <h2 style={{ marginBottom: "20px" }}>📊 Thống kê Admin</h2>
+
+      {/* Bộ lọc năm */}
+      <div style={{ marginBottom: "20px" }}>
+        <label htmlFor="yearFilter" style={{ marginRight: "10px" }}>
+          Chọn năm:
+        </label>
+        <select
+          id="yearFilter"
+          value={selectedYear}
+          onChange={(e) => setSelectedYear(Number(e.target.value))}
+          style={{ padding: "5px 10px" }}
+        >
+          {[2023, 2024, 2025].map((year) => (
+            <option key={year} value={year}>
+              {year}
+            </option>
+          ))}
+        </select>
+      </div>
 
       {/* Card thống kê */}
       <div

@@ -13,6 +13,9 @@ export const endpoints = {
 
   /*Admnin*/
   'admin-dashboard': '/users/admin/dashboard/stats',
+  "admin-employers": "/users/admin/employers",
+  "admin-employer-verify": (id) => `/users/admin/employers/${id}/verify`,
+  "admin-employer-reject": (id) => `/users/admin/employers/${id}/reject`,
   
   /* Candidate */
   'candidate-profile': "/users/candidate/profile",

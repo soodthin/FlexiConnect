@@ -66,6 +66,8 @@ public class Employer implements Serializable {
     private Integer id;
     @Column(name = "is_verified")
     private Boolean isVerified;
+    @Column(name = "reason_reject")
+    private String reasonReject;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "employer")
     private Set<FollowEmployer> followEmployerSet;
     @OneToMany(mappedBy = "employerId")
@@ -103,10 +105,6 @@ public class Employer implements Serializable {
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
     }
-
-   
-
-   
 
     public String getCompanyIntro() {
         return companyIntro;
@@ -209,7 +207,6 @@ public class Employer implements Serializable {
         this.taxCode = taxCode;
     }
 
-   
     public String getWebsite() {
         return website;
     }
@@ -218,5 +215,18 @@ public class Employer implements Serializable {
         this.website = website;
     }
 
-  
+    /**
+     * @return the reasonReject
+     */
+    public String getReasonReject() {
+        return reasonReject;
+    }
+
+    /**
+     * @param reasonReject the reasonReject to set
+     */
+    public void setReasonReject(String reasonReject) {
+        this.reasonReject = reasonReject;
+    }
+
 }

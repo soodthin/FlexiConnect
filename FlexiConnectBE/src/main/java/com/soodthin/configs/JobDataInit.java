@@ -2,10 +2,12 @@ package com.soodthin.configs;
 
 import com.soodthin.entity.Employer;
 import com.soodthin.entity.JobPost;
+import com.soodthin.entity.Role;
 import com.soodthin.entity.User;
 import com.soodthin.entity.User.UserStatus;
 import com.soodthin.repositories.EmployerRepository;
 import com.soodthin.repositories.JobPostRepository;
+import com.soodthin.repositories.RoleRepository;
 import com.soodthin.repositories.UserRepository;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -18,6 +20,9 @@ import org.springframework.stereotype.Component;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Component
@@ -32,6 +37,15 @@ public class JobDataInit implements CommandLineRunner {
 
     @Autowired
     private UserRepository userRepo;
+    @Autowired
+    private RoleRepository roleRepository;
+
+    private LocalDateTime randomDateTime(LocalDateTime start, LocalDateTime end) {
+        long startSeconds = start.toEpochSecond(ZoneOffset.UTC);
+        long endSeconds = end.toEpochSecond(ZoneOffset.UTC);
+        long randomSeconds = ThreadLocalRandom.current().nextLong(startSeconds, endSeconds);
+        return LocalDateTime.ofEpochSecond(randomSeconds, 0, ZoneOffset.UTC);
+    }
 
     @Override
     public void run(String... args) {
@@ -46,6 +60,18 @@ public class JobDataInit implements CommandLineRunner {
 
             Sheet sheet = workbook.getSheetAt(0);
             int lineNumber = 0;
+
+            // --- define time range 2025 ---
+            LocalDateTime start2025 = LocalDateTime.of(2025, 1, 1, 0, 0, 0);
+            LocalDateTime end2025 = LocalDateTime.of(2025, 12, 31, 23, 59, 59);
+
+            // --- đảm bảo role EMPLOYER tồn tại ---
+            Role employerRole = roleRepository.findByRoleName("EMPLOYER")
+                    .orElseGet(() -> {
+                        Role r = new Role();
+                        r.setRoleName("EMPLOYER");
+                        return roleRepository.save(r);
+                    });
 
             for (Row row : sheet) {
                 if (lineNumber++ == 0) {
@@ -71,7 +97,8 @@ public class JobDataInit implements CommandLineRunner {
                         u.setEmail(fakeEmail);
                         u.setPassword(encoder.encode("123456"));
                         u.setStatus(UserStatus.ACTIVE);
-                        u.setCreatedAt(LocalDateTime.now());
+                        u.setCreatedAt(randomDateTime(start2025, end2025));
+                        u.setRoleSet(Set.of(employerRole)); 
                         return userRepo.save(u);
                     });
 
@@ -101,9 +128,9 @@ public class JobDataInit implements CommandLineRunner {
                     job.setStatus(JobPost.JobStatus.OPEN);
                     job.setViewCount(0);
 
-                    LocalDateTime now = LocalDateTime.now();
-                    job.setCreatedAt(now);
-                    job.setExpiredAt(now.plusDays(30));
+                    LocalDateTime createdAt = randomDateTime(start2025, end2025);
+                    job.setCreatedAt(createdAt);
+                    job.setExpiredAt(createdAt.plusDays(30));
 
                     jobPostRepo.save(job);
 

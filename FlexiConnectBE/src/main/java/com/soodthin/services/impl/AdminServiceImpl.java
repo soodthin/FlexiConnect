@@ -4,6 +4,7 @@
  */
 package com.soodthin.services.impl;
 
+import com.soodthin.dto.EmployerDTO;
 import com.soodthin.dto.JobPostStatsDTO;
 import com.soodthin.dto.UserRegistrationStatsDTO;
 import com.soodthin.dto.response.AdminDashboardResponse;
@@ -13,7 +14,6 @@ import com.soodthin.dto.request.UserStatusUpdateRequest;
 import com.soodthin.dto.request.EmployerVerificationRequest;
 import com.soodthin.entity.Employer;
 import com.soodthin.entity.JobPost;
-import com.soodthin.entity.JobPost.JobStatus;
 import com.soodthin.entity.Role;
 import com.soodthin.entity.User;
 import com.soodthin.entity.User.UserStatus;
@@ -69,8 +69,51 @@ public class AdminServiceImpl implements AdminService {
     private static final Logger log = Logger.getLogger(AdminServiceImpl.class.getName());
 
     @Override
-    public AdminDashboardResponse getDashboardStats() {
-        log.info("Fetching admin dashboard statistics");
+    public List<EmployerDTO> getAllEmployers() {
+        return employerRepository.findAll()
+                .stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
+    @Override
+    public EmployerDTO verifyEmployer(Integer id) {
+        Employer employer = employerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Employer not found"));
+        employer.setIsVerified(true);
+        employer.setReasonReject(null); 
+        employerRepository.save(employer);
+        return toDTO(employer);
+    }
+
+    @Override
+    public EmployerDTO rejectEmployer(Integer id, String reason) {
+        Employer employer = employerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Employer not found"));
+
+        employer.setIsVerified(false);
+        employer.setReasonReject(reason);
+        employerRepository.save(employer);
+
+        return toDTO(employer);
+    }
+
+    private EmployerDTO toDTO(Employer employer) {
+        return EmployerDTO.builder()
+                .id(employer.getId())
+                .companyName(employer.getCompanyName())
+                .taxCode(employer.getTaxCode())
+                .website(employer.getWebsite())
+                .companyAddress(employer.getCompanyAddress())
+                .companyIntro(employer.getCompanyIntro())
+                .isVerified(employer.getIsVerified())
+                .reasonReject(employer.getReasonReject())
+                .build();
+    }
+
+    @Override
+    public AdminDashboardResponse getDashboardStats(int year) {
+        log.info(String.format("Fetching admin dashboard statistics for year {}", year));
 
         try {
             Long totalUsers = userRepository.count();
@@ -82,14 +125,14 @@ public class AdminServiceImpl implements AdminService {
             Long pendingVerifications = employerRepository.countByIsVerified(false);
             Long bannedUsers = userRepository.countByStatus(UserStatus.BANNED);
 
-            LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
-            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime startOfYear = LocalDate.of(year, 1, 1).atStartOfDay();
+            LocalDateTime endOfYear = LocalDate.of(year, 12, 31).atTime(23, 59, 59);
 
-            List<User> recentUsers = userRepository.findByCreatedAtBetween(thirtyDaysAgo, now);
-            List<UserRegistrationStatsDTO> userRegistrationStats = calculateUserRegistrationStats(recentUsers);
+            List<User> usersThisYear = userRepository.findByCreatedAtBetween(startOfYear, endOfYear);
+            List<UserRegistrationStatsDTO> userRegistrationStats = calculateUserRegistrationStats(usersThisYear);
 
-            List<JobPost> recentJobPosts = jobPostRepository.findByCreatedAtBetween(thirtyDaysAgo, now);
-            List<JobPostStatsDTO> jobPostStats = calculateJobPostStats(recentJobPosts);
+            List<JobPost> jobPostsThisYear = jobPostRepository.findByCreatedAtBetween(startOfYear, endOfYear);
+            List<JobPostStatsDTO> jobPostStats = calculateJobPostStats(jobPostsThisYear);
 
             return AdminDashboardResponse.builder()
                     .totalUsers(totalUsers)
@@ -266,38 +309,36 @@ public class AdminServiceImpl implements AdminService {
     }
 
     private List<UserRegistrationStatsDTO> calculateUserRegistrationStats(List<User> users) {
-    Map<LocalDate, UserRegistrationStatsDTO> statsMap = new HashMap<>();
+        Map<LocalDate, UserRegistrationStatsDTO> statsMap = new HashMap<>();
 
-    for (User user : users) {
-        LocalDate date = user.getCreatedAt().toLocalDate();
+        for (User user : users) {
+            LocalDate date = user.getCreatedAt().toLocalDate();
 
-        boolean isCandidate = user.getRoleSet().stream()
-                .anyMatch(role -> role.getRoleName().equals("CANDIDATE"));
-        boolean isEmployer = user.getRoleSet().stream()
-                .anyMatch(role -> role.getRoleName().equals("EMPLOYER"));
+            boolean isCandidate = user.getRoleSet().stream()
+                    .anyMatch(role -> role.getRoleName().equals("CANDIDATE"));
+            boolean isEmployer = user.getRoleSet().stream()
+                    .anyMatch(role -> role.getRoleName().equals("EMPLOYER"));
 
-        statsMap.putIfAbsent(date, UserRegistrationStatsDTO.builder()
-        .date(date.toString())
-        .candidate(0)
-        .employer(0)
-        .build());
+            statsMap.putIfAbsent(date, UserRegistrationStatsDTO.builder()
+                    .date(date.toString())
+                    .candidate(0)
+                    .employer(0)
+                    .build());
 
-
-        UserRegistrationStatsDTO stat = statsMap.get(date);
-        if (isCandidate) {
-            stat.setCandidate(stat.getCandidate() + 1);
+            UserRegistrationStatsDTO stat = statsMap.get(date);
+            if (isCandidate) {
+                stat.setCandidate(stat.getCandidate() + 1);
+            }
+            if (isEmployer) {
+                stat.setEmployer(stat.getEmployer() + 1);
+            }
         }
-        if (isEmployer) {
-            stat.setEmployer(stat.getEmployer() + 1);
-        }
+
+        // Sắp xếp theo ngày tăng dần
+        return statsMap.values().stream()
+                .sorted(Comparator.comparing(UserRegistrationStatsDTO::getDate))
+                .collect(Collectors.toList());
     }
-
-    // Sắp xếp theo ngày tăng dần
-    return statsMap.values().stream()
-            .sorted(Comparator.comparing(UserRegistrationStatsDTO::getDate))
-            .collect(Collectors.toList());
-}
-
 
     private List<JobPostStatsDTO> calculateJobPostStats(List<JobPost> jobPosts) {
         Map<LocalDate, Long> statsMap = jobPosts.stream()

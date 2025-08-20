@@ -6,6 +6,7 @@ package com.soodthin.repositories;
 
 import com.soodthin.entity.Employer;
 import com.soodthin.entity.User;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +21,8 @@ public interface EmployerRepository extends JpaRepository<Employer, Integer> {
     Optional<Employer> findByUserId(User user);
 
     Optional<Employer> findByCompanyName(String companyName);
+
+    List<Employer> findByIsVerified(Boolean isVerified);
 
     long countByIsVerified(Boolean isVerified);
 
