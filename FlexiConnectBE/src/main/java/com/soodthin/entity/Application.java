@@ -7,6 +7,8 @@ package com.soodthin.entity;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -35,6 +37,9 @@ import java.util.Set;
     @NamedQuery(name = "Application.findByStatus", query = "SELECT a FROM Application a WHERE a.status = :status")})
 public class Application implements Serializable {
 
+    public enum ApplicationStatus {
+        PENDING, VIEWED, ACCEPTED, REJECTED,
+    }
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,9 +57,9 @@ public class Application implements Serializable {
     private String downloadUrl;
     @Column(name = "applied_at")
     private LocalDateTime appliedAt;
-    @Size(max = 8)
+    @Enumerated(EnumType.STRING) 
     @Column(name = "status")
-    private String status;
+    private ApplicationStatus status;
     @Lob
     @Size(max = 65535)
     @Column(name = "rejection_reason")
@@ -99,13 +104,15 @@ public class Application implements Serializable {
         this.appliedAt = appliedAt;
     }
 
-    public String getStatus() {
+    public ApplicationStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(ApplicationStatus status) {
         this.status = status;
     }
+
+    
 
     public String getRejectionReason() {
         return rejectionReason;

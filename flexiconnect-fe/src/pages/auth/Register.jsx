@@ -2,18 +2,20 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Apis, { endpoints } from "@configs/APIs";
 import { FaUserPlus } from "react-icons/fa";
-import { unstable_PasswordToggleField as PasswordToggleField } from "radix-ui";
 import { EyeClosedIcon, EyeOpenIcon } from "@radix-ui/react-icons";
 
 export default function Register() {
   const [user, setUser] = useState({});
   const [msg, setMsg] = useState(null);
   const [strength, setStrength] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const navigate = useNavigate();
 
   const setState = (value, field) => {
     setUser({ ...user, [field]: value });
-    if (field === "password") setStrength(evaluatePasswordStrength(value));
+    if (field === "password")
+      setStrength(value ? evaluatePasswordStrength(value) : {});
   };
 
   const evaluatePasswordStrength = (password) => {
@@ -59,7 +61,7 @@ export default function Register() {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-beige-50 dark:bg-[#181818]">
-      {/* Left illustration + AI info */}
+      {/* Left illustration */}
       <div className="hidden md:flex flex-[0.45] relative items-center justify-center overflow-hidden bg-beige-100 dark:bg-[#1e1e1e] p-8">
         <img
           src="https://images.unsplash.com/photo-1556155092-490a1ba16284?q=80&w=708&auto=format&fit=crop"
@@ -71,7 +73,8 @@ export default function Register() {
             Bắt đầu hành trình sự nghiệp!
           </h2>
           <p className="text-gray-700 dark:text-gray-200">
-            Tạo tài khoản ứng viên và tìm việc mơ ước nhanh chóng với <strong>FlexiConnect AI</strong>.
+            Tạo tài khoản ứng viên và tìm việc mơ ước nhanh chóng với{" "}
+            <strong>FlexiConnect AI</strong>.
           </p>
         </div>
       </div>
@@ -102,67 +105,107 @@ export default function Register() {
             </div>
           )}
 
-          {["fullName", "email", "password", "confirmPassword"].map((field) => (
-            <div className="space-y-1" key={field}>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 capitalize">
-                {field === "fullName"
-                  ? "Họ và tên"
-                  : field === "confirmPassword"
-                  ? "Xác nhận mật khẩu"
-                  : field.charAt(0).toUpperCase() + field.slice(1)}
-              </label>
+          {/* Họ và tên */}
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+              Họ và tên
+            </label>
+            <input
+              type="text"
+              className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 px-3 h-10 text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400 transition"
+              placeholder="Nhập họ và tên..."
+              value={user.fullName || ""}
+              onChange={(e) => setState(e.target.value, "fullName")}
+              required
+            />
+          </div>
 
-              <PasswordToggleField.Root>
-                <div className="flex items-center gap-2 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 px-3 h-10 hover:border-blue-400 focus-within:ring-2 focus-within:ring-blue-400 transition">
-                  <PasswordToggleField.Input
-                    type={field.includes("password") ? "password" : "text"}
-                    className="flex-1 bg-transparent outline-none text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300"
-                    placeholder={`Nhập ${
-                      field === "fullName"
-                        ? "họ và tên"
-                        : field === "confirmPassword"
-                        ? "xác nhận mật khẩu"
-                        : field
-                    }...`}
-                    value={user[field] || ""}
-                    onChange={(e) => setState(e.target.value, field)}
-                    required
-                  />
-                  {field.includes("password") && (
-                    <PasswordToggleField.Toggle className="outline-none flex items-center justify-center w-5 h-5 text-gray-500 dark:text-gray-300">
-                      <PasswordToggleField.Icon
-                        visible={<EyeOpenIcon />}
-                        hidden={<EyeClosedIcon />}
-                      />
-                    </PasswordToggleField.Toggle>
-                  )}
-                </div>
+          {/* Email */}
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+              Email
+            </label>
+            <input
+              type="email"
+              className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 px-3 h-10 text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400 transition"
+              placeholder="Nhập email..."
+              value={user.email || ""}
+              onChange={(e) => setState(e.target.value, "email")}
+              required
+            />
+          </div>
 
-                {/* Password strength bar */}
-                {field === "password" && user.password && (
-                  <>
-                    <div className="w-full h-2 rounded bg-gray-200 dark:bg-gray-600 mt-1">
-                      <div
-                        className={`h-2 rounded transition-all duration-300 ${strength.color}`}
-                        style={{ width: `${strength.percent || 0}%` }}
-                      ></div>
-                    </div>
-                    {strength.label && (
-                      <div
-                        className={`text-xs mt-1 font-medium ${strength.color.replace(
-                          "bg-",
-                          "text-"
-                        )}`}
-                      >
-                        Độ mạnh mật khẩu: {strength.label}
-                      </div>
-                    )}
-                  </>
-                )}
-              </PasswordToggleField.Root>
+          {/* Password */}
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+              Mật khẩu
+            </label>
+            <div className="flex items-center gap-2 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 px-3 h-10 focus-within:ring-2 focus-within:ring-blue-400 transition">
+              <input
+                type={showPassword ? "text" : "password"}
+                className="flex-1 bg-transparent outline-none text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300"
+                placeholder="Nhập mật khẩu..."
+                value={user.password || ""}
+                onChange={(e) => setState(e.target.value, "password")}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="outline-none flex items-center justify-center w-5 h-5 text-gray-500 dark:text-gray-300"
+              >
+                {showPassword ? <EyeOpenIcon /> : <EyeClosedIcon />}
+              </button>
             </div>
-          ))}
 
+            {/* Strength bar */}
+            {user.password && (
+              <>
+                <div className="w-full h-2 rounded bg-gray-200 dark:bg-gray-600 mt-1">
+                  <div
+                    className={`h-2 rounded transition-all duration-300 ${strength.color}`}
+                    style={{ width: `${strength.percent || 0}%` }}
+                  ></div>
+                </div>
+                {strength.label && (
+                  <div
+                    className={`text-xs mt-1 font-medium ${strength.color.replace(
+                      "bg-",
+                      "text-"
+                    )}`}
+                  >
+                    Độ mạnh mật khẩu: {strength.label}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+
+          {/* Confirm Password */}
+          <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+              Xác nhận mật khẩu
+            </label>
+            <div className="flex items-center gap-2 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 px-3 h-10 focus-within:ring-2 focus-within:ring-blue-400 transition">
+              <input
+                type={showConfirm ? "text" : "password"}
+                className="flex-1 bg-transparent outline-none text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300"
+                placeholder="Xác nhận mật khẩu..."
+                value={user.confirmPassword || ""}
+                onChange={(e) => setState(e.target.value, "confirmPassword")}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirm(!showConfirm)}
+                className="outline-none flex items-center justify-center w-5 h-5 text-gray-500 dark:text-gray-300"
+              >
+                {showConfirm ? <EyeOpenIcon /> : <EyeClosedIcon />}
+              </button>
+            </div>
+          </div>
+
+          {/* Submit */}
           <button
             type="submit"
             className="w-full bg-gradient-to-r from-gray-700 to-gray-900 text-white py-2 rounded-xl font-semibold shadow hover:opacity-90 transition flex items-center justify-center gap-2"

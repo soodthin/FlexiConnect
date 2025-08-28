@@ -68,7 +68,7 @@ export default function Login() {
     </p>
 
     <div className="bg-white/80 dark:bg-gray-800/80 p-4 shadow-sm backdrop-blur-sm rounded-md">
-      <h3 className="font-semibold text-gray-800 dark:text-gray-100 mb-2">✨ Tính năng AI</h3>
+      <h3 className="font-semibold text-gray-800 dark:text-gray-100 mb-2">Tính năng AI</h3>
       <ul className="text-gray-700 dark:text-gray-300 list-disc list-inside space-y-1 text-sm">
         <li>Gợi ý CV phù hợp vị trí bạn muốn ứng tuyển</li>
         <li>Chatbot luyện tập phỏng vấn trực tuyến</li>

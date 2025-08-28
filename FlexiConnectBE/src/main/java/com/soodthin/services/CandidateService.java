@@ -20,4 +20,6 @@ public interface CandidateService {
     void updateProfile(User user, CandidateProfileRequest request);
 
     String updateAvatar(User user, MultipartFile avatar);
+
+
 }

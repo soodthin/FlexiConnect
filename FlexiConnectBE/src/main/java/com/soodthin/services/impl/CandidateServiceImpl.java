@@ -38,6 +38,7 @@ public class CandidateServiceImpl implements CandidateService {
     private Cloudinary cloudinary;
     @Autowired
     private ModelMapper modelMapper;
+    
 
     @Override
     public CandidateProfileResponse getProfile(User user) {
@@ -85,4 +86,5 @@ public class CandidateServiceImpl implements CandidateService {
         }
     }
 
+    
 }

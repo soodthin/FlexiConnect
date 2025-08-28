@@ -8,7 +8,7 @@ import com.soodthin.dto.request.CandidateProfileRequest;
 import com.soodthin.dto.request.CvSuggestionRequest;
 import com.soodthin.dto.request.CvSuggestionSubmitRequest;
 
-import com.soodthin.dto.response.ApplicationResponseDTO;
+import com.soodthin.dto.response.CandidateApplicationResponse;
 import com.soodthin.dto.response.CandidateProfileResponse;
 
 import com.soodthin.entity.CvSuggestion;
@@ -17,6 +17,7 @@ import com.soodthin.repositories.UserRepository;
 import com.soodthin.services.ApplicationService;
 import com.soodthin.services.CandidateService;
 import com.soodthin.services.CvSuggestionService;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -47,11 +48,16 @@ public class CandidateController {
     @Autowired
     private CvSuggestionService cvSuggestionService;
 
+    private User getCurrentUser(Authentication authentication) {
+        String email = authentication.getName();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
 
     @GetMapping("/profile")
     public ResponseEntity<CandidateProfileResponse> getProfile(Authentication authentication) {
-        String email = authentication.getName();
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = getCurrentUser(authentication);
+
         CandidateProfileResponse response = candidateService.getProfile(user);
         return ResponseEntity.ok(response);
     }
@@ -61,8 +67,8 @@ public class CandidateController {
             Authentication authentication,
             @RequestBody CandidateProfileRequest request
     ) {
-        String email = authentication.getName();
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = getCurrentUser(authentication);
+
         candidateService.updateProfile(user, request);
         return ResponseEntity.ok("Cập nhật hồ sơ thành công!");
     }
@@ -72,23 +78,21 @@ public class CandidateController {
             Authentication authentication,
             @RequestParam("avatar") MultipartFile avatar
     ) {
-        String email = authentication.getName();
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = getCurrentUser(authentication);
+
         String url = candidateService.updateAvatar(user, avatar);
         return ResponseEntity.ok("Cập nhật avatar thành công! URL: " + url);
     }
 
     @PostMapping(value = "/apply", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApplicationResponseDTO> applyToJob(
+    public ResponseEntity<CandidateApplicationResponse> applyToJob(
             @RequestParam("jobPostId") Integer jobPostId,
             @RequestParam("resumeFile") MultipartFile resumeFile,
-            Authentication auth) {
+            Authentication authentication) {
 
-        String email = auth.getName();
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = getCurrentUser(authentication);
 
-        ApplicationResponseDTO response = applicationService.applyToJob(jobPostId, resumeFile, user);
+        CandidateApplicationResponse response = applicationService.applyToJob(jobPostId, resumeFile, user);
         return ResponseEntity.ok(response);
     }
 
@@ -97,8 +101,8 @@ public class CandidateController {
             Authentication authentication,
             @RequestBody CvSuggestionRequest request) {
 
-        String email = authentication.getName();
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = getCurrentUser(authentication);
+
         Integer candidateId = user.getCandidate().getId();
 
         CvSuggestion suggestion = cvSuggestionService.createSuggestion(candidateId, request);
@@ -114,4 +118,12 @@ public class CandidateController {
         return ResponseEntity.ok(updated);
     }
 
+    @GetMapping("/applied")
+    public ResponseEntity<List<CandidateApplicationResponse>> getMyApplications(Authentication authentication) {
+        User user = getCurrentUser(authentication);
+
+        List<CandidateApplicationResponse> responses = applicationService.getAppliedJobs(user);
+
+        return ResponseEntity.ok(responses);
+    }
 }

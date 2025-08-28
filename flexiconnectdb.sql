@@ -61,6 +61,7 @@ CREATE TABLE employer (
     company_address TEXT,
     company_intro TEXT,
     is_verified BOOLEAN DEFAULT FALSE,
+    reason_reject VARCHAR(20),
     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );
 
@@ -81,12 +82,11 @@ CREATE TABLE job_post (
     location VARCHAR(150),
     salary_min DECIMAL(12,2),
     salary_max DECIMAL(12,2),
-    job_type ENUM('PARTTIME', 'REMOTE', 'FREELANCE', 'INTERNSHIP'),
+    job_type ENUM('FULLTIME', 'PARTTIME', 'REMOTE', 'FREELANCE', 'INTERNSHIP'),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     expired_at DATE,
     status ENUM('OPEN', 'CLOSED', 'HIDDEN') DEFAULT 'OPEN',
     view_count INT DEFAULT 0,
-    job_vector TEXT,
     FOREIGN KEY (employer_id) REFERENCES employer(id) ON DELETE CASCADE
 );
 
@@ -121,13 +121,6 @@ CREATE TABLE candidate_skill (
     UNIQUE (candidate_id, skill_id)
 );
 
-CREATE TABLE job_post_skill (
-    job_post_id INT,
-    skill_id INT,
-    PRIMARY KEY (job_post_id, skill_id),
-    FOREIGN KEY (job_post_id) REFERENCES job_post(id) ON DELETE CASCADE,
-    FOREIGN KEY (skill_id) REFERENCES skill(id) ON DELETE CASCADE
-);
 
 CREATE TABLE education_history (
     id INT AUTO_INCREMENT PRIMARY KEY,

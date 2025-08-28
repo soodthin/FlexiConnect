@@ -4,25 +4,27 @@
  */
 package com.soodthin.dto.request;
 
+import com.soodthin.entity.Application.ApplicationStatus;
+
 /**
  *
  * @author ADMIN
  */
 public class ApplicationReviewRequest {
-    private String status;  
+    private ApplicationStatus status;  
     private String reason;
 
     /**
      * @return the status
      */
-    public String getStatus() {
+    public ApplicationStatus getStatus() {
         return status;
     }
 
     /**
      * @param status the status to set
      */
-    public void setStatus(String status) {
+    public void setStatus(ApplicationStatus status) {
         this.status = status;
     }
 
@@ -39,4 +41,5 @@ public class ApplicationReviewRequest {
     public void setReason(String reason) {
         this.reason = reason;
     }
+    
 }

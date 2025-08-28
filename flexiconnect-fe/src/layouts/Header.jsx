@@ -139,7 +139,7 @@ export default function Header() {
                   {user.role === "CANDIDATE" && (
                     <>
                       <li onClick={() => navigate("/candidate-profile")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Hồ sơ người dùng</li>
-                      <li onClick={() => navigate("/applied-jobs")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Việc đã ứng tuyển</li>
+                      <li onClick={() => navigate("/applied")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Việc đã ứng tuyển</li>
                       <li onClick={() => navigate("/notifications")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Thông báo</li>
                     </>
                   )}
@@ -149,7 +149,7 @@ export default function Header() {
                     <>
                       <li onClick={() => navigate("/employer-profile")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Hồ sơ công ty</li>
                       <li onClick={() => navigate("/employer-jobposts-management")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Quản lý tin tuyển dụng</li>
-                      <li onClick={() => navigate("/employer-job-applications")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Ứng viên đã ứng tuyển</li>
+                      <li onClick={() => navigate("/employer-applications-management")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Ứng viên đã ứng tuyển</li>
                     </>
                   )}
 

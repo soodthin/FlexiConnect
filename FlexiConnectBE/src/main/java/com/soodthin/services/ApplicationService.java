@@ -5,7 +5,8 @@
 package com.soodthin.services;
 
 import com.soodthin.dto.request.ApplicationReviewRequest;
-import com.soodthin.dto.response.ApplicationResponseDTO;
+import com.soodthin.dto.response.CandidateApplicationResponse;
+import com.soodthin.dto.response.EmployerApplicationResponse;
 import com.soodthin.entity.User;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,10 +17,12 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface ApplicationService {
 
-    ApplicationResponseDTO applyToJob(Integer jobPostId, MultipartFile cvFile, User user);
+    CandidateApplicationResponse applyToJob(Integer jobPostId, MultipartFile cvFile, User user);
 
-    ApplicationResponseDTO reviewApplication(Integer applicationId, ApplicationReviewRequest request, User currentUser);
+    public EmployerApplicationResponse reviewApplication(Integer id, ApplicationReviewRequest request, User user);
 
-    List<ApplicationResponseDTO> getAllApplicationsByEmployer(User user);
+    public List<EmployerApplicationResponse> getAllApplicationsByEmployer(User user);
+
+    List<CandidateApplicationResponse> getAppliedJobs(User user);
 
 }

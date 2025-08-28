@@ -7,7 +7,8 @@ package com.soodthin.controllers;
 import com.soodthin.dto.request.ApplicationReviewRequest;
 import com.soodthin.dto.request.EmployerProfileRequest;
 import com.soodthin.dto.request.JobPostRequest;
-import com.soodthin.dto.response.ApplicationResponseDTO;
+import com.soodthin.dto.response.CandidateApplicationResponse;
+import com.soodthin.dto.response.EmployerApplicationResponse;
 import com.soodthin.dto.response.EmployerProfileResponse;
 import com.soodthin.dto.response.JobPostResponse;
 import com.soodthin.entity.JobPost;
@@ -42,10 +43,15 @@ public class EmployerController {
     @Autowired
     private ApplicationService applicationService;
 
+    private User getCurrentUser(Authentication authentication) {
+        String email = authentication.getName();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
     @GetMapping("/profile")
     public ResponseEntity<EmployerProfileResponse> getProfile(Authentication authentication) {
-        String email = authentication.getName();
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = getCurrentUser(authentication);
         EmployerProfileResponse response = employerService.getProfile(user);
         return ResponseEntity.ok(response);
     }
@@ -55,8 +61,7 @@ public class EmployerController {
             Authentication authentication,
             @RequestBody EmployerProfileRequest request
     ) {
-        String email = authentication.getName();
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = getCurrentUser(authentication);
         employerService.updateProfile(user, request);
         return ResponseEntity.ok("Cập nhật hồ sơ thành công!");
     }
@@ -66,8 +71,7 @@ public class EmployerController {
             Authentication authentication,
             @RequestParam("avatar") MultipartFile avatar
     ) {
-        String email = authentication.getName();
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = getCurrentUser(authentication);
         String url = employerService.updateAvatar(user, avatar);
         return ResponseEntity.ok("Cập nhật avatar thành công! URL: " + url);
     }
@@ -77,16 +81,14 @@ public class EmployerController {
             Authentication authentication,
             @RequestBody JobPostRequest request
     ) {
-        String email = authentication.getName();
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = getCurrentUser(authentication);
         JobPost jobPost = jobPostService.createJobPost(user, request);
         return ResponseEntity.ok(jobPost);
     }
 
     @GetMapping("/job-posts")
     public ResponseEntity<List<JobPostResponse>> getJobPostsByEmployer(Authentication authentication) {
-        String email = authentication.getName();
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = getCurrentUser(authentication);
         List<JobPostResponse> jobPosts = jobPostService.getJobPostsByEmployer(user);
         return ResponseEntity.ok(jobPosts);
     }
@@ -97,8 +99,7 @@ public class EmployerController {
             @PathVariable Integer id,
             @RequestBody JobPostRequest request
     ) {
-        String email = authentication.getName();
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = getCurrentUser(authentication);
         JobPost updated = jobPostService.updateJobPost(user, id, request);
         return ResponseEntity.ok(updated);
     }
@@ -108,35 +109,28 @@ public class EmployerController {
             Authentication authentication,
             @PathVariable Integer id
     ) {
-        String email = authentication.getName();
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = getCurrentUser(authentication);
         jobPostService.deleteJobPost(user, id);
         return ResponseEntity.ok("Xóa bài tuyển dụng thành công!");
     }
 
     @GetMapping("/applications")
-    public ResponseEntity<List<ApplicationResponseDTO>> getAllApplicationsByEmployer(
+    public ResponseEntity<List<EmployerApplicationResponse>> getAllApplicationsByEmployer(
             Authentication authentication
     ) {
-        String email = authentication.getName();
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        List<ApplicationResponseDTO> responses = applicationService.getAllApplicationsByEmployer(user);
+        User user = getCurrentUser(authentication);
+        List<EmployerApplicationResponse> responses = applicationService.getAllApplicationsByEmployer(user);
         return ResponseEntity.ok(responses);
     }
 
     @PutMapping("/applications/{applicationId}/review")
-    public ResponseEntity<ApplicationResponseDTO> reviewApplication(
+    public ResponseEntity<EmployerApplicationResponse> reviewApplication(
             @PathVariable Integer applicationId,
             @RequestBody ApplicationReviewRequest request,
             Authentication authentication
     ) {
-        String email = authentication.getName();
-        User currentUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        ApplicationResponseDTO response = applicationService.reviewApplication(applicationId, request, currentUser);
+        User user = getCurrentUser(authentication);
+        EmployerApplicationResponse response = applicationService.reviewApplication(applicationId, request, user);
         return ResponseEntity.ok(response);
     }
 

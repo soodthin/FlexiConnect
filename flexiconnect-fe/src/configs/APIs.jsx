@@ -29,6 +29,7 @@ export const endpoints = {
   'workexperience': "/candidate/workexperience",
   'apply-job': "/users/candidate/apply",
   "cv-suggestion": "/users/candidate/cv-suggestion",
+  'candidate-applied': "/users/candidate/applied",
 
   /* Employer */
   'employer-profile': "/users/employer/profile",
@@ -36,8 +37,7 @@ export const endpoints = {
   'jobposts': "/users/employer/job-posts",
   'jobpost': "/users/employer/job-post",
   'employer-jobpost-id': (id) => `/users/employer/job-post/${id}`,
-  'applications': "/users/employer/applications",
-  'review-application': (applicationId) => `/users/employer/applications/${applicationId}/review`,
+  'employer-applications': "/users/employer/applications",
 
 }
 

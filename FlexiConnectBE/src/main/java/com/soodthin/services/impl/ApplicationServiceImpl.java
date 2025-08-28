@@ -5,11 +5,12 @@
 package com.soodthin.services.impl;
 
 import com.cloudinary.Cloudinary;
-import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
 import com.soodthin.dto.request.ApplicationReviewRequest;
-import com.soodthin.dto.response.ApplicationResponseDTO;
+import com.soodthin.dto.response.CandidateApplicationResponse;
+import com.soodthin.dto.response.EmployerApplicationResponse;
 import com.soodthin.entity.Application;
+import com.soodthin.entity.Application.ApplicationStatus;
 import com.soodthin.entity.Candidate;
 import com.soodthin.entity.Employer;
 import com.soodthin.entity.JobPost;
@@ -22,13 +23,14 @@ import com.soodthin.services.ApplicationService;
 import java.util.UUID;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -50,7 +52,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     private EmployerRepository employerRepository;
 
     @Override
-    public ApplicationResponseDTO applyToJob(Integer jobPostId, MultipartFile cvFile, User user) {
+    public CandidateApplicationResponse applyToJob(Integer jobPostId, MultipartFile cvFile, User user) {
         System.out.println("Tên file: " + cvFile.getOriginalFilename());
         System.out.println("Kích thước: " + cvFile.getSize() + " bytes");
         System.out.println("Loại: " + cvFile.getContentType());
@@ -88,7 +90,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         application.setJobPostId(jobPost);
         application.setResumeFile(resumeFile);
         application.setAppliedAt(LocalDateTime.now());
-        application.setStatus("PENDING");
+        application.setStatus(ApplicationStatus.PENDING);
 
         application = applicationRepository.save(application);
 
@@ -96,7 +98,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public List<ApplicationResponseDTO> getAllApplicationsByEmployer(User user) {
+    public List<EmployerApplicationResponse> getAllApplicationsByEmployer(User user) {
         Employer employer = employerRepository.findByUserId(user)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy employer"));
 
@@ -109,43 +111,80 @@ public class ApplicationServiceImpl implements ApplicationService {
         List<Application> applications = applicationRepository.findByJobPostIn(jobPosts);
 
         return applications.stream()
-                .map(this::mapToResponseDTO)
-                .collect(java.util.stream.Collectors.toList());
+                .map(this::mapToEmployerApplicationResponse)
+                .toList();
     }
 
     @Override
-    public ApplicationResponseDTO reviewApplication(Integer applicationId, ApplicationReviewRequest request, User currentUser) {
-        Application application = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Hồ sơ không tồn tại."));
+    public EmployerApplicationResponse reviewApplication(Integer id, ApplicationReviewRequest request, User user) {
+        Employer employer = employerRepository.findByUserId(user)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy employer"));
 
-        // Kiểm tra xem employer có sở hữu job này không
-        Integer employerUserId = application.getJobPostId().getEmployerId().getUserId().getId();
-        if (!employerUserId.equals(currentUser.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền duyệt hồ sơ này.");
+        Application application = applicationRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Application not found"));
+
+        if (!application.getJobPostId().getEmployerId().getId().equals(employer.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền duyệt hồ sơ này");
         }
 
-        String newStatus = request.getStatus().toUpperCase();
-        if (!newStatus.equals("ACCEPTED") && !newStatus.equals("REJECTED")) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Trạng thái không hợp lệ.");
+        application.setStatus(request.getStatus());
+        if (request.getStatus() == ApplicationStatus.REJECTED) {
+            application.setRejectionReason(request.getReason());
+        } else {
+            application.setRejectionReason(null);
         }
 
-        application.setStatus(newStatus);
-        application.setRejectionReason("REJECTED".equals(newStatus) ? request.getReason() : null);
-        applicationRepository.save(application);
+        applicationRepository.saveAndFlush(application);
 
-        return mapToResponseDTO(application);
-
+        return mapToEmployerApplicationResponse(application);
     }
 
-    private ApplicationResponseDTO mapToResponseDTO(Application application) {
-        ApplicationResponseDTO dto = modelMapper.map(application, ApplicationResponseDTO.class
+    private EmployerApplicationResponse mapToEmployerApplicationResponse(Application application) {
+        return EmployerApplicationResponse.builder()
+                .id(application.getId())
+                .candidateName(application.getCandidateId().getUserId().getFullName())
+                .jobTitle(application.getJobPostId().getTitle())
+                .status(application.getStatus())
+                .rejectionReason(application.getRejectionReason())
+                .appliedAt(application.getAppliedAt())
+                .build();
+    }
+
+    @Override
+    public List<CandidateApplicationResponse> getAppliedJobs(User user) {
+        Candidate candidate = candidateRepository.findByUserId(user)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy hồ sơ ứng viên!"));
+
+        List<Application> applications = applicationRepository.findAll()
+                .stream()
+                .filter(app -> app.getCandidateId().getId().equals(candidate.getId()))
+                .toList();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        return applications.stream().map(app -> {
+            CandidateApplicationResponse dto = new CandidateApplicationResponse();
+            dto.setId(app.getId());
+            dto.setJobTitle(app.getJobPostId().getTitle());
+            dto.setCompanyName(app.getJobPostId().getEmployerId().getCompanyName());
+            dto.setCompanyAddress(app.getJobPostId().getEmployerId().getCompanyAddress());
+            dto.setStatus(app.getStatus());
+            dto.setRejectionReason(app.getRejectionReason());
+            dto.setAppliedAt(app.getAppliedAt());
+
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    private CandidateApplicationResponse mapToResponseDTO(Application application) {
+        CandidateApplicationResponse dto = modelMapper.map(application, CandidateApplicationResponse.class
         );
         dto.setCandidateId(application.getCandidateId().getId());
         dto.setCandidateName(application.getCandidateId().getUserId().getFullName());
         dto.setJobPostId(application.getJobPostId().getId());
         dto.setJobPostTitle(application.getJobPostId().getTitle());
         dto.setDownloadUrl(application.getResumeFile() + "?fl_attachment=true");
-        dto.setStatus(application.getStatus());
+        application.setStatus(ApplicationStatus.PENDING);
         return dto;
     }
 }
