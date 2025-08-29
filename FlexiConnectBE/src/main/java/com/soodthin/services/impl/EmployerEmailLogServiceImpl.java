@@ -13,6 +13,7 @@ import com.soodthin.repositories.EmployerRepository;
 import com.soodthin.services.EmailService;
 import com.soodthin.services.EmployerEmailLogService;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -142,53 +143,78 @@ public class EmployerEmailLogServiceImpl implements EmployerEmailLogService {
             Employer emp,
             Candidate cand,
             EmployerEmailRequest request) {
+
         String candidateName = cand.getUserId().getFullName();
         String jobTitle = app.getJobPostId().getTitle();
         String company = emp.getCompanyName();
+        String jobType = app.getJobPostId().getJobType();
+
+        String interviewTime = null;
+        if (request.getInterviewTime() != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+            interviewTime = request.getInterviewTime().format(formatter);
+        }
 
         return switch (actionType) {
             case INTERVIEW_INVITE ->
-                """
-            <p>Chào %s,</p>
-            <p>Bạn được mời tham gia buổi phỏng vấn cho vị trí <b>%s</b> tại <b>%s</b>.</p>
-            <p>Thời gian: %s<br>
-               Địa điểm/Link online: %s</p>
-            <p>Vui lòng xác nhận sự tham gia của bạn.</p>
-            <p>Trân trọng,<br/>%s</p>
-            """.formatted(candidateName, jobTitle, company,
-                request.getInterviewTime(), request.getLocation(), company);
+                String.format("""
+        <p>Kính chào %s,</p>
+        <p>Cảm ơn bạn đã quan tâm và ứng tuyển vào vị trí <b>%s</b> tại <b>%s</b>.</p>
+        <p>Sau khi xem xét hồ sơ, chúng tôi trân trọng mời bạn tham dự buổi phỏng vấn để trao đổi chi tiết hơn.</p>
+        <p><b>Thời gian:</b> %s<br>
+           <b>Link phỏng vấn:</b> <a href="%s" target="_blank">%s</a></p>
+        <p>Rất mong bạn sắp xếp thời gian và phản hồi xác nhận tham dự trong thời gian sớm nhất.</p>
+        <p>Trân trọng,<br/>%s</p>
+        """,
+                candidateName, jobTitle, company,
+                interviewTime, request.getLocation(), request.getLocation(), company);
 
             case INTERVIEW_RESULT ->
                 """
-            <p>Chào %s,</p>
-            <p>Kết quả phỏng vấn của bạn cho vị trí <b>%s</b>: <b>%s</b>.</p>
-            <p>Cảm ơn bạn đã tham gia phỏng vấn.</p>
-            <p>Trân trọng,<br/>%s</p>
-            """.formatted(candidateName, jobTitle, request.getResult(), company);
+                <p>Kính chào %s,</p>
+                <p>Chúng tôi xin gửi đến bạn kết quả phỏng vấn cho vị trí <b>%s</b>: <b>%s</b>.</p>
+                <p>Cảm ơn bạn đã dành thời gian trao đổi cùng chúng tôi.</p>
+                <p>Chúc bạn luôn thành công và may mắn trên con đường sự nghiệp.</p>
+                <p>Trân trọng,<br/>%s</p>
+                """.formatted(candidateName, jobTitle, request.getResult(), company);
 
             case REQUEST_DOCUMENTS ->
                 """
-            <p>Chào %s,</p>
-            <p>Hồ sơ ứng tuyển của bạn cho vị trí <b>%s</b> còn thiếu giấy tờ.</p>
-            <p>Vui lòng bổ sung: %s</p>
-            <p>Trân trọng,<br/>%s</p>
-            """.formatted(candidateName, jobTitle, request.getDocuments(), company);
+                <p>Kính chào %s,</p>
+                <p>Trong quá trình rà soát hồ sơ ứng tuyển vị trí <b>%s</b> tại <b>%s</b>, chúng tôi nhận thấy còn thiếu một số giấy tờ cần thiết.</p>
+                <p>Để hoàn thiện, bạn vui lòng bổ sung các tài liệu sau: %s</p>
+                <p>Việc bổ sung đầy đủ hồ sơ sẽ giúp chúng tôi tiến hành các bước tiếp theo nhanh chóng và thuận lợi hơn.</p>
+                <p>Trân trọng,<br/>%s</p>
+                """.formatted(candidateName, jobTitle, company, request.getDocuments(), company);
 
             case OFFER_LETTER ->
                 """
-            <p>Chào %s,</p>
-            <p>Chúc mừng bạn đã trúng tuyển vị trí <b>%s</b> tại <b>%s</b>.</p>
-            <p>Vui lòng phản hồi email này để xác nhận nhận việc.</p>
-            <p>Trân trọng,<br/>%s</p>
-            """.formatted(candidateName, jobTitle, company, company);
+                <p>Kính chào %s,</p>
+                <p>Chúc mừng bạn đã xuất sắc vượt qua toàn bộ vòng tuyển dụng và chính thức được lựa chọn cho vị trí <b>%s</b> tại <b>%s</b>.</p>
+                <p><b>Thông tin công việc:</b></p>
+                <ul>
+                    <li><b>Vị trí:</b> %s</li>
+                    <li><b>Mức lương:</b> %s triệu</li>
+                    <li><b>Hình thức làm việc:</b> %s</li>
+                    <li><b>Ngày bắt đầu dự kiến:</b> %s</li>
+                </ul>
+                <p>Chúng tôi tin rằng sự đồng hành của bạn sẽ mang lại nhiều giá trị và thành công chung. Vui lòng xác nhận phản hồi để chúng tôi hoàn tất thủ tục tiếp theo.</p>
+                <p>Trân trọng,<br/>%s</p>
+                """.formatted(candidateName, jobTitle, company,
+                jobTitle,
+                request.getSalary(),
+                jobType,
+                request.getStartDate(),
+                company);
 
             case INTERVIEW_CANCEL ->
                 """
-            <p>Chào %s,</p>
-            <p>Buổi phỏng vấn cho vị trí <b>%s</b> tại <b>%s</b> đã bị hủy.</p>
-            <p>Chúng tôi sẽ liên hệ lại với bạn để sắp xếp lịch mới nếu cần thiết.</p>
-            <p>Trân trọng,<br/>%s</p>
-            """.formatted(candidateName, jobTitle, company, company);
+                <p>Kính chào %s,</p>
+                <p>Rất tiếc phải thông báo rằng buổi phỏng vấn cho vị trí <b>%s</b> tại <b>%s</b> đã bị hoãn/hủy do một số lý do khách quan.</p>
+                <p>Chúng tôi sẽ sớm liên hệ lại với bạn để sắp xếp lịch phỏng vấn khác phù hợp hơn.</p>
+                <p>Rất mong bạn thông cảm và tiếp tục đồng hành cùng chúng tôi.</p>
+                <p>Trân trọng,<br/>%s</p>
+                """.formatted(candidateName, jobTitle, company, company);
         };
     }
 

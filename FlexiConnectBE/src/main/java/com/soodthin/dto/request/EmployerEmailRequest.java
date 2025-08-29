@@ -5,6 +5,8 @@
 package com.soodthin.dto.request;
 
 import com.soodthin.entity.EmployerEmailLog.ActionType;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,9 +25,11 @@ public class EmployerEmailRequest {
     private String subject;
     private String content;
 
-    private String interviewTime;
+    private LocalDateTime interviewTime;
     private String location;
     private String result;
     private String documents;
+    private int salary;
+    private LocalDate startDate;
 
 }

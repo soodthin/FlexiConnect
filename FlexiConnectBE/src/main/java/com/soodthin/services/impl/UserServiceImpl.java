@@ -13,6 +13,7 @@ import com.soodthin.repositories.CandidateRepository;
 import com.soodthin.repositories.EmployerRepository;
 import com.soodthin.repositories.RoleRepository;
 import com.soodthin.repositories.UserRepository;
+import com.soodthin.services.EmailService;
 import com.soodthin.services.UserService;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
@@ -51,6 +52,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private EmailService emailService;
 
     @Override
     public User registerCandidate(CandidateRegisterDTO dto) {
@@ -63,7 +66,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new IllegalArgumentException("Vai trò 'CANDIDATE' không tồn tại."));
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setStatus(UserStatus.ACTIVE);
+        user.setStatus(UserStatus.ACTIVE); // ✅ Kích hoạt ngay, không cần xác thực
         user.setCreatedAt(LocalDateTime.now());
         user.setRoleSet(Set.of(candidateRole));
         user = userRepository.save(user);
@@ -71,6 +74,25 @@ public class UserServiceImpl implements UserService {
         Candidate candidate = new Candidate();
         candidate.setUserId(user);
         candidateRepository.save(candidate);
+
+        try {
+            emailService.sendHtmlMessage(
+                    user.getEmail(),
+                    "Chào mừng đến với FlexiConnect",
+                    "<p>Kính chào <b>" + user.getFullName() + "</b>,</p>"
+                    + "<p>Bạn đã đăng ký tài khoản ứng viên thành công trên <b>FlexiConnect</b>.</p>"
+                    + "<p>Từ bây giờ, bạn có thể:</p>"
+                    + "<ul>"
+                    + "  <li>Tìm kiếm và ứng tuyển các công việc phù hợp</li>"
+                    + "  <li>Theo dõi trạng thái ứng tuyển của mình</li>"
+                    + "  <li>Kết nối nhanh chóng với các nhà tuyển dụng</li>"
+                    + "</ul>"
+                    + "<p>Chúc bạn sớm tìm được công việc phù hợp và thành công trong sự nghiệp.</p>"
+                    + "<p>Trân trọng,<br/><b>FlexiConnect</b></p>"
+            );
+        } catch (Exception e) {
+            System.err.println("Không thể gửi email chào mừng: " + e.getMessage());
+        }
 
         return user;
     }
@@ -86,16 +108,35 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new IllegalArgumentException("Vai trò 'EMPLOYER' không tồn tại."));
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setStatus(UserStatus.ACTIVE);
+        user.setStatus(UserStatus.INACTIVE);
         user.setCreatedAt(LocalDateTime.now());
         user.setRoleSet(Set.of(employerRole));
         user = userRepository.save(user);
 
         Employer employer = modelMapper.map(employerDTO, Employer.class);
         employer.setUserId(user);
-        employer.setIsVerified(false);
+        employer.setIsVerified(false); // có thể giữ cờ này để Admin duyệt sau
         employer.setCompanyIntro(buildCompanyIntro(employerDTO.getCompanyIntro(), images));
         employerRepository.save(employer);
+
+        try {
+            emailService.sendHtmlMessage(
+                    user.getEmail(),
+                    "Chào mừng đến với FlexiConnect",
+                    "<p>Kính chào <b>" + employer.getCompanyName() + "</b>,</p>"
+                    + "<p>Bạn đã đăng ký tài khoản nhà tuyển dụng thành công trên <b>FlexiConnect</b>.</p>"
+                    + "<p>Từ bây giờ, bạn có thể:</p>"
+                    + "<ul>"
+                    + "  <li>Đăng tin tuyển dụng và thu hút ứng viên</li>"
+                    + "  <li>Quản lý hồ sơ ứng viên tập trung</li>"
+                    + "  <li>Kết nối nhanh chóng với nhân tài tiềm năng</li>"
+                    + "</ul>"
+                    + "<p>Chúc quý công ty sớm tìm được những ứng viên phù hợp nhất.</p>"
+                    + "<p>Trân trọng,<br/><b>FlexiConnect</b></p>"
+            );
+        } catch (Exception e) {
+            System.err.println("Không thể gửi email chào mừng: " + e.getMessage());
+        }
 
         return user;
     }

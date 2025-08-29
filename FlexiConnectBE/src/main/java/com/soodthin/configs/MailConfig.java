@@ -14,17 +14,17 @@ public class MailConfig {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 
         mailSender.setHost("smtp.gmail.com");
-        mailSender.setPort(587); // TLS port
+        mailSender.setPort(587); 
 
-        mailSender.setUsername("thinhthai963@gmail.com");
-        mailSender.setPassword("gbyw evbi qvxb disq"); // App Password của Gmail
+        mailSender.setUsername("flexiconnect.mail@gmail.com");
+        mailSender.setPassword("rkyu gula jiny kswi");
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.starttls.required", "true"); // thêm dòng này
-        props.put("mail.smtp.ssl.trust", "*"); // hoặc smtp.gmail.com nếu bạn thích cụ thể hơn
+        props.put("mail.smtp.starttls.required", "true");
+        props.put("mail.smtp.ssl.trust", "*");
         props.put("mail.debug", "true");
 
         return mailSender;

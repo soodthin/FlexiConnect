@@ -97,6 +97,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         application = applicationRepository.save(application);
 
         try {
+            //Gửi mail cho ỨNG VIÊN
             emailService.sendHtmlMessage(
                     candidate.getUserId().getEmail(),
                     "Ứng tuyển thành công",
@@ -107,6 +108,22 @@ public class ApplicationServiceImpl implements ApplicationService {
                     + "<p>Trân trọng!</p>"
             );
 
+            //Gửi mail cho NHÀ TUYỂN DỤNG (HR)
+            emailService.sendHtmlMessage(
+                    jobPost.getEmployerId().getUserId().getEmail(), // email HR
+                    "Ứng viên mới ứng tuyển",
+                    "<p>Kính gửi <b>" + jobPost.getEmployerId().getCompanyName() + "</b>,</p>"
+                    + "<p>Có một ứng viên mới vừa ứng tuyển vào vị trí <b>" + jobPost.getTitle() + "</b>.</p>"
+                    + "<p><b>Thông tin ứng viên:</b></p>"
+                    + "<ul>"
+                    + "  <li>Họ tên: " + candidate.getUserId().getFullName() + "</li>"
+                    + "  <li>Email: " + candidate.getUserId().getEmail() + "</li>"
+                    + "  <li>Số điện thoại: " + (candidate.getUserId().getPhone() != null ? candidate.getUserId().getPhone() : "Chưa cập nhật") + "</li>"
+                    + "  <li>CV: <a href='" + resumeFile + "' target='_blank'>Xem CV</a></li>"
+                    + "</ul>"
+                    + "<p>Vui lòng đăng nhập hệ thống để xem chi tiết hồ sơ ứng tuyển.</p>"
+                    + "<p>Trân trọng!</p>"
+            );
         } catch (Exception e) {
             System.err.println("Không thể gửi email xác nhận: " + e.getMessage());
         }
