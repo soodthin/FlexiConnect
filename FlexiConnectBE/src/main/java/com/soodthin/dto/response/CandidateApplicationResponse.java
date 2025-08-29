@@ -5,12 +5,11 @@
 package com.soodthin.dto.response;
 
 import com.soodthin.entity.Application.ApplicationStatus;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-
 
 /**
  *
@@ -33,8 +32,12 @@ public class CandidateApplicationResponse {
     private String rejectionReason;
     private LocalDateTime appliedAt;
 
-    private String jobTitle;
     private String companyName;
-    private String companyAddress;
-   
+
+    private String jobTitle;
+    private String location;
+    private String description;
+    private BigDecimal salaryMin;
+    private BigDecimal salaryMax;
+    private String jobType;
 }

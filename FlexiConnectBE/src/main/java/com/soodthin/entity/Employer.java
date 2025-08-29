@@ -57,6 +57,8 @@ public class Employer implements Serializable {
     @Size(max = 65535)
     @Column(name = "company_intro")
     private String companyIntro;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "employerId")
+    private Set<EmployerEmailLog> employerEmailLogSet;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -207,14 +209,6 @@ public class Employer implements Serializable {
         this.taxCode = taxCode;
     }
 
-    public String getWebsite() {
-        return website;
-    }
-
-    public void setWebsite(String website) {
-        this.website = website;
-    }
-
     /**
      * @return the reasonReject
      */
@@ -227,6 +221,22 @@ public class Employer implements Serializable {
      */
     public void setReasonReject(String reasonReject) {
         this.reasonReject = reasonReject;
+    }
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
+    }
+
+    public Set<EmployerEmailLog> getEmployerEmailLogSet() {
+        return employerEmailLogSet;
+    }
+
+    public void setEmployerEmailLogSet(Set<EmployerEmailLog> employerEmailLogSet) {
+        this.employerEmailLogSet = employerEmailLogSet;
     }
 
 }

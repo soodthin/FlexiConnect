@@ -23,6 +23,8 @@ import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
@@ -50,11 +52,6 @@ import java.util.Set;
     @NamedQuery(name = "JobPost.findByViewCount", query = "SELECT j FROM JobPost j WHERE j.viewCount = :viewCount")})
 public class JobPost implements Serializable {
 
-    public enum JobStatus {
-        OPEN,
-        CLOSED,
-        HIDDEN,
-    }
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 150)
@@ -69,16 +66,21 @@ public class JobPost implements Serializable {
     @Size(max = 150)
     @Column(name = "location")
     private String location;
-    @Size(max = 100)
+    @Size(max = 10)
     @Column(name = "job_type")
     private String jobType;
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     @Column(name = "expired_at")
     private LocalDateTime expiredAt;
-    @Enumerated(EnumType.STRING) 
-    @Column(name = "status", nullable = false)
+    @Column(name = "status", length = 10)
+@Enumerated(EnumType.STRING)
     private JobStatus status;
+    public enum JobStatus {
+        OPEN,
+        CLOSED,
+        HIDDEN,
+    }
     @Lob
     @Size(max = 65535)
     @Column(name = "job_vector")
@@ -156,22 +158,6 @@ public class JobPost implements Serializable {
 
     public void setJobType(String jobType) {
         this.jobType = jobType;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getExpiredAt() {
-        return expiredAt;
-    }
-
-    public void setExpiredAt(LocalDateTime expiredAt) {
-        this.expiredAt = expiredAt;
     }
 
     public Integer getViewCount() {
@@ -279,12 +265,48 @@ public class JobPost implements Serializable {
         this.location = location;
     }
 
+    /**
+     * @return the createdAt
+     */
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    /**
+     * @param createdAt the createdAt to set
+     */
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    /**
+     * @return the expiredAt
+     */
+    public LocalDateTime getExpiredAt() {
+        return expiredAt;
+    }
+
+    /**
+     * @param expiredAt the expiredAt to set
+     */
+    public void setExpiredAt(LocalDateTime expiredAt) {
+        this.expiredAt = expiredAt;
+    }
+
+    /**
+     * @return the status
+     */
     public JobStatus getStatus() {
         return status;
     }
 
+    /**
+     * @param status the status to set
+     */
     public void setStatus(JobStatus status) {
         this.status = status;
     }
+
+
 
 }

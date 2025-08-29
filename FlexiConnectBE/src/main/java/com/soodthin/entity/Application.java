@@ -5,6 +5,7 @@
 package com.soodthin.entity;
 
 import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -19,9 +20,12 @@ import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Set;
 
 /**
@@ -37,6 +41,25 @@ import java.util.Set;
     @NamedQuery(name = "Application.findByStatus", query = "SELECT a FROM Application a WHERE a.status = :status")})
 public class Application implements Serializable {
 
+    @Lob
+    @Size(max = 65535)
+    @Column(name = "cover_letter")
+    private String coverLetter;
+    @Size(max = 255)
+    @Column(name = "resume_file")
+    private String resumeFile;
+    @Column(name = "applied_at")
+    private LocalDateTime appliedAt;
+    @Column(name = "status", length = 10)
+    @Enumerated(EnumType.STRING)
+    private ApplicationStatus status;
+    @Lob
+    @Size(max = 65535)
+    @Column(name = "rejection_reason")
+    private String rejectionReason;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "applicationId")
+    private Set<EmployerEmailLog> employerEmailLogSet;
+
     public enum ApplicationStatus {
         PENDING, VIEWED, ACCEPTED, REJECTED,
     }
@@ -46,24 +69,8 @@ public class Application implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-    @Lob
-    @Size(max = 65535)
-    @Column(name = "cover_letter")
-    private String coverLetter;
-    @Size(max = 255)
-    @Column(name = "resume_file")
-    private String resumeFile;
     @Column(name = "download_url")
     private String downloadUrl;
-    @Column(name = "applied_at")
-    private LocalDateTime appliedAt;
-    @Enumerated(EnumType.STRING) 
-    @Column(name = "status")
-    private ApplicationStatus status;
-    @Lob
-    @Size(max = 65535)
-    @Column(name = "rejection_reason")
-    private String rejectionReason;
     @OneToMany(mappedBy = "applicationId")
     private Set<Rating> ratingSet;
     @JoinColumn(name = "candidate_id", referencedColumnName = "id")
@@ -95,24 +102,6 @@ public class Application implements Serializable {
     public void setCoverLetter(String coverLetter) {
         this.coverLetter = coverLetter;
     }
-
-    public LocalDateTime getAppliedAt() {
-        return appliedAt;
-    }
-
-    public void setAppliedAt(LocalDateTime appliedAt) {
-        this.appliedAt = appliedAt;
-    }
-
-    public ApplicationStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(ApplicationStatus status) {
-        this.status = status;
-    }
-
-    
 
     public String getRejectionReason() {
         return rejectionReason;
@@ -197,6 +186,30 @@ public class Application implements Serializable {
      */
     public void setDownloadUrl(String downloadUrl) {
         this.downloadUrl = downloadUrl;
+    }
+
+    public LocalDateTime getAppliedAt() {
+        return appliedAt;
+    }
+
+    public void setAppliedAt(LocalDateTime appliedAt) {
+        this.appliedAt = appliedAt;
+    }
+
+    public ApplicationStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ApplicationStatus status) {
+        this.status = status;
+    }
+
+    public Set<EmployerEmailLog> getEmployerEmailLogSet() {
+        return employerEmailLogSet;
+    }
+
+    public void setEmployerEmailLogSet(Set<EmployerEmailLog> employerEmailLogSet) {
+        this.employerEmailLogSet = employerEmailLogSet;
     }
 
 }

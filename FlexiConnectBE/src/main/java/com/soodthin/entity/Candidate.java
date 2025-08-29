@@ -43,10 +43,6 @@ public class Candidate implements Serializable {
     @Size(max = 65535)
     @Column(name = "bio")
     private String bio;
-    @Lob
-    @Size(max = 65535)
-    @Column(name = "bio_ai_suggestion")
-    private String bioAiSuggestion;
     @Size(max = 255)
     @Column(name = "resume_file")
     private String resumeFile;
@@ -54,6 +50,12 @@ public class Candidate implements Serializable {
     @Size(max = 65535)
     @Column(name = "profile_vector")
     private String profileVector;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "candidateId")
+    private Set<EmployerEmailLog> employerEmailLogSet;
+    @Lob
+    @Size(max = 65535)
+    @Column(name = "bio_ai_suggestion")
+    private String bioAiSuggestion;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "candidateId")
     private Set<CvSuggestion> cvSuggestionsSet;
 
@@ -233,6 +235,15 @@ public class Candidate implements Serializable {
 
     public void setBio(String bio) {
         this.bio = bio;
+    }
+
+
+    public Set<EmployerEmailLog> getEmployerEmailLogSet() {
+        return employerEmailLogSet;
+    }
+
+    public void setEmployerEmailLogSet(Set<EmployerEmailLog> employerEmailLogSet) {
+        this.employerEmailLogSet = employerEmailLogSet;
     }
 
 }

@@ -50,11 +50,11 @@ public class JobDataInit implements CommandLineRunner {
     @Override
     public void run(String... args) {
         if (jobPostRepo.count() > 0) {
-            System.out.println("✔️ Job data already loaded. Skipping import.");
+            System.out.println(" Job data already loaded. Skipping import.");
             return;
         }
 
-        System.out.println("📥 Importing job data from Excel...");
+        System.out.println("Importing job data from Excel...");
 
         try (InputStream is = new ClassPathResource("jobs_company.xlsx").getInputStream(); Workbook workbook = new XSSFWorkbook(is)) {
 
@@ -120,10 +120,10 @@ public class JobDataInit implements CommandLineRunner {
                     job.setSalaryMin(BigDecimal.valueOf(salaryMin));
                     job.setSalaryMax(BigDecimal.valueOf(salaryMax));
                     job.setDescription(
-                            "📌 Position: " + positionLevel
-                            + "\n🔧 Experience: " + experience
-                            + "\n💼 Skills: " + skills
-                            + "\n🏷️ Fields: " + jobFields
+                            " Position: " + positionLevel
+                            + "\n Experience: " + experience
+                            + "\n Skills: " + skills
+                            + "\n Fields: " + jobFields
                     );
                     job.setStatus(JobPost.JobStatus.OPEN);
                     job.setViewCount(0);
@@ -135,14 +135,14 @@ public class JobDataInit implements CommandLineRunner {
                     jobPostRepo.save(job);
 
                 } catch (Exception e) {
-                    System.err.println("❌ Error at row " + lineNumber + ": " + e.getMessage());
+                    System.err.println("Error at row " + lineNumber + ": " + e.getMessage());
                 }
             }
 
-            System.out.println("✅ Job import completed.");
+            System.out.println("Job import completed.");
 
         } catch (Exception e) {
-            System.err.println("❌ Error during import: " + e.getMessage());
+            System.err.println("Error during import: " + e.getMessage());
         }
     }
 

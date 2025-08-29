@@ -151,6 +151,7 @@ function App() {
                     </PrivateRoute>
                   }
                 />
+              
                 <Route path="/unauthorized" element={<Unauthorized />} />
 
                 <Route path="/job-posts/:id" element={<JobDetails />} />

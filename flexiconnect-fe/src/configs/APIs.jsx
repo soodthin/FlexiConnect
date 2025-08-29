@@ -38,6 +38,9 @@ export const endpoints = {
   'jobpost': "/users/employer/job-post",
   'employer-jobpost-id': (id) => `/users/employer/job-post/${id}`,
   'employer-applications': "/users/employer/applications",
+  "employer-send-email": "/users/employer/email/send", 
+  "employer-email-logs": (appId) => `/users/employer/email/logs?applicationId=${appId}`,
+
 
 }
 

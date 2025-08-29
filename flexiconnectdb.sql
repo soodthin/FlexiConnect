@@ -98,12 +98,31 @@ CREATE TABLE application (
 	resume_file VARCHAR(255),
     download_url VARCHAR(512),
     applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    status ENUM('PENDING', 'VIEWED', 'ACCEPTED', 'REJECTED') DEFAULT 'PENDING',
+    status ENUM('PENDING', 'ACCEPTED', 'REJECTED') DEFAULT 'PENDING',
     rejection_reason TEXT,
     FOREIGN KEY (job_post_id) REFERENCES job_post(id) ON DELETE CASCADE,
     FOREIGN KEY (candidate_id) REFERENCES candidate(id) ON DELETE CASCADE
 );
 
+CREATE TABLE employer_email_log (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    application_id INT NOT NULL,
+    employer_id INT NOT NULL,
+    candidate_id INT NOT NULL,
+    action_type ENUM(
+        'INTERVIEW_INVITE',
+        'INTERVIEW_RESULT',
+        'REQUEST_DOCUMENTS',
+        'OFFER_LETTER',
+        'INTERVIEW_CANCEL'
+    ) NOT NULL,
+    subject VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (application_id) REFERENCES application(id) ON DELETE CASCADE,
+    FOREIGN KEY (employer_id) REFERENCES employer(id) ON DELETE CASCADE,
+    FOREIGN KEY (candidate_id) REFERENCES candidate(id) ON DELETE CASCADE
+);
 
 CREATE TABLE skill (
     id INT AUTO_INCREMENT PRIMARY KEY,

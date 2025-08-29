@@ -20,10 +20,10 @@ import com.soodthin.repositories.CandidateRepository;
 import com.soodthin.repositories.EmployerRepository;
 import com.soodthin.repositories.JobPostRepository;
 import com.soodthin.services.ApplicationService;
+import com.soodthin.services.EmailService;
 import java.util.UUID;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -50,6 +50,8 @@ public class ApplicationServiceImpl implements ApplicationService {
     private ModelMapper modelMapper;
     @Autowired
     private EmployerRepository employerRepository;
+    @Autowired
+    private EmailService emailService;
 
     @Override
     public CandidateApplicationResponse applyToJob(Integer jobPostId, MultipartFile cvFile, User user) {
@@ -94,6 +96,21 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         application = applicationRepository.save(application);
 
+        try {
+            emailService.sendHtmlMessage(
+                    candidate.getUserId().getEmail(),
+                    "Ứng tuyển thành công",
+                    "<p>Chào <b>" + candidate.getUserId().getFullName() + "</b>,</p>"
+                    + "<p>Bạn đã ứng tuyển thành công vào vị trí: <b>" + jobPost.getTitle() + "</b> tại công ty <b>"
+                    + jobPost.getEmployerId().getCompanyName() + "</b>.</p>"
+                    + "<p>Chúng tôi sẽ xem xét hồ sơ và phản hồi trong thời gian sớm nhất.</p>"
+                    + "<p>Trân trọng!</p>"
+            );
+
+        } catch (Exception e) {
+            System.err.println("Không thể gửi email xác nhận: " + e.getMessage());
+        }
+
         return mapToResponseDTO(application);
     }
 
@@ -136,6 +153,47 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         applicationRepository.saveAndFlush(application);
 
+        // 🔹 Gửi email kết quả duyệt hồ sơ
+        try {
+            String subject;
+            String body;
+
+            String candidateName = application.getCandidateId().getUserId().getFullName();
+            String jobTitle = application.getJobPostId().getTitle();
+            String companyName = employer.getCompanyName();
+
+            if (request.getStatus() == ApplicationStatus.ACCEPTED) {
+                subject = "Hồ sơ đã được duyệt - " + companyName;
+                body
+                        = "<p>Chào <b>" + candidateName + "</b>,</p>"
+                        + "<p>Chúc mừng! Hồ sơ của bạn cho vị trí <b>" + jobTitle + "</b> tại <b>" + companyName + "</b> đã được <span style='color:green;'>duyệt</span> và sẽ chuyển qua vòng tiếp theo.</p>"
+                        + "<p>Chúng tôi sẽ liên hệ với bạn sớm để thông báo chi tiết.</p>"
+                        + "<p>Trân trọng,<br/><b>" + companyName + "</b></p>";
+            } else if (request.getStatus() == ApplicationStatus.REJECTED) {
+                subject = "Hồ sơ bị từ chối - " + companyName;
+                body
+                        = "<p>Chào <b>" + candidateName + "</b>,</p>"
+                        + "<p>Rất tiếc, hồ sơ của bạn cho vị trí <b>" + jobTitle + "</b> tại <b>" + companyName + "</b> đã bị <span style='color:red;'>từ chối</span>.</p>"
+                        + "<p><b>Lý do:</b> " + request.getReason() + "</p>"
+                        + "<p>Chúc bạn may mắn trong những cơ hội tiếp theo.</p>"
+                        + "<p>Trân trọng,<br/><b>" + companyName + "</b></p>";
+            } else {
+                subject = "Cập nhật hồ sơ ứng tuyển - " + companyName;
+                body
+                        = "<p>Chào <b>" + candidateName + "</b>,</p>"
+                        + "<p>Hồ sơ của bạn đã được cập nhật trạng thái: <b>" + request.getStatus() + "</b>.</p>"
+                        + "<p>Trân trọng,<br/><b>" + companyName + "</b></p>";
+            }
+
+            emailService.sendHtmlMessage(
+                    application.getCandidateId().getUserId().getEmail(),
+                    subject,
+                    body
+            );
+        } catch (Exception e) {
+            System.err.println("❌ Không thể gửi email kết quả duyệt hồ sơ: " + e.getMessage());
+        }
+
         return mapToEmployerApplicationResponse(application);
     }
 
@@ -160,31 +218,41 @@ public class ApplicationServiceImpl implements ApplicationService {
                 .filter(app -> app.getCandidateId().getId().equals(candidate.getId()))
                 .toList();
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
-        return applications.stream().map(app -> {
-            CandidateApplicationResponse dto = new CandidateApplicationResponse();
-            dto.setId(app.getId());
-            dto.setJobTitle(app.getJobPostId().getTitle());
-            dto.setCompanyName(app.getJobPostId().getEmployerId().getCompanyName());
-            dto.setCompanyAddress(app.getJobPostId().getEmployerId().getCompanyAddress());
-            dto.setStatus(app.getStatus());
-            dto.setRejectionReason(app.getRejectionReason());
-            dto.setAppliedAt(app.getAppliedAt());
-
-            return dto;
-        }).collect(Collectors.toList());
+        return applications.stream()
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
     }
 
     private CandidateApplicationResponse mapToResponseDTO(Application application) {
-        CandidateApplicationResponse dto = modelMapper.map(application, CandidateApplicationResponse.class
-        );
+        CandidateApplicationResponse dto = new CandidateApplicationResponse();
+
+        dto.setId(application.getId());
         dto.setCandidateId(application.getCandidateId().getId());
         dto.setCandidateName(application.getCandidateId().getUserId().getFullName());
+
         dto.setJobPostId(application.getJobPostId().getId());
         dto.setJobPostTitle(application.getJobPostId().getTitle());
-        dto.setDownloadUrl(application.getResumeFile() + "?fl_attachment=true");
-        application.setStatus(ApplicationStatus.PENDING);
+
+        dto.setCoverLetter(application.getCoverLetter());
+        dto.setResumeFile(application.getResumeFile());
+        if (application.getResumeFile() != null) {
+            dto.setDownloadUrl(application.getResumeFile() + "?fl_attachment=true");
+        }
+
+        dto.setStatus(application.getStatus());
+        dto.setRejectionReason(application.getRejectionReason());
+        dto.setAppliedAt(application.getAppliedAt());
+
+        // Thông tin job
+        dto.setCompanyName(application.getJobPostId().getEmployerId().getCompanyName());
+        dto.setJobTitle(application.getJobPostId().getTitle());
+        dto.setLocation(application.getJobPostId().getLocation());
+        dto.setDescription(application.getJobPostId().getDescription());
+        dto.setSalaryMin(application.getJobPostId().getSalaryMin());
+        dto.setSalaryMax(application.getJobPostId().getSalaryMax());
+        dto.setJobType(application.getJobPostId().getJobType());
+
         return dto;
     }
+
 }

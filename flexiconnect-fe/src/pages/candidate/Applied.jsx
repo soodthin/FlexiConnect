@@ -27,14 +27,28 @@ const Applied = () => {
   const statusStyle = (status) => {
     switch (status) {
       case "PENDING":
-        return "bg-yellow-200 text-yellow-900";
+        return "bg-yellow-100 text-yellow-800 border border-yellow-300";
       case "APPROVED":
-        return "bg-green-200 text-green-900";
+        return "bg-green-100 text-green-800 border border-green-300";
       case "REJECTED":
-        return "bg-red-200 text-red-900";
+        return "bg-red-100 text-red-800 border border-red-300";
       default:
-        return "bg-gray-200 text-gray-800";
+        return "bg-gray-100 text-gray-800 border border-gray-300";
     }
+  };
+
+  // 🔹 Hàm parse description
+  const parseDescription = (description) => {
+    if (!description) return [];
+
+    return description
+      .split("\n")
+      .map((line) => {
+        const [key, value] = line.split(":").map((s) => s.trim());
+        if (!key || !value) return null;
+        return { key, value };
+      })
+      .filter(Boolean);
   };
 
   return (
@@ -48,10 +62,10 @@ const Applied = () => {
           {applications.map((app) => (
             <div
               key={app.id}
-              className="p-6 rounded-xl shadow-md border bg-white dark:bg-[#242424] hover:shadow-lg transition"
+              className="p-6 rounded-xl shadow-sm border bg-white dark:bg-[#242424] hover:shadow-md transition"
             >
               {/* Header */}
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <Avatar.Root className="w-12 h-12 rounded-full overflow-hidden border shadow">
                     <Avatar.Image
@@ -59,13 +73,13 @@ const Applied = () => {
                       alt={app.companyName}
                       className="w-full h-full object-cover"
                     />
-                    <Avatar.Fallback className="flex items-center justify-center w-full h-full bg-gray-300 dark:bg-gray-600 text-sm text-gray-700 dark:text-gray-200">
-                      🏢
+                    <Avatar.Fallback className="flex items-center justify-center w-full h-full bg-gray-200 dark:bg-gray-600 text-sm font-medium text-gray-700 dark:text-gray-200">
+                      {app.companyName?.[0] || "C"}
                     </Avatar.Fallback>
                   </Avatar.Root>
                   <div>
                     <h3 className="text-lg font-semibold text-blue-600">
-                      {app.jobTitle}
+                      {app.jobPostTitle || app.jobTitle}
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-300">
                       {app.companyName}
@@ -74,7 +88,7 @@ const Applied = () => {
                 </div>
 
                 <span
-                  className={`px-4 py-1 text-xs font-semibold rounded-full ${statusStyle(
+                  className={`px-3 py-1 text-xs font-medium rounded-full ${statusStyle(
                     app.status
                   )}`}
                 >
@@ -85,13 +99,56 @@ const Applied = () => {
               <Separator.Root className="bg-gray-200 dark:bg-gray-700 h-px w-full mb-4" />
 
               {/* Body */}
-              <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-                <p>📍 <span className="font-medium">{app.companyAddress || "—"}</span></p>
-                <p>⏰ Ứng tuyển lúc: {new Date(app.appliedAt).toLocaleString("vi-VN")}</p>
+              <div className="grid grid-cols-2 gap-3 text-sm text-gray-700 dark:text-gray-300">
+                <div>
+                  <p className="text-gray-500">Địa điểm</p>
+                  <p className="font-medium">{app.location || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Loại công việc</p>
+                  <p className="font-medium">{app.jobType || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Mức lương</p>
+                  <p className="font-medium">
+                    {app.salaryMin && app.salaryMax
+                      ? `${app.salaryMin} - ${app.salaryMax} triệu`
+                      : "Thỏa thuận"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Ứng tuyển lúc</p>
+                  <p className="font-medium">
+                    {new Date(app.appliedAt).toLocaleString("vi-VN")}
+                  </p>
+                </div>
+              </div>
+
+              {/* Extra info */}
+              <div className="mt-4 space-y-2">
+                {app.coverLetter && (
+                  <p className="italic text-gray-500">“{app.coverLetter}”</p>
+                )}
+
+                
+                
+
                 {app.rejectionReason && (
                   <p className="text-red-500 font-medium">
-                    ❌ Lý do từ chối: {app.rejectionReason}
+                    Lý do từ chối: {app.rejectionReason}
                   </p>
+                )}
+
+                {/* 🔹 Render description đẹp hơn */}
+                {app.description && (
+                  <div className="grid grid-cols-2 gap-3 text-sm text-gray-700 dark:text-gray-300">
+                    {parseDescription(app.description).map(({ key, value }, idx) => (
+                      <div key={idx}>
+                        <p className="text-gray-500">{key}</p>
+                        <p className="font-medium">{value}</p>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             </div>

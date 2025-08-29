@@ -5,16 +5,19 @@
 package com.soodthin.controllers;
 
 import com.soodthin.dto.request.ApplicationReviewRequest;
+import com.soodthin.dto.request.EmployerEmailRequest;
 import com.soodthin.dto.request.EmployerProfileRequest;
 import com.soodthin.dto.request.JobPostRequest;
 import com.soodthin.dto.response.CandidateApplicationResponse;
 import com.soodthin.dto.response.EmployerApplicationResponse;
+import com.soodthin.dto.response.EmployerEmailLogResponse;
 import com.soodthin.dto.response.EmployerProfileResponse;
 import com.soodthin.dto.response.JobPostResponse;
 import com.soodthin.entity.JobPost;
 import com.soodthin.entity.User;
 import com.soodthin.repositories.UserRepository;
 import com.soodthin.services.ApplicationService;
+import com.soodthin.services.EmployerEmailLogService;
 import com.soodthin.services.EmployerService;
 import com.soodthin.services.JobPostService;
 import java.util.List;
@@ -42,6 +45,8 @@ public class EmployerController {
 
     @Autowired
     private ApplicationService applicationService;
+    @Autowired
+    private EmployerEmailLogService employerEmailLogService;
 
     private User getCurrentUser(Authentication authentication) {
         String email = authentication.getName();
@@ -134,4 +139,24 @@ public class EmployerController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/email/send")
+    public ResponseEntity<EmployerEmailLogResponse> sendEmail(
+            Authentication authentication,
+            @RequestBody EmployerEmailRequest request
+    ) {
+        User user = getCurrentUser(authentication);
+        EmployerEmailLogResponse response = employerEmailLogService.sendEmailToCandidate(user, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("email/logs/{applicationId}")
+    public ResponseEntity<List<EmployerEmailLogResponse>> getEmailLogsByApplication(
+            @PathVariable Integer applicationId,
+            Authentication authentication
+    ) {
+        User user = getCurrentUser(authentication);
+        List<EmployerEmailLogResponse> responses
+                = employerEmailLogService.getEmailLogsByApplication(user, applicationId);
+        return ResponseEntity.ok(responses);
+    }
 }
