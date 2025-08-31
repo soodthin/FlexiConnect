@@ -7,6 +7,8 @@ package com.soodthin.entity;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -20,7 +22,7 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  *
@@ -53,15 +55,21 @@ public class Notification implements Serializable {
     private String content;
     @Column(name = "is_read")
     private Boolean isRead;
-    @Size(max = 18)
-    @Column(name = "type")
-    private String type;
+    public enum NotificationType {
+    JOB_NEW,
+    APPLICATION_STATUS,
+    SYSTEM_MESSAGE,
+    CHAT_MESSAGE
+    }
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", length = 10)
+    private NotificationType type;
     @Size(max = 255)
     @Column(name = "link_to")
     private String linkTo;
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
+    private LocalDateTime createdAt;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @ManyToOne
     private User userId;
@@ -105,11 +113,11 @@ public class Notification implements Serializable {
         this.isRead = isRead;
     }
 
-    public String getType() {
+    public NotificationType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(NotificationType type) {
         this.type = type;
     }
 
@@ -121,11 +129,11 @@ public class Notification implements Serializable {
         this.linkTo = linkTo;
     }
 
-    public Date getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 

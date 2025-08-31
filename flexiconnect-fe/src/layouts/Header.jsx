@@ -1,34 +1,30 @@
-import { useContext, useRef, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaUser, FaSearch, FaSignOutAlt, FaMoon, FaSun } from "react-icons/fa";
 import { IoIosArrowDown } from "react-icons/io";
-import { MyUserContext, MyDispatcherContext } from '@contexts/MyContexts';
-
+import { MyUserContext, MyDispatcherContext } from "@contexts/MyContexts";
 import cookie from "react-cookies";
+import Notifications from "@components/notifications/Notifications"; 
 
 export default function Header() {
   const user = useContext(MyUserContext);
   const dispatch = useContext(MyDispatcherContext);
   const navigate = useNavigate();
+
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [isDark, setIsDark] = useState(() => localStorage.getItem("theme") === "dark");
-
   const userMenuRef = useRef();
 
+  // theme
   useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
+    document.documentElement.classList.toggle("dark", isDark);
+    localStorage.setItem("theme", isDark ? "dark" : "light");
   }, [isDark]);
 
-  useEffect(() => {
-    setShowUserMenu(false);
-  }, [user]);
+  // reset dropdown khi đổi user
+  useEffect(() => setShowUserMenu(false), [user]);
 
+  // click outside -> đóng dropdown
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
@@ -49,15 +45,18 @@ export default function Header() {
 
   return (
     <header className="flex justify-between items-center p-6 bg-[#f7f6f3] dark:bg-[#181818] font-inter text-[#222222] dark:text-[#f5efe6]">
+      
       {/* Logo */}
       <div
         className="flex items-center gap-3 mr-8 select-none cursor-pointer"
         onClick={() => {
           if (!user) return navigate("/");
-          if (user.role === "CANDIDATE") navigate("/candidate-dashboard");
-          else if (user.role === "EMPLOYER") navigate("/employer-dashboard");
-          else if (user.role === "ADMIN") navigate("/admin-dashboard");
-          else navigate("/");
+          const roleRoutes = {
+            CANDIDATE: "/candidate-dashboard",
+            EMPLOYER: "/employer-dashboard",
+            ADMIN: "/admin-dashboard",
+          };
+          navigate(roleRoutes[user.role] || "/");
         }}
       >
         <span className="w-10 h-10 rounded-xl shadow bg-[#111111] flex items-center justify-center font-bold text-white text-2xl">
@@ -67,7 +66,6 @@ export default function Header() {
           FlexiConnect
         </span>
       </div>
-
 
       {/* Search bar */}
       <div className="flex-grow max-w-2xl mx-auto">
@@ -90,7 +88,6 @@ export default function Header() {
           Bạn là nhà tuyển dụng?
         </button>
 
-        {/* Only show login button when user is not logged in */}
         {!user && (
           <button
             onClick={() => navigate("/login")}
@@ -99,6 +96,9 @@ export default function Header() {
             Đăng nhập
           </button>
         )}
+
+        {/* Notifications */}
+        {user && <Notifications user={user} />}
 
         {/* Dark mode toggle */}
         <button
@@ -112,7 +112,7 @@ export default function Header() {
           )}
         </button>
 
-        {/* User Dropdown: Only show when user is logged in */}
+        {/* User Menu */}
         {user && (
           <div className="relative" ref={userMenuRef}>
             <button
@@ -120,42 +120,35 @@ export default function Header() {
               onClick={() => setShowUserMenu((v) => !v)}
             >
               <FaUser className="text-xl text-[#6b7280] dark:text-[#aaa]" />
-              <span className="font-medium">{user?.fullName?.split(" ")[0] || "Bạn"}</span>
+              <span className="font-medium">
+                {user?.fullName?.split(" ")[0] || "Bạn"}
+              </span>
               <IoIosArrowDown className="text-gray-500 dark:text-gray-400" />
             </button>
 
             {showUserMenu && (
               <div className="absolute right-0 mt-3 w-60 bg-white dark:bg-[#232323] border border-gray-100 dark:border-[#444] rounded-2xl shadow-xl z-30 overflow-hidden">
                 <ul className="text-base text-gray-700 dark:text-[#f5efe6]">
-                  {/*ROLE_ADMIN*/}
                   {user.role === "ADMIN" && (
                     <>
-                      <li onClick={() => navigate("/admin-pending-employers")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Duyệt nhà tuyển dụng</li>
-                      <li onClick={() => navigate("/admin-users-management")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Quản lý người dùng</li>
-                      <li onClick={() => navigate("/admin-jobposts-management")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Quản lý tin tuyển dụng</li>
+                      <MenuItem to="/admin-pending-employers" label="Duyệt nhà tuyển dụng" />
+                      <MenuItem to="/admin-users-management" label="Quản lý người dùng" />
+                      <MenuItem to="/admin-jobposts-management" label="Quản lý tin tuyển dụng" />
                     </>
                   )}
-                  {/* ROLE_CANDIDATE */}
                   {user.role === "CANDIDATE" && (
                     <>
-                      <li onClick={() => navigate("/candidate-profile")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Hồ sơ người dùng</li>
-                      <li onClick={() => navigate("/applied")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Việc đã ứng tuyển</li>
-                      <li onClick={() => navigate("/notifications")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Thông báo</li>
+                      <MenuItem to="/candidate-profile" label="Hồ sơ người dùng" />
+                      <MenuItem to="/applied" label="Việc đã ứng tuyển" />
                     </>
                   )}
-
-                  {/* ROLE_EMPLOYER */}
                   {user.role === "EMPLOYER" && (
                     <>
-                      <li onClick={() => navigate("/employer-profile")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Hồ sơ công ty</li>
-                      <li onClick={() => navigate("/employer-jobposts-management")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Quản lý tin tuyển dụng</li>
-                      <li onClick={() => navigate("/employer-applications-management")} className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer">Ứng viên đã ứng tuyển</li>
+                      <MenuItem to="/employer-profile" label="Hồ sơ công ty" />
+                      <MenuItem to="/employer-jobposts-management" label="Quản lý tin tuyển dụng" />
+                      <MenuItem to="/employer-applications-management" label="Ứng viên đã ứng tuyển" />
                     </>
                   )}
-
-
-
-                  {/* Common: Logout */}
                   <li
                     className="px-6 py-4 text-red-600 hover:bg-red-50 dark:hover:bg-red-900 cursor-pointer"
                     onClick={logout}
@@ -170,5 +163,18 @@ export default function Header() {
         )}
       </div>
     </header>
+  );
+}
+
+/* 🔹 Sub Component cho Menu Item */
+function MenuItem({ to, label }) {
+  const navigate = useNavigate();
+  return (
+    <li
+      onClick={() => navigate(to)}
+      className="px-6 py-4 hover:bg-[#f5efe6] dark:hover:bg-[#353535] cursor-pointer"
+    >
+      {label}
+    </li>
   );
 }

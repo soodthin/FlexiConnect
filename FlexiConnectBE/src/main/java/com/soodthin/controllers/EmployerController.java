@@ -8,11 +8,11 @@ import com.soodthin.dto.request.ApplicationReviewRequest;
 import com.soodthin.dto.request.EmployerEmailRequest;
 import com.soodthin.dto.request.EmployerProfileRequest;
 import com.soodthin.dto.request.JobPostRequest;
-import com.soodthin.dto.response.CandidateApplicationResponse;
 import com.soodthin.dto.response.EmployerApplicationResponse;
 import com.soodthin.dto.response.EmployerEmailLogResponse;
 import com.soodthin.dto.response.EmployerProfileResponse;
 import com.soodthin.dto.response.JobPostResponse;
+import com.soodthin.dto.response.NotificationResponse;
 import com.soodthin.entity.JobPost;
 import com.soodthin.entity.User;
 import com.soodthin.repositories.UserRepository;
@@ -20,8 +20,10 @@ import com.soodthin.services.ApplicationService;
 import com.soodthin.services.EmployerEmailLogService;
 import com.soodthin.services.EmployerService;
 import com.soodthin.services.JobPostService;
+import com.soodthin.services.NotificationService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -47,6 +49,8 @@ public class EmployerController {
     private ApplicationService applicationService;
     @Autowired
     private EmployerEmailLogService employerEmailLogService;
+    @Autowired
+    private NotificationService notificationService;
 
     private User getCurrentUser(Authentication authentication) {
         String email = authentication.getName();
@@ -159,4 +163,7 @@ public class EmployerController {
                 = employerEmailLogService.getEmailLogsByApplication(user, applicationId);
         return ResponseEntity.ok(responses);
     }
+
+    
+
 }

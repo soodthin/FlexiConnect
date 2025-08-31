@@ -15,6 +15,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -33,9 +34,11 @@ public class FollowEmployer implements Serializable {
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected FollowEmployerPK followEmployerPK;
+    @Column(name = "notify_job", nullable = false)
+    private Boolean notifyJob = true;
     @Column(name = "followed_at")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date followedAt;
+    private LocalDateTime followedAt;
     @JoinColumn(name = "candidate_id", referencedColumnName = "id", insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private Candidate candidate;
@@ -62,11 +65,11 @@ public class FollowEmployer implements Serializable {
         this.followEmployerPK = followEmployerPK;
     }
 
-    public Date getFollowedAt() {
+    public LocalDateTime getFollowedAt() {
         return followedAt;
     }
 
-    public void setFollowedAt(Date followedAt) {
+    public void setFollowedAt(LocalDateTime followedAt) {
         this.followedAt = followedAt;
     }
 
@@ -109,6 +112,20 @@ public class FollowEmployer implements Serializable {
     @Override
     public String toString() {
         return "com.soodthin.pojo.FollowEmployer[ followEmployerPK=" + followEmployerPK + " ]";
+    }
+
+    /**
+     * @return the notifyJob
+     */
+    public Boolean getNotifyJob() {
+        return notifyJob;
+    }
+
+    /**
+     * @param notifyJob the notifyJob to set
+     */
+    public void setNotifyJob(Boolean notifyJob) {
+        this.notifyJob = notifyJob;
     }
     
 }

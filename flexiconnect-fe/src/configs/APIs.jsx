@@ -18,7 +18,7 @@ export const endpoints = {
   "admin-employer-reject": (id) => `/users/admin/employers/${id}/reject`,
   'admin-users-management': "/users/admin/users",
   'admin-jobposts': "/users/admin/jobposts",
-  
+
   /* Candidate */
   'candidate-profile': "/users/candidate/profile",
   'update-profile': "/users/candidate/profile",
@@ -29,7 +29,13 @@ export const endpoints = {
   'workexperience': "/candidate/workexperience",
   'apply-job': "/users/candidate/apply",
   "cv-suggestion": "/users/candidate/cv-suggestion",
+  
   'candidate-applied': "/users/candidate/applied",
+  'follow-employer': "/users/candidate/follow-employer/follow",
+  'unfollow-employer': "/users/candidate/follow-employer/unfollow",
+  'notify-employer': "/users/candidate/follow-employer/notify",
+  'save-job': "/users/candidate/save-job",
+  'un-save-job': "/users/candidate/un-save-job",
 
   /* Employer */
   'employer-profile': "/users/employer/profile",
@@ -38,8 +44,13 @@ export const endpoints = {
   'jobpost': "/users/employer/job-post",
   'employer-jobpost-id': (id) => `/users/employer/job-post/${id}`,
   'employer-applications': "/users/employer/applications",
-  "employer-send-email": "/users/employer/email/send", 
+  "employer-send-email": "/users/employer/email/send",
   "employer-email-logs": (appId) => `/users/employer/email/logs?applicationId=${appId}`,
+
+  notifications: {
+    my: "/users/notifications/my",
+    markAsRead: (id) => `/users/notifications/${id}/read`,
+  }
 
 
 }

@@ -3,10 +3,14 @@ package com.soodthin.services.impl;
 import com.soodthin.dto.request.JobPostRequest;
 import com.soodthin.dto.response.JobPostResponse;
 import com.soodthin.entity.Employer;
+import com.soodthin.entity.FollowEmployer;
+import com.soodthin.entity.FollowEmployerPK;
 import com.soodthin.entity.JobPost;
 import com.soodthin.entity.User;
 import com.soodthin.repositories.EmployerRepository;
+import com.soodthin.repositories.FollowEmployerRepository;
 import com.soodthin.repositories.JobPostRepository;
+import com.soodthin.services.FollowEmployerService;
 import com.soodthin.services.JobPostService;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
@@ -14,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +33,8 @@ public class JobPostServiceImpl implements JobPostService {
 
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private FollowEmployerRepository followEmployerRepository;
 
     @Override
     public JobPost createJobPost(User user, JobPostRequest request) {
@@ -108,26 +115,53 @@ public class JobPostServiceImpl implements JobPostService {
     }
 
     @Override
-public List<JobPostResponse> getAllPublicJobPosts() {
-    return jobPostRepository.findByStatus(JobPost.JobStatus.OPEN).stream()
-            .map(job -> {
-                JobPostResponse dto = mapToResponse(job);
-                dto.setDescription(truncate(job.getDescription(), 200));
-                return dto;
-            })
-            .collect(Collectors.toList());
-}
-
+    public List<JobPostResponse> getAllPublicJobPosts() {
+        return jobPostRepository.findByStatus(JobPost.JobStatus.OPEN).stream()
+                .map(job -> {
+                    JobPostResponse dto = mapToResponse(job);
+                    dto.setDescription(truncate(job.getDescription(), 200));
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
 
     @Override
-    public JobPostResponse viewJobPost(Integer id) {
-        JobPost jobPost = jobPostRepository.findById(id)
+    public JobPostResponse viewJobPost(Integer jobPostId, Integer candidateId) {
+        JobPost jobPost = jobPostRepository.findById(jobPostId)
                 .orElseThrow(() -> new RuntimeException("Job post not found"));
 
         jobPost.setViewCount(jobPost.getViewCount() + 1);
         jobPostRepository.save(jobPost);
 
-        return mapToResponse(jobPost);
+        JobPostResponse dto = mapToResponse(jobPost);
+
+        // Initialize default values
+        dto.setIsFollowed(false);
+        dto.setNotifyJob(false);
+
+        if (candidateId != null) {
+            System.out.println("🔍 Checking follow status: candidateId=" + candidateId
+                    + ", employerId=" + jobPost.getEmployerId().getId());
+
+            Optional<FollowEmployer> followRecord = followEmployerRepository
+                    .findByCandidateIdAndEmployerId(candidateId, jobPost.getEmployerId().getId());
+
+            if (followRecord.isPresent()) {
+                FollowEmployer fe = followRecord.get();
+                dto.setIsFollowed(true);
+                dto.setNotifyJob(fe.getNotifyJob());
+                System.out.println("🔍 Found follow record: isFollowed=true, notifyJob=" + fe.getNotifyJob());
+            } else {
+                System.out.println("🔍 No follow record found - user not following this employer");
+            }
+        } else {
+            System.out.println("🔍 No candidateId provided - anonymous user");
+        }
+
+        System.out.println("🔍 Final response: isFollowed=" + dto.getIsFollowed()
+                + ", notifyJob=" + dto.getNotifyJob());
+
+        return dto;
     }
 
     private JobPostResponse mapToResponse(JobPost job) {

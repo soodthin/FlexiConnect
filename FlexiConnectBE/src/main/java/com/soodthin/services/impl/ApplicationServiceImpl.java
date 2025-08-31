@@ -7,6 +7,7 @@ package com.soodthin.services.impl;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.soodthin.dto.request.ApplicationReviewRequest;
+import com.soodthin.dto.request.NotificationRequest;
 import com.soodthin.dto.response.CandidateApplicationResponse;
 import com.soodthin.dto.response.EmployerApplicationResponse;
 import com.soodthin.entity.Application;
@@ -14,6 +15,7 @@ import com.soodthin.entity.Application.ApplicationStatus;
 import com.soodthin.entity.Candidate;
 import com.soodthin.entity.Employer;
 import com.soodthin.entity.JobPost;
+import com.soodthin.entity.Notification;
 import com.soodthin.entity.User;
 import com.soodthin.repositories.ApplicationRepository;
 import com.soodthin.repositories.CandidateRepository;
@@ -21,6 +23,7 @@ import com.soodthin.repositories.EmployerRepository;
 import com.soodthin.repositories.JobPostRepository;
 import com.soodthin.services.ApplicationService;
 import com.soodthin.services.EmailService;
+import com.soodthin.services.NotificationService;
 import java.util.UUID;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -52,6 +55,8 @@ public class ApplicationServiceImpl implements ApplicationService {
     private EmployerRepository employerRepository;
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private NotificationService notificationService;
 
     @Override
     public CandidateApplicationResponse applyToJob(Integer jobPostId, MultipartFile cvFile, User user) {
@@ -97,7 +102,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         application = applicationRepository.save(application);
 
         try {
-            //Gửi mail cho ỨNG VIÊN
+            // Gửi mail cho ỨNG VIÊN
             emailService.sendHtmlMessage(
                     candidate.getUserId().getEmail(),
                     "Ứng tuyển thành công",
@@ -108,7 +113,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                     + "<p>Trân trọng!</p>"
             );
 
-            //Gửi mail cho NHÀ TUYỂN DỤNG (HR)
+            // Gửi mail cho NHÀ TUYỂN DỤNG (HR)
             emailService.sendHtmlMessage(
                     jobPost.getEmployerId().getUserId().getEmail(), // email HR
                     "Ứng viên mới ứng tuyển",
@@ -126,6 +131,20 @@ public class ApplicationServiceImpl implements ApplicationService {
             );
         } catch (Exception e) {
             System.err.println("Không thể gửi email xác nhận: " + e.getMessage());
+        }
+
+        try {
+            notificationService.createNotification(
+                    NotificationRequest.builder()
+                            .userId(jobPost.getEmployerId().getUserId().getId())
+                            .title("Ứng viên mới ứng tuyển")
+                            .content(candidate.getUserId().getFullName() + " vừa ứng tuyển vào job: " + jobPost.getTitle())
+                            .type(Notification.NotificationType.APPLICATION_STATUS)
+                            .linkTo("/employer/applications/" + application.getId())
+                            .build()
+            );
+        } catch (Exception e) {
+            System.err.println("Không thể gửi notification: " + e.getMessage());
         }
 
         return mapToResponseDTO(application);
@@ -181,23 +200,20 @@ public class ApplicationServiceImpl implements ApplicationService {
 
             if (request.getStatus() == ApplicationStatus.ACCEPTED) {
                 subject = "Hồ sơ đã được duyệt - " + companyName;
-                body
-                        = "<p>Chào <b>" + candidateName + "</b>,</p>"
+                body = "<p>Chào <b>" + candidateName + "</b>,</p>"
                         + "<p>Chúc mừng! Hồ sơ của bạn cho vị trí <b>" + jobTitle + "</b> tại <b>" + companyName + "</b> đã được <span style='color:green;'>duyệt</span> và sẽ chuyển qua vòng tiếp theo.</p>"
                         + "<p>Chúng tôi sẽ liên hệ với bạn sớm để thông báo chi tiết.</p>"
                         + "<p>Trân trọng,<br/><b>" + companyName + "</b></p>";
             } else if (request.getStatus() == ApplicationStatus.REJECTED) {
                 subject = "Hồ sơ bị từ chối - " + companyName;
-                body
-                        = "<p>Chào <b>" + candidateName + "</b>,</p>"
+                body = "<p>Chào <b>" + candidateName + "</b>,</p>"
                         + "<p>Rất tiếc, hồ sơ của bạn cho vị trí <b>" + jobTitle + "</b> tại <b>" + companyName + "</b> đã bị <span style='color:red;'>từ chối</span>.</p>"
                         + "<p><b>Lý do:</b> " + request.getReason() + "</p>"
                         + "<p>Chúc bạn may mắn trong những cơ hội tiếp theo.</p>"
                         + "<p>Trân trọng,<br/><b>" + companyName + "</b></p>";
             } else {
                 subject = "Cập nhật hồ sơ ứng tuyển - " + companyName;
-                body
-                        = "<p>Chào <b>" + candidateName + "</b>,</p>"
+                body = "<p>Chào <b>" + candidateName + "</b>,</p>"
                         + "<p>Hồ sơ của bạn đã được cập nhật trạng thái: <b>" + request.getStatus() + "</b>.</p>"
                         + "<p>Trân trọng,<br/><b>" + companyName + "</b></p>";
             }
@@ -209,6 +225,21 @@ public class ApplicationServiceImpl implements ApplicationService {
             );
         } catch (Exception e) {
             System.err.println("❌ Không thể gửi email kết quả duyệt hồ sơ: " + e.getMessage());
+        }
+
+        try {
+            notificationService.createNotification(
+                    NotificationRequest.builder()
+                            .userId(application.getCandidateId().getUserId().getId())
+                            .title(request.getStatus() == ApplicationStatus.ACCEPTED ? "Hồ sơ đã được duyệt" : "Hồ sơ bị từ chối")
+                            .content("Hồ sơ của bạn cho vị trí " + application.getJobPostId().getTitle() + " tại " + employer.getCompanyName()
+                                    + (request.getStatus() == ApplicationStatus.REJECTED ? " đã bị từ chối" : " đã được duyệt") + ".")
+                            .type(Notification.NotificationType.APPLICATION_STATUS)
+                            .linkTo("/candidate/applications/" + application.getId())
+                            .build()
+            );
+        } catch (Exception e) {
+            System.err.println("❌ Không thể gửi notification: " + e.getMessage());
         }
 
         return mapToEmployerApplicationResponse(application);

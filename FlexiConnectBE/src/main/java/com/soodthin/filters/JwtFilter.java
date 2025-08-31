@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,52 +20,55 @@ import java.util.List;
 public class JwtFilter extends OncePerRequestFilter {
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain)
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
         System.out.println("Request URI: " + request.getRequestURI());
 
+        // Bỏ qua filter cho các đường dẫn xác thực (đăng nhập/đăng ký)
         String path = request.getRequestURI();
-        if (path.contains("/api/auth")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-        if (path.contains("/api/job-post")) {
+        if (path.startsWith("/api/auth")) {
             filterChain.doFilter(request, response);
             return;
         }
 
+        // Lấy header Authorization
         String header = request.getHeader("Authorization");
+
+
         if (header == null || !header.startsWith("Bearer ")) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Thiếu hoặc sai token.");
-            return;
+            filterChain.doFilter(request, response);
+            return; // Rất quan trọng
         }
 
         String token = header.substring(7).trim();
         if (token.isEmpty() || token.equalsIgnoreCase("null")) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token rỗng hoặc không hợp lệ.");
+            filterChain.doFilter(request, response);
             return;
         }
 
         try {
             String username = JwtUtils.validateTokenAndGetUsername(token);
             String role = JwtUtils.getRoleFromToken(token);
+
             if (username != null && role != null) {
+                // Nếu token hợp lệ, tạo đối tượng xác thực và đặt vào SecurityContext
                 User userDetails = new User(username, "", List.of(new SimpleGrantedAuthority(role)));
-                UsernamePasswordAuthenticationToken auth
-                        = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities()
+                );
                 SecurityContextHolder.getContext().setAuthentication(auth);
-            } else {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token không hợp lệ.");
-                return;
             }
         } catch (Exception e) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Lỗi token.");
-            return;
+           
+            System.err.println("JWT Token validation error: " + e.getMessage());
         }
 
+        // Cho request đi tiếp trong chuỗi filter
         filterChain.doFilter(request, response);
     }
 }
