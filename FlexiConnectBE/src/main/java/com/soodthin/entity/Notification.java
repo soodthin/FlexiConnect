@@ -5,6 +5,7 @@
 package com.soodthin.entity;
 
 import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,17 +13,16 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 /**
  *
@@ -34,11 +34,30 @@ import java.time.LocalDateTime;
     @NamedQuery(name = "Notification.findAll", query = "SELECT n FROM Notification n"),
     @NamedQuery(name = "Notification.findById", query = "SELECT n FROM Notification n WHERE n.id = :id"),
     @NamedQuery(name = "Notification.findByTitle", query = "SELECT n FROM Notification n WHERE n.title = :title"),
-    @NamedQuery(name = "Notification.findByIsRead", query = "SELECT n FROM Notification n WHERE n.isRead = :isRead"),
     @NamedQuery(name = "Notification.findByType", query = "SELECT n FROM Notification n WHERE n.type = :type"),
     @NamedQuery(name = "Notification.findByLinkTo", query = "SELECT n FROM Notification n WHERE n.linkTo = :linkTo"),
     @NamedQuery(name = "Notification.findByCreatedAt", query = "SELECT n FROM Notification n WHERE n.createdAt = :createdAt")})
 public class Notification implements Serializable {
+
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 255)
+    @Column(name = "title")
+    private String title;
+    @Lob
+    @Size(max = 65535)
+    @Column(name = "content")
+    private String content;
+    @Column(name = "type", length = 20)
+    @Enumerated(EnumType.STRING)
+    private NotificationType type;
+    @Size(max = 255)
+    @Column(name = "link_to")
+    private String linkTo;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "notificationId")
+    private Set<NotificationUser> notificationUserSet;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -46,33 +65,13 @@ public class Notification implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-    @Size(max = 255)
-    @Column(name = "title")
-    private String title;
-    @Lob
-    @Size(max = 65535)
-    @Column(name = "content")
-    private String content;
-    @Column(name = "is_read")
-    private Boolean isRead;
+
     public enum NotificationType {
-    JOB_NEW,
-    APPLICATION_STATUS,
-    SYSTEM_MESSAGE,
-    CHAT_MESSAGE
+        JOB_NEW,
+        APPLICATION_STATUS,
+        SYSTEM_MESSAGE,
+        CHAT_MESSAGE
     }
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type", length = 10)
-    private NotificationType type;
-    @Size(max = 255)
-    @Column(name = "link_to")
-    private String linkTo;
-    @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime createdAt;
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @ManyToOne
-    private User userId;
 
     public Notification() {
     }
@@ -87,38 +86,6 @@ public class Notification implements Serializable {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public Boolean getIsRead() {
-        return isRead;
-    }
-
-    public void setIsRead(Boolean isRead) {
-        this.isRead = isRead;
-    }
-
-    public NotificationType getType() {
-        return type;
-    }
-
-    public void setType(NotificationType type) {
-        this.type = type;
     }
 
     public String getLinkTo() {
@@ -137,13 +104,6 @@ public class Notification implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public User getUserId() {
-        return userId;
-    }
-
-    public void setUserId(User userId) {
-        this.userId = userId;
-    }
 
     @Override
     public int hashCode() {
@@ -169,5 +129,37 @@ public class Notification implements Serializable {
     public String toString() {
         return "com.soodthin.pojo.Notification[ id=" + id + " ]";
     }
-    
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public NotificationType getType() {
+        return type;
+    }
+
+    public void setType(NotificationType type) {
+        this.type = type;
+    }
+
+    public Set<NotificationUser> getNotificationUserSet() {
+        return notificationUserSet;
+    }
+
+    public void setNotificationUserSet(Set<NotificationUser> notificationUserSet) {
+        this.notificationUserSet = notificationUserSet;
+    }
+
 }

@@ -13,6 +13,8 @@ import lombok.*;
  */
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class NotificationRequest {
 
     private Integer userId;

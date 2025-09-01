@@ -5,10 +5,9 @@
 package com.soodthin.services;
 
 import com.soodthin.dto.request.NotificationRequest;
-import com.soodthin.dto.response.NotificationResponse;
+import com.soodthin.dto.response.NotificationUserResponse;
+import com.soodthin.entity.Notification;
 import com.soodthin.entity.User;
-import java.util.Optional;
-import org.springframework.data.domain.Page;
 
 /**
  *
@@ -16,13 +15,8 @@ import org.springframework.data.domain.Page;
  */
 public interface NotificationService {
 
-    NotificationResponse createNotification(NotificationRequest request);
+    NotificationUserResponse createNotification(NotificationRequest request);
 
-    Page<NotificationResponse> getNotifications(User userId, int page, int size);
+    void deleteNotification(Notification notificationId, User user);
 
-    Optional<NotificationResponse> markAsRead(Integer id, User user);
-
-    void markAllAsRead(User userId);
-
-    void deleteNotification(Integer id, User user);
 }

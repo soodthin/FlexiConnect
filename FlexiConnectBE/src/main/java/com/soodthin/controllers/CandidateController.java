@@ -1,4 +1,4 @@
-    /*
+/*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
@@ -14,7 +14,6 @@ import com.soodthin.dto.request.SavedJobRequest;
 import com.soodthin.dto.response.CandidateApplicationResponse;
 import com.soodthin.dto.response.CandidateProfileResponse;
 import com.soodthin.dto.response.SavedJobResponse;
-
 import com.soodthin.entity.CvSuggestion;
 import com.soodthin.entity.User;
 import com.soodthin.repositories.UserRepository;
@@ -22,6 +21,7 @@ import com.soodthin.services.ApplicationService;
 import com.soodthin.services.CandidateService;
 import com.soodthin.services.CvSuggestionService;
 import com.soodthin.services.FollowEmployerService;
+import com.soodthin.services.NotificationUserService;
 import com.soodthin.services.SavedJobService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +59,8 @@ public class CandidateController {
     private FollowEmployerService followEmployerService;
     @Autowired
     private SavedJobService savedJobService;
+    @Autowired
+    private NotificationUserService notificationUserService;
 
     private User getCurrentUser(Authentication authentication) {
         String email = authentication.getName();

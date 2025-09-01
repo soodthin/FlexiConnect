@@ -140,7 +140,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                             .title("Ứng viên mới ứng tuyển")
                             .content(candidate.getUserId().getFullName() + " vừa ứng tuyển vào job: " + jobPost.getTitle())
                             .type(Notification.NotificationType.APPLICATION_STATUS)
-                            .linkTo("/employer/applications/" + application.getId())
+                            .linkTo("/employer-applications-management")
                             .build()
             );
         } catch (Exception e) {
@@ -235,7 +235,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                             .content("Hồ sơ của bạn cho vị trí " + application.getJobPostId().getTitle() + " tại " + employer.getCompanyName()
                                     + (request.getStatus() == ApplicationStatus.REJECTED ? " đã bị từ chối" : " đã được duyệt") + ".")
                             .type(Notification.NotificationType.APPLICATION_STATUS)
-                            .linkTo("/candidate/applications/" + application.getId())
+                            .linkTo("/candidate/applied")
                             .build()
             );
         } catch (Exception e) {

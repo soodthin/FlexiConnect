@@ -50,6 +50,7 @@
     <class>com.soodthin.configs.Notification</class>
     <class>com.soodthin.entity.CvSuggestion</class>
     <class>com.soodthin.entity.EmployerEmailLog</class>
+    <class>com.soodthin.entity.NotificationUser</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/flexiconnectdb?zeroDateTimeBehavior=CONVERT_TO_NULL"/>
       <property name="javax.persistence.jdbc.user" value="root"/>

@@ -4,7 +4,7 @@ import { FaUser, FaSearch, FaSignOutAlt, FaMoon, FaSun } from "react-icons/fa";
 import { IoIosArrowDown } from "react-icons/io";
 import { MyUserContext, MyDispatcherContext } from "@contexts/MyContexts";
 import cookie from "react-cookies";
-import Notifications from "@components/notifications/Notifications"; 
+import Notifications from "@components/notifications/Notifications";
 
 export default function Header() {
   const user = useContext(MyUserContext);
@@ -45,7 +45,7 @@ export default function Header() {
 
   return (
     <header className="flex justify-between items-center p-6 bg-[#f7f6f3] dark:bg-[#181818] font-inter text-[#222222] dark:text-[#f5efe6]">
-      
+
       {/* Logo */}
       <div
         className="flex items-center gap-3 mr-8 select-none cursor-pointer"
@@ -98,7 +98,12 @@ export default function Header() {
         )}
 
         {/* Notifications */}
-        {user && <Notifications user={user} />}
+        {user?.role === "EMPLOYER" && (
+          <Notifications user={user} role="employer" />
+        )}
+        {user?.role === "CANDIDATE" && (
+          <Notifications user={user} role="candidate" />
+        )}
 
         {/* Dark mode toggle */}
         <button

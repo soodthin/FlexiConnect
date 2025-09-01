@@ -9,17 +9,16 @@ package com.soodthin.services.impl;
  * @author ADMIN
  */
 import com.soodthin.dto.request.NotificationRequest;
-import com.soodthin.dto.response.NotificationResponse;
+import com.soodthin.dto.response.NotificationUserResponse;
 import com.soodthin.entity.Notification;
+import com.soodthin.entity.NotificationUser;
 import com.soodthin.entity.User;
 import com.soodthin.repositories.NotificationRepository;
+import com.soodthin.repositories.NotificationUserRepository;
 import com.soodthin.repositories.UserRepository;
 import com.soodthin.services.NotificationService;
 import java.time.LocalDateTime;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -30,31 +29,42 @@ public class NotificationServiceImpl implements NotificationService {
     private NotificationRepository notificationRepository;
 
     @Autowired
-    private SimpMessagingTemplate messagingTemplate;
+    private NotificationUserRepository notificationUserRepository;
 
     @Autowired
     private UserRepository userRepository;
 
-    @Override
-    public NotificationResponse createNotification(NotificationRequest request) {
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + request.getUserId()));
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
 
+    @Override
+    public NotificationUserResponse createNotification(NotificationRequest request) {
         Notification notification = new Notification();
-        notification.setUserId(user);
         notification.setTitle(request.getTitle());
         notification.setContent(request.getContent());
         notification.setType(request.getType());
         notification.setLinkTo(request.getLinkTo());
-        notification.setIsRead(false);
         notification.setCreatedAt(LocalDateTime.now());
 
         Notification saved = notificationRepository.save(notification);
 
-        NotificationResponse response = toResponse(saved);
+        // Gán cho user nhận thông báo
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + request.getUserId()));
+
+        NotificationUser notifUser = new NotificationUser();
+        notifUser.setNotificationId(saved);
+        notifUser.setUserId(user);
+        notifUser.setIsRead(false);
+        notifUser.setReadAt(null);
+
+        notificationUserRepository.save(notifUser);
+
+        // Build response
+        NotificationUserResponse response = NotificationMapper.toDTO(saved, notifUser);
 
         // Push realtime qua WebSocket cho đúng user
-        messagingTemplate.convertAndSendToUser(
+        simpMessagingTemplate.convertAndSendToUser(
                 user.getId().toString(),
                 "/queue/notifications",
                 response
@@ -64,47 +74,27 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public Page<NotificationResponse> getNotifications(User user, int page, int size) {
-        return notificationRepository.findByUserIdOrderByCreatedAtDesc(user, PageRequest.of(page, size))
-                .map(this::toResponse);
+    public void deleteNotification(Notification notificationId, User user) {
+        notificationUserRepository.findByNotificationIdAndUserId(notificationId, user)
+                .ifPresent(notificationUserRepository::delete);
     }
 
-    @Override
-    public Optional<NotificationResponse> markAsRead(Integer id, User user) {
-        return notificationRepository.findById(id)
-                .filter(n -> n.getUserId().getId().equals(user.getId())) // chỉ cho phép đọc của chính mình
-                .map(n -> {
-                    n.setIsRead(true);
-                    return toResponse(notificationRepository.save(n));
-                });
-    }
+    // Mapper tách riêng
+    public static class NotificationMapper {
 
-    @Override
-    public void markAllAsRead(User user) {
-        notificationRepository.findByUserIdOrderByCreatedAtDesc(user, PageRequest.of(0, Integer.MAX_VALUE))
-                .forEach(n -> {
-                    n.setIsRead(true);
-                    notificationRepository.save(n);
-                });
-    }
-
-    @Override
-    public void deleteNotification(Integer id, User user) {
-        notificationRepository.findById(id)
-                .filter(n -> n.getUserId().getId().equals(user.getId())) // chỉ xoá của mình
-                .ifPresent(notificationRepository::delete);
-    }
-
-    private NotificationResponse toResponse(Notification notification) {
-        return NotificationResponse.builder()
-                .id(notification.getId())
-                .userId(notification.getUserId().getId()) // trả về ID thôi, không trả nguyên User
-                .title(notification.getTitle())
-                .content(notification.getContent())
-                .type(notification.getType())
-                .linkTo(notification.getLinkTo())
-                .isRead(notification.getIsRead())
-                .createdAt(notification.getCreatedAt())
-                .build();
+        public static NotificationUserResponse toDTO(Notification notification, NotificationUser notifUser) {
+            return NotificationUserResponse.builder()
+                    .id(notification.getId())
+                    .userId(notifUser.getUserId().getId())
+                    .title(notification.getTitle())
+                    .content(notification.getContent())
+                    .type(notification.getType())
+                    .linkTo(notification.getLinkTo())
+                    .isRead(notifUser.getIsRead())
+                    .createdAt(notification.getCreatedAt())
+                    .readAt(notifUser.getReadAt())
+                    .build();
+        }
     }
 }
+    

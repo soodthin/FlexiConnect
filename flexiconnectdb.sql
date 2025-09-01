@@ -60,6 +60,7 @@ CREATE TABLE employer (
     website VARCHAR(100),
     company_address TEXT,
     company_intro TEXT,
+    follower INT NOT NULL DEFAULT 0,
     is_verified BOOLEAN DEFAULT FALSE,
     reason_reject VARCHAR(20),
     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
@@ -179,6 +180,7 @@ CREATE TABLE cv_suggestion (
 CREATE TABLE follow_employer (
     candidate_id INT,
     employer_id INT,
+    notify_job BOOLEAN DEFAULT TRUE,
     followed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (candidate_id, employer_id),
     FOREIGN KEY (candidate_id) REFERENCES candidate(id) ON DELETE CASCADE,
@@ -269,15 +271,24 @@ CREATE TABLE user_package (
 
 CREATE TABLE notification (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT,
-    title VARCHAR(255),
+    title VARCHAR(255) NOT NULL,
     content TEXT,
-    is_read BOOLEAN DEFAULT FALSE,
     type ENUM('JOB_NEW', 'APPLICATION_STATUS', 'SYSTEM_MESSAGE', 'CHAT_MESSAGE') DEFAULT 'SYSTEM_MESSAGE',
     link_to VARCHAR(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE notification_user (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    notification_id INT NOT NULL,
+    user_id INT NOT NULL,
+    is_read BOOLEAN DEFAULT FALSE,
+    read_at TIMESTAMP NULL,
+    FOREIGN KEY (notification_id) REFERENCES notification(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
+    UNIQUE(notification_id, user_id)
+);
+
 
 CREATE TABLE conversation (
     id VARCHAR(100) PRIMARY KEY,
@@ -290,13 +301,3 @@ CREATE TABLE conversation (
     UNIQUE(user1_id, user2_id)
 );
 
-CREATE TABLE activity_log (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT,
-    action_type VARCHAR(100) NOT NULL,
-    target_id INT,
-    target_type VARCHAR(50),
-    details TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE SET NULL
-);

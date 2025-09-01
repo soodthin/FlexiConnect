@@ -5,13 +5,13 @@
 package com.soodthin.controllers;
 
 import com.soodthin.dto.request.NotificationRequest;
-import com.soodthin.dto.response.NotificationResponse;
+import com.soodthin.dto.response.NotificationUserResponse;
 import com.soodthin.entity.User;
 import com.soodthin.repositories.UserRepository;
 import com.soodthin.services.NotificationService;
-import java.util.Optional;
+import com.soodthin.services.NotificationUserService;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -35,6 +34,9 @@ public class NotificationController {
     private NotificationService notificationService;
 
     @Autowired
+    private NotificationUserService notificationUserService;
+
+    @Autowired
     private UserRepository userRepository;
 
     private User getCurrentUser(Authentication authentication) {
@@ -44,36 +46,61 @@ public class NotificationController {
     }
 
     @PostMapping
-    public NotificationResponse create(@RequestBody NotificationRequest request) {
+    public NotificationUserResponse createNotification(@RequestBody NotificationRequest request) {
         return notificationService.createNotification(request);
     }
 
+    @DeleteMapping("/{id}")
+    public void deleteNotification(
+            @PathVariable("id") Integer id,
+            Authentication authentication
+    ) {
+        User currentUser = getCurrentUser(authentication);
+        notificationService.deleteNotification(
+                new com.soodthin.entity.Notification(id), // tạo object với id
+                currentUser
+        );
+    }
+
     @GetMapping
-    public Page<NotificationResponse> getMyNotifications(
-            Authentication authentication,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        User user = getCurrentUser(authentication);
-        return notificationService.getNotifications(user, page, size);
+    public List<NotificationUserResponse> getMyNotifications(Authentication authentication) {
+        User currentUser = getCurrentUser(authentication);
+        return notificationUserService.getNotifications(currentUser);
+    }
+
+    @GetMapping("/unread-count")
+    public long countUnread(Authentication authentication) {
+        User currentUser = getCurrentUser(authentication);
+        return notificationUserService.countUnreadByUser(currentUser);
     }
 
     @PatchMapping("/{id}/read")
-    public Optional<NotificationResponse> markAsRead(
-            @PathVariable Integer id,
-            Authentication authentication) {
-        User user = getCurrentUser(authentication);
-        return notificationService.markAsRead(id, user);
+    public void markAsRead(@PathVariable("id") Integer id, Authentication authentication) {
+        User currentUser = getCurrentUser(authentication);
+        notificationUserService.markAsRead(id, currentUser);
     }
 
-    @PatchMapping("/mark-all-read")
+    @PatchMapping("/read-all")
     public void markAllAsRead(Authentication authentication) {
-        User user = getCurrentUser(authentication);
-        notificationService.markAllAsRead(user);
+        User currentUser = getCurrentUser(authentication);
+        notificationUserService.markAllAsRead(currentUser);
     }
 
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Integer id, Authentication authentication) {
-        User user = getCurrentUser(authentication);
-        notificationService.deleteNotification(id, user);
+    @PatchMapping("/{id}/unread")
+    public void markAsUnread(@PathVariable("id") Integer id, Authentication authentication) {
+        User currentUser = getCurrentUser(authentication);
+        notificationUserService.markAsUnread(id, currentUser);
+    }
+
+    @DeleteMapping("/{id}/user")
+    public void deleteNotificationForUser(
+            @PathVariable("id") Integer id,
+            Authentication authentication
+    ) {
+        User currentUser = getCurrentUser(authentication);
+        notificationUserService.deleteNotificationForUser(
+                new com.soodthin.entity.Notification(id),
+                currentUser
+        );
     }
 }

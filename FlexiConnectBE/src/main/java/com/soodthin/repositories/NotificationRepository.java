@@ -5,9 +5,6 @@
 package com.soodthin.repositories;
 
 import com.soodthin.entity.Notification;
-import com.soodthin.entity.User;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
@@ -15,7 +12,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author ADMIN
  */
 public interface NotificationRepository extends JpaRepository<Notification, Integer> {
-
-    Page<Notification> findByUserIdOrderByCreatedAtDesc(User user, Pageable pageable);
 
 }

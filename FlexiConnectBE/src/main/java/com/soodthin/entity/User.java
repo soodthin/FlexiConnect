@@ -28,6 +28,7 @@ import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Set;
 
 /**
@@ -55,6 +56,7 @@ public class User implements Serializable {
     // @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message="Invalid email")//if the field contains email address consider using this annotation to enforce field validation
     // @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message="Invalid email")//if the field contains email address consider using this annotation to enforce field validation
     // @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message="Invalid email")//if the field contains email address consider using this annotation to enforce field validation
+    // @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message="Invalid email")//if the field contains email address consider using this annotation to enforce field validation
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 100)
@@ -68,6 +70,7 @@ public class User implements Serializable {
     @Size(max = 100)
     @Column(name = "full_name")
     private String fullName;
+    // @Pattern(regexp="^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$", message="Invalid phone/fax format, should be as xxx-xxx-xxxx")//if the field contains phone or fax number consider using this annotation to enforce field validation
     // @Pattern(regexp="^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$", message="Invalid phone/fax format, should be as xxx-xxx-xxxx")//if the field contains phone or fax number consider using this annotation to enforce field validation
     @Size(max = 20)
     @Column(name = "phone")
@@ -91,6 +94,8 @@ public class User implements Serializable {
     private LocalDateTime createdAt;
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
+    private Set<NotificationUser> notificationUserSet;
 
     public enum UserStatus {
         ACTIVE,
@@ -118,8 +123,6 @@ public class User implements Serializable {
     private Set<Rating> ratingSet1;
     @OneToMany(mappedBy = "userId")
     private Set<ActivityLog> activityLogSet;
-    @OneToMany(mappedBy = "userId")
-    private Set<Notification> notificationSet;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "userId")
     private Candidate candidate;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "userId")
@@ -232,14 +235,6 @@ public class User implements Serializable {
         this.activityLogSet = activityLogSet;
     }
 
-    public Set<Notification> getNotificationSet() {
-        return notificationSet;
-    }
-
-    public void setNotificationSet(Set<Notification> notificationSet) {
-        this.notificationSet = notificationSet;
-    }
-
     public Candidate getCandidate() {
         return candidate;
     }
@@ -337,10 +332,16 @@ public class User implements Serializable {
         this.gender = gender;
     }
 
+    /**
+     * @return the status
+     */
     public String getAddress() {
         return address;
     }
 
+    /**
+     * @param status the status to set
+     */
     public void setAddress(String address) {
         this.address = address;
     }
@@ -353,18 +354,20 @@ public class User implements Serializable {
         this.avatar = avatar;
     }
 
-    /**
-     * @return the status
-     */
     public UserStatus getStatus() {
         return status;
     }
 
-    /**
-     * @param status the status to set
-     */
     public void setStatus(UserStatus status) {
         this.status = status;
+    }
+
+    public Set<NotificationUser> getNotificationUserSet() {
+        return notificationUserSet;
+    }
+
+    public void setNotificationUserSet(Set<NotificationUser> notificationUserSet) {
+        this.notificationUserSet = notificationUserSet;
     }
 
 }

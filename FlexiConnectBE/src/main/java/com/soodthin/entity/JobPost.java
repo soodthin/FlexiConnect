@@ -23,8 +23,6 @@ import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
@@ -74,7 +72,7 @@ public class JobPost implements Serializable {
     @Column(name = "expired_at")
     private LocalDateTime expiredAt;
     @Column(name = "status", length = 10)
-@Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     private JobStatus status;
     public enum JobStatus {
         OPEN,

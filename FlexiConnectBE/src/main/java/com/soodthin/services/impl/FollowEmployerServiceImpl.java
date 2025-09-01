@@ -38,53 +38,71 @@ public class FollowEmployerServiceImpl implements FollowEmployerService {
 
     @Override
     public FollowEmployerDTO follow(Integer candidateId, Integer employerId) {
-    
-    Optional<FollowEmployer> existing = followEmployerRepository
-            .findByCandidateIdAndEmployerId(candidateId, employerId);
-    
-    if (existing.isPresent()) {
-        System.out.println("🔍 Already following - returning existing record");
-        FollowEmployer fe = existing.get();
-        return new FollowEmployerDTO(
-                candidateId,
-                employerId,
-                fe.getNotifyJob(),
-                fe.getFollowedAt()
-        );
-    } else {
-        System.out.println("🔍 Creating new follow record");
-        
-        Candidate candidate = candidateRepository.findById(candidateId)
-                .orElseThrow(() -> new RuntimeException("Candidate không tồn tại"));
-        Employer employer = employerRepository.findById(employerId)
-                .orElseThrow(() -> new RuntimeException("Employer không tồn tại"));
-        
-        FollowEmployerPK pk = new FollowEmployerPK(candidateId, employerId);
-        FollowEmployer fe = new FollowEmployer();
-        fe.setFollowEmployerPK(pk);
-        fe.setCandidate(candidate);
-        fe.setEmployer(employer);
-        fe.setNotifyJob(true);
-        fe.setFollowedAt(LocalDateTime.now());
-        
-        FollowEmployer saved = followEmployerRepository.save(fe);
-        
-        // Force flush to ensure data is committed immediately
-        followEmployerRepository.flush();
-        
-        System.out.println("🔍 Saved and flushed follow record");
-        
-        return new FollowEmployerDTO(
-                candidateId,
-                employerId,
-                saved.getNotifyJob(),
-                saved.getFollowedAt()
-        );
+
+        Optional<FollowEmployer> existing = followEmployerRepository
+                .findByCandidateIdAndEmployerId(candidateId, employerId);
+
+        if (existing.isPresent()) {
+            System.out.println("🔍 Already following - returning existing record");
+            FollowEmployer fe = existing.get();
+            return new FollowEmployerDTO(
+                    candidateId,
+                    employerId,
+                    fe.getNotifyJob(),
+                    fe.getFollowedAt()
+            );
+        } else {
+            System.out.println("🔍 Creating new follow record");
+
+            Candidate candidate = candidateRepository.findById(candidateId)
+                    .orElseThrow(() -> new RuntimeException("Candidate không tồn tại"));
+            Employer employer = employerRepository.findById(employerId)
+                    .orElseThrow(() -> new RuntimeException("Employer không tồn tại"));
+
+            FollowEmployerPK pk = new FollowEmployerPK(candidateId, employerId);
+            FollowEmployer fe = new FollowEmployer();
+            fe.setFollowEmployerPK(pk);
+            fe.setCandidate(candidate);
+            fe.setEmployer(employer);
+            fe.setNotifyJob(true);
+            fe.setFollowedAt(LocalDateTime.now());
+
+            FollowEmployer saved = followEmployerRepository.save(fe);
+
+            // 🔥 Update follower count
+            Integer currentFollower = employer.getFollower() == null ? 0 : employer.getFollower();
+            employer.setFollower(currentFollower + 1);
+            employerRepository.save(employer);
+
+            // Force flush to ensure data is committed immediately
+            followEmployerRepository.flush();
+
+            System.out.println("🔍 Saved and flushed follow record + updated employer follower count");
+
+            return new FollowEmployerDTO(
+                    candidateId,
+                    employerId,
+                    saved.getNotifyJob(),
+                    saved.getFollowedAt()
+            );
+        }
     }
-}
+
     @Override
     public void unfollow(Integer candidateId, Integer employerId) {
         followEmployerRepository.deleteByFollowEmployerPKCandidateIdAndFollowEmployerPKEmployerId(candidateId, employerId);
+
+        Employer employer = employerRepository.findById(employerId)
+                .orElseThrow(() -> new RuntimeException("Employer không tồn tại"));
+
+        Integer currentFollower = employer.getFollower() == null ? 0 : employer.getFollower();
+        if (currentFollower > 0) {
+            employer.setFollower(currentFollower - 1);
+        } else {
+            employer.setFollower(0); 
+        }
+
+        employerRepository.save(employer);
     }
 
     @Override

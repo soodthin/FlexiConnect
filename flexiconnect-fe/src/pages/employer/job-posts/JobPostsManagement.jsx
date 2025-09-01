@@ -82,7 +82,7 @@ export default function EmployerDashboard() {
 
   const deleteJobPost = async (id) => {
     try {
-      await authApis().delete(endpoints["jobpost-id"](id));
+      await authApis().delete(endpoints["employer-jobpost-id"](id));
       setReload((prev) => prev + 1);
     } catch { }
   };

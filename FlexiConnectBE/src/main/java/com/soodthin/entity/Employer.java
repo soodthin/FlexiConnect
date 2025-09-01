@@ -57,6 +57,9 @@ public class Employer implements Serializable {
     @Size(max = 65535)
     @Column(name = "company_intro")
     private String companyIntro;
+    @Column(name = "follower")
+    private Integer follower = 0;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "employerId")
     private Set<EmployerEmailLog> employerEmailLogSet;
 
@@ -237,6 +240,20 @@ public class Employer implements Serializable {
 
     public void setEmployerEmailLogSet(Set<EmployerEmailLog> employerEmailLogSet) {
         this.employerEmailLogSet = employerEmailLogSet;
+    }
+
+    /**
+     * @return the follower
+     */
+    public Integer getFollower() {
+        return follower;
+    }
+
+    /**
+     * @param follower the follower to set
+     */
+    public void setFollower(Integer follower) {
+        this.follower = follower;
     }
 
 }

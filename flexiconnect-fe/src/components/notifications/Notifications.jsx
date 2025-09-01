@@ -1,15 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 import { FaBell } from "react-icons/fa";
-import { authApis } from "@configs/APIs";
+import { authApis, endpoints } from "@configs/APIs";
+import { toast } from "sonner";
 
-export default function Notifications({ user }) {
+export default function Notifications() {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showNotifications, setShowNotifications] = useState(false);
   const [selectedNotif, setSelectedNotif] = useState(null);
   const notifRef = useRef();
 
-  // click outside -> đóng dropdown
+  // đóng dropdown khi click ngoài
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (notifRef.current && !notifRef.current.contains(e.target)) {
@@ -20,26 +21,59 @@ export default function Notifications({ user }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // fetch notifications
+  // load notifications
+  const loadNotifications = async () => {
+    try {
+      let res = await authApis().get(endpoints["notifications"]);
+      setNotifications(res.data || []);
+      let unread = res.data.filter((n) => !n.isRead).length;
+      setUnreadCount(unread);
+    } catch (err) {
+      console.error("❌ Lỗi load notifications:", err);
+      toast.error("Không tải được thông báo");
+    }
+  };
+
   useEffect(() => {
-    const fetchUnread = async () => {
-      if (!user) {
-        setUnreadCount(0);
-        setNotifications([]);
-        return;
-      }
-      try {
-        const res = await authApis().get(`/users/notifications?page=0&size=10`);
-        const data = res.data?.content || [];
-        setNotifications(data);
-        setUnreadCount(data.filter((n) => !n.isRead).length);
-      } catch (err) {
-        console.error("❌ Lỗi load notifications:", err);
-        setUnreadCount(0);
-      }
-    };
-    fetchUnread();
-  }, [user]);
+    loadNotifications();
+  }, []);
+
+  // actions
+  const markAsRead = async (id) => {
+    try {
+      await authApis().patch(`${endpoints["notifications"]}/${id}/read`);
+      loadNotifications();
+    } catch {
+      toast.error("Lỗi khi đánh dấu đã đọc");
+    }
+  };
+
+  const markAsUnread = async (id) => {
+    try {
+      await authApis().patch(`${endpoints["notifications"]}/${id}/unread`);
+      loadNotifications();
+    } catch {
+      toast.error("Lỗi khi đánh dấu chưa đọc");
+    }
+  };
+
+  const markAllAsRead = async () => {
+    try {
+      await authApis().patch(`${endpoints["notifications"]}/read-all`);
+      loadNotifications();
+    } catch {
+      toast.error("Lỗi khi đánh dấu tất cả đã đọc");
+    }
+  };
+
+  const deleteNotification = async (id) => {
+    try {
+      await authApis().delete(`${endpoints["notifications"]}/${id}/user`);
+      loadNotifications();
+    } catch {
+      toast.error("Lỗi khi xóa thông báo");
+    }
+  };
 
   return (
     <div className="relative" ref={notifRef}>
@@ -59,17 +93,17 @@ export default function Notifications({ user }) {
       {/* dropdown danh sách noti */}
       {showNotifications && (
         <div className="absolute right-0 mt-3 w-80 max-h-96 overflow-y-auto bg-white dark:bg-[#232323] border border-gray-100 dark:border-[#444] rounded-2xl shadow-xl z-40">
-          {notifications.length === 0 ? (
-            <div
-              className="p-6 text-center text-gray-500 dark:text-gray-400 cursor-default"
-              onClick={() =>
-                setSelectedNotif({
-                  title: "Thông báo",
-                  content: "Bạn hiện không có thông báo nào.",
-                  createdAt: new Date().toISOString(),
-                })
-              }
+          <div className="flex justify-between items-center px-4 py-2 border-b dark:border-[#444]">
+            <span className="font-semibold text-sm">Thông báo</span>
+            <button
+              onClick={markAllAsRead}
+              className="text-xs text-blue-600 hover:underline"
             >
+              Đánh dấu tất cả đã đọc
+            </button>
+          </div>
+          {notifications.length === 0 ? (
+            <div className="p-6 text-center text-gray-500 dark:text-gray-400 cursor-default">
               Không có thông báo
             </div>
           ) : (
@@ -77,15 +111,44 @@ export default function Notifications({ user }) {
               {notifications.map((n) => (
                 <li
                   key={n.id}
-                  className={`p-4 cursor-pointer hover:bg-[#f5efe6] dark:hover:bg-[#353535] ${!n.isRead ? "font-semibold" : ""
-                    }`}
-                  onClick={() => setSelectedNotif(n)}
+                  className={`p-4 flex justify-between items-start cursor-pointer hover:bg-[#f5efe6] dark:hover:bg-[#353535] ${
+                    !n.isRead ? "font-semibold" : ""
+                  }`}
+                  onClick={() => {
+                    setSelectedNotif(n);
+                    if (!n.isRead) markAsRead(n.id);
+                  }}
                 >
-                  <p className="text-sm">{n.title || "Không có tiêu đề"}</p>
-                  <div className="text-xs text-gray-400 mt-1">
-                    {n.createdAt
-                      ? new Date(n.createdAt).toLocaleString("vi-VN")
-                      : ""}
+                  <div>
+                    <p className="text-sm">{n.title}</p>
+                    <p className="text-xs text-gray-500">{n.content}</p>
+                    <div className="text-xs text-gray-400 mt-1">
+                      {n.createdAt
+                        ? new Date(n.createdAt).toLocaleString("vi-VN")
+                        : ""}
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1 ml-2">
+                    {n.isRead ? (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          markAsUnread(n.id);
+                        }}
+                        className="text-yellow-600 text-xs"
+                      >
+                        Chưa đọc
+                      </button>
+                    ) : null}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteNotification(n.id);
+                      }}
+                      className="text-red-600 text-xs"
+                    >
+                      Xóa
+                    </button>
                   </div>
                 </li>
               ))}
@@ -124,7 +187,6 @@ export default function Notifications({ user }) {
           </div>
         </div>
       )}
-
     </div>
   );
 }
