@@ -18,6 +18,7 @@ export default function CompanyInfo({ profile, onUpdated }) {
     setOpen(val);
     if (val) {
       setForm({
+        phoneNumber: profile.phoneNumber || "",
         companyName: profile.companyName || "",
         taxCode: profile.taxCode || "",
         companyAddress: profile.companyAddress || "",
@@ -29,27 +30,27 @@ export default function CompanyInfo({ profile, onUpdated }) {
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  try {
-    await authApis().put(endpoints["employer-profile"], {
-      ...profile,
-      ...form,
-    });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await authApis().put(endpoints["employer-profile"], {
+        ...profile,
+        ...form,
+      });
+      
+      toast.success("✅ Cập nhật thông tin công ty thành công!");
+      setOpen(false);
 
-    toast.success("✅ Cập nhật thông tin công ty thành công!");
-    setOpen(false);
+      const res = await authApis().get(endpoints["employer-profile"]);
 
-    const res = await authApis().get(endpoints["employer-profile"]);
-
-    if (onUpdated) onUpdated(res.data); 
-  } catch (err) {
-    toast.error("❌ Có lỗi xảy ra khi cập nhật thông tin.");
-  } finally {
-    setLoading(false);
-  }
-};
+      if (onUpdated) onUpdated(res.data);
+    } catch (err) {
+      toast.error("❌ Có lỗi xảy ra khi cập nhật thông tin.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
 
@@ -72,19 +73,21 @@ const handleSubmit = async (e) => {
                 Chỉnh sửa thông tin công ty
               </Dialog.Title>
               <form onSubmit={handleSubmit} className="space-y-5">
-                {["companyName", "taxCode", "companyAddress", "website"].map(
+                {["phoneNumber", "companyName", "taxCode", "companyAddress", "website"].map(
                   (field) => (
                     <input
                       key={field}
                       name={field}
                       placeholder={
-                        field === "companyName"
-                          ? "Tên công ty"
-                          : field === "taxCode"
-                            ? "Mã số thuế"
-                            : field === "companyAddress"
-                              ? "Địa chỉ công ty"
-                              : "Website"
+                        field === "phoneNumber"
+                          ? "Số điện thoại"
+                          : field === "companyName"
+                            ? "Tên công ty"
+                            : field === "taxCode"
+                              ? "Mã số thuế"
+                              : field === "companyAddress"
+                                ? "Địa chỉ công ty"
+                                : "Website"
                       }
                       value={form[field]}
                       onChange={handleChange}
@@ -120,16 +123,19 @@ const handleSubmit = async (e) => {
           </Dialog.Portal>
         </Dialog.Root>
       </div>
-      <div className="flex flex-wrap gap-6 text-sm text-gray-700 dark:text-gray-300">
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-300">
+        <div>
+          <strong>Email:</strong> {profile.email || "Chưa cập nhật"}
+        </div>
+        <div>
+          <strong>Điện thoại:</strong> {profile.phoneNumber || "Chưa cập nhật"}
+        </div>
         <div>
           <strong>Tên công ty:</strong> {profile.companyName || "Chưa cập nhật"}
         </div>
         <div>
           <strong>Mã số thuế:</strong> {profile.taxCode || "Chưa cập nhật"}
-        </div>
-        <div>
-          <strong>Địa chỉ công ty:</strong>{" "}
-          {profile.companyAddress || "Chưa cập nhật"}
         </div>
         <div>
           <strong>Website:</strong>{" "}
@@ -146,7 +152,11 @@ const handleSubmit = async (e) => {
             "Chưa cập nhật"
           )}
         </div>
+        <div className="sm:col-span-2">
+          <strong>Địa chỉ:</strong> {profile.companyAddress || "Chưa cập nhật"}
+        </div>
       </div>
     </div>
+
   );
 }

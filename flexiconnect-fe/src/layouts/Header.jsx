@@ -150,7 +150,6 @@ export default function Header() {
                   {user.role === "EMPLOYER" && (
                     <>
                       <MenuItem to="/employer-profile" label="Hồ sơ công ty" />
-                      <MenuItem to="/employer-jobposts-management" label="Quản lý tin tuyển dụng" />
                       <MenuItem to="/employer-applications-management" label="Ứng viên đã ứng tuyển" />
                     </>
                   )}

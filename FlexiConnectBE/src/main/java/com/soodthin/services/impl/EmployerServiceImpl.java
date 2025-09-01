@@ -71,11 +71,15 @@ public class EmployerServiceImpl implements EmployerService {
         EmployerProfileResponse response = modelMapper.map(employer, EmployerProfileResponse.class);
         response.setFullName(user.getFullName());
         response.setEmail(user.getEmail());
+        response.setTaxCode(employer.getTaxCode());
         response.setPhoneNumber(user.getPhone());
         response.setAvatar(user.getAvatar());
         response.setCompanyAddress(employer.getCompanyAddress());
         response.setWebsite(employer.getWebsite());
         response.setCompanyIntro(employer.getCompanyIntro());
+        response.getFollower();
+        response.getIsVerified();
+        response.getReasonReject();
         return response;
     }
     

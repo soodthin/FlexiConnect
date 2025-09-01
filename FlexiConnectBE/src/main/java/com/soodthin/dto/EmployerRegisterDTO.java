@@ -4,13 +4,16 @@
  */
 package com.soodthin.dto;
 
+
 /**
  *
  * @author ADMIN
  */
+
 public class EmployerRegisterDTO {
+
     private String companyName;
-    private String taxId;
+    private String taxCode;
     private String companyIntro;
     private CandidateRegisterDTO user;
 
@@ -26,6 +29,20 @@ public class EmployerRegisterDTO {
      */
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
+    }
+
+    /**
+     * @return the taxCode
+     */
+    public String getTaxCode() {
+        return taxCode;
+    }
+
+    /**
+     * @param taxCode the taxCode to set
+     */
+    public void setTaxCode(String taxCode) {
+        this.taxCode = taxCode;
     }
 
     /**
@@ -55,19 +72,4 @@ public class EmployerRegisterDTO {
     public void setUser(CandidateRegisterDTO user) {
         this.user = user;
     }
-
-    /**
-     * @return the taxId
-     */
-    public String getTaxId() {
-        return taxId;
-    }
-
-    /**
-     * @param taxId the taxId to set
-     */
-    public void setTaxId(String taxId) {
-        this.taxId = taxId;
-    }
-    
 }

@@ -12,10 +12,12 @@ import com.soodthin.dto.response.EmployerVerificationResponse;
 import com.soodthin.dto.response.UserManagementResponse;
 import com.soodthin.dto.request.UserStatusUpdateRequest;
 import com.soodthin.dto.request.EmployerVerificationRequest;
+import com.soodthin.dto.request.NotificationRequest;
 import com.soodthin.dto.response.JobPostAdminResponse;
 import com.soodthin.entity.Employer;
 import com.soodthin.entity.JobPost;
 import com.soodthin.entity.JobPost.JobStatus;
+import com.soodthin.entity.Notification;
 import com.soodthin.entity.Role;
 import com.soodthin.entity.User;
 import com.soodthin.entity.User.UserStatus;
@@ -24,6 +26,7 @@ import com.soodthin.repositories.EmployerRepository;
 import com.soodthin.repositories.JobPostRepository;
 import com.soodthin.repositories.UserRepository;
 import com.soodthin.services.AdminService;
+import com.soodthin.services.NotificationService;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +72,8 @@ public class AdminServiceImpl implements AdminService {
 
     @Autowired
     private ModelMapper modelMapper;
+    @Autowired
+    private NotificationService notificationService;
 
     @Override
     public List<EmployerDTO> getAllEmployers() {
@@ -82,9 +87,20 @@ public class AdminServiceImpl implements AdminService {
     public EmployerDTO verifyEmployer(Integer id) {
         Employer employer = employerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Employer not found"));
+
         employer.setIsVerified(true);
         employer.setReasonReject(null);
         employerRepository.save(employer);
+
+        NotificationRequest notifRequest = new NotificationRequest();
+        notifRequest.setUserId(employer.getUserId().getId());
+        notifRequest.setTitle("Tài khoản nhà tuyển dụng đã được xác minh");
+        notifRequest.setContent("Chúc mừng! Tài khoản của bạn đã được admin xác minh thành công.");
+        notifRequest.setType(Notification.NotificationType.SYSTEM_MESSAGE);
+        notifRequest.setLinkTo("/employer-profile"); 
+
+        notificationService.createNotification(notifRequest); 
+
         return toDTO(employer);
     }
 
@@ -96,6 +112,15 @@ public class AdminServiceImpl implements AdminService {
         employer.setIsVerified(false);
         employer.setReasonReject(reason);
         employerRepository.save(employer);
+
+        NotificationRequest notifRequest = new NotificationRequest();
+        notifRequest.setUserId(employer.getUserId().getId());
+        notifRequest.setTitle("Tài khoản nhà tuyển dụng bị từ chối");
+        notifRequest.setContent("Rất tiếc! Tài khoản của bạn bị từ chối xác minh. Lý do: " + reason);
+        notifRequest.setType(Notification.NotificationType.SYSTEM_MESSAGE);
+        notifRequest.setLinkTo("/employer-profile");
+
+        notificationService.createNotification(notifRequest);
 
         return toDTO(employer);
     }

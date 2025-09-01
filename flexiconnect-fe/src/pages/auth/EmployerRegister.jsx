@@ -39,9 +39,9 @@ export default function EmployerRegister() {
 
   const nextStep = (e) => {
     e.preventDefault();
-    const { fullName, email, password, confirmPassword, companyName, taxId } = employer;
+    const { fullName, email, password, confirmPassword, companyName, taxCode } = employer;
 
-    if (!fullName || !email || !password || !confirmPassword || !companyName || !taxId) {
+    if (!fullName || !email || !password || !confirmPassword || !companyName || !taxCode) {
       setMsg("❌ Vui lòng nhập đầy đủ các trường.");
       return;
     }
@@ -69,10 +69,10 @@ export default function EmployerRegister() {
 
     try {
       const formData = new FormData();
-      const { fullName, email, password, companyName, taxId } = employer;
+      const { fullName, email, password, companyName, taxCode } = employer;
       const employerObj = {
         companyName,
-        taxId,
+        taxCode,
         companyIntro: "",
         user: { fullName, email, password },
       };
@@ -114,7 +114,7 @@ export default function EmployerRegister() {
             {[{ label: "Họ và tên", field: "fullName", type: "text" },
               { label: "Email", field: "email", type: "email" },
               { label: "Tên công ty", field: "companyName", type: "text" },
-              { label: "Mã số thuế", field: "taxId", type: "text" }
+              { label: "Mã số thuế", field: "taxCode", type: "text" }
             ].map(({ label, field, type }) => (
               <div className="space-y-1" key={field}>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">{label}</label>

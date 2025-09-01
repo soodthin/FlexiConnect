@@ -25,6 +25,7 @@ export default function EmployerProfilePage() {
     try {
       const res = await authApis().get(endpoints["employer-profile"]);
       setProfile(res.data);
+      console.log(res.data);
     } catch (err) {
       console.error(err);
     }
@@ -43,14 +44,10 @@ export default function EmployerProfilePage() {
 
     try {
       await authApis().post(endpoints["employer-avatar"], formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+        headers: { "Content-Type": "multipart/form-data" },
       });
-
       await loadProfile();
-      setAvatarTimestamp(Date.now()); 
-
+      setAvatarTimestamp(Date.now());
       toast.success("✅ Ảnh đại diện đã được cập nhật!");
     } catch (err) {
       console.error(err);
@@ -107,6 +104,7 @@ export default function EmployerProfilePage() {
       </aside>
 
       <main className="flex-1 overflow-y-auto px-4 sm:px-8 py-8">
+        {/* Progress bar */}
         <div className="flex flex-wrap gap-3 items-center mb-6">
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-500 dark:text-gray-300">Hoàn thiện hồ sơ</span>
@@ -122,12 +120,13 @@ export default function EmployerProfilePage() {
 
         {profile ? (
           <div className="flex flex-col gap-8">
+            {/* Header: Avatar, Name, Verified + Follower */}
             <section
               id="profile"
               ref={(el) => (sectionRefs.current["profile"] = el)}
               className="bg-white dark:bg-[#232323] rounded-xl shadow p-4 sm:p-6 flex flex-col sm:flex-row items-center gap-6"
             >
-              <div className="relative w-20 h-20">
+              <div className="relative w-24 h-24">
                 <img
                   src={
                     profile.avatar
@@ -139,23 +138,47 @@ export default function EmployerProfilePage() {
                 />
                 <label className="absolute bottom-0 right-0 p-1 bg-white dark:bg-[#333] rounded-full shadow cursor-pointer text-sm">
                   📷
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleAvatarChange}
-                  />
+                  <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
                 </label>
               </div>
-              <div className="flex-1 space-y-1">
-                <h2 className="text-2xl font-bold text-[#111] dark:text-beige">{profile.fullName}</h2>
-                <div className="flex flex-wrap gap-x-8 text-gray-600 dark:text-gray-300 text-sm">
-                  <span>{profile.email}</span>
-                  <span>{profile.phoneNumber}</span>
+
+              <div className="flex-1 flex flex-col gap-2">
+                <h2 className="text-2xl font-bold text-[#111] dark:text-beige flex items-center gap-3">
+                  {profile.fullName}
+                  {profile.isVerified ? (
+                    <span className="px-3 py-1 text-xs font-semibold text-green-800 bg-green-200 dark:bg-green-700 dark:text-green-100 rounded-full">
+                      Đã xác minh ✅
+                    </span>
+                  ) : (
+                    <span
+                      className="px-3 py-1 text-xs font-semibold text-red-800 bg-red-200 dark:bg-red-700 dark:text-red-100 rounded-full"
+                      title={profile.reasonReject || "Chưa được xác minh"}
+                    >
+                      Chưa xác minh ❌
+                    </span>
+                  )}
+                </h2>
+
+                {/* Follower */}
+                <div className="flex items-center gap-2 mt-1">
+                  <div className="flex items-center gap-1 px-3 py-1 bg-gray-100 dark:bg-[#353535] rounded-full shadow-sm hover:shadow-md transition cursor-pointer">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 text-blue-500"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4h4M3 5h4v4H3V5zm0 8v4h4m-4-2h4m8-8v4h4M15 5h4v4h-4V5zm0 8v4h4m-4-2h4" />
+                    </svg>
+                    <span className="font-semibold">{profile.follower || 0}</span>
+                    <span>followers</span>
+                  </div>
                 </div>
               </div>
             </section>
 
+            {/* Company info + Email + Phone */}
             <section
               id="company"
               ref={(el) => (sectionRefs.current["company"] = el)}
@@ -167,6 +190,8 @@ export default function EmployerProfilePage() {
               />
             </section>
 
+
+            {/* Company Intro */}
             <section
               id="intro"
               ref={(el) => (sectionRefs.current["intro"] = el)}

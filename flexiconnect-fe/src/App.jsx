@@ -25,7 +25,6 @@ import JobPostManagement from "@admin/JobPostManagement";
 import EmployerDashboard from '@employer/EmployerDashboard';
 import EmployerProfile from '@employerProfile/EmployerProfile';
 import ApplicationsManagement from '@employer/ApplicationsManagement';
-import JobPostsManagement from '@jobPosts/JobPostsManagement';
 
 import CandidateDashboard from '@candidate/CandidateDashboard';
 import CandidateProfile from '@candidateProfile/CandidateProfile';
@@ -127,14 +126,7 @@ function App() {
                     </PrivateRoute>
                   }
                 />
-                <Route
-                  path="/employer-jobposts-management"
-                  element={
-                    <PrivateRoute allowedRoles={["EMPLOYER"]}>
-                      <JobPostsManagement />
-                    </PrivateRoute>
-                  }
-                />
+                
                 <Route
                   path="/employer-dashboard"
                   element={

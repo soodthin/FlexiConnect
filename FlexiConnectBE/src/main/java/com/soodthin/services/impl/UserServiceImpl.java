@@ -115,7 +115,8 @@ public class UserServiceImpl implements UserService {
 
         Employer employer = modelMapper.map(employerDTO, Employer.class);
         employer.setUserId(user);
-        employer.setIsVerified(false); // có thể giữ cờ này để Admin duyệt sau
+        employer.setTaxCode(employerDTO.getTaxCode());
+        employer.setIsVerified(false);
         employer.setCompanyIntro(buildCompanyIntro(employerDTO.getCompanyIntro(), images));
         employerRepository.save(employer);
 
