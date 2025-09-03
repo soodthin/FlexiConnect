@@ -7,7 +7,9 @@ CREATE TABLE role (
 );
 
 INSERT INTO role (role_name) VALUES ('ADMIN'), ('EMPLOYER'), ('CANDIDATE');
-
+INSERT INTO package (name, description, price, duration_days, target_role) VALUES
+('Basic', 'Chức năng AI cơ bản', 55000, 30, 'CANDIDATE'),
+('Premium', 'Chức năng AI nâng cao', 115000, 30, 'CANDIDATE');
 CREATE TABLE user (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(100) UNIQUE NOT NULL,
@@ -242,6 +244,10 @@ CREATE TABLE package (
     duration_days INT,
     target_role ENUM('EMPLOYER', 'CANDIDATE') NOT NULL
 );
+
+INSERT INTO package (name, description, price, duration_days, target_role) VALUES
+('Basic', 'Chức năng AI cơ bản', 55000, 30, 'CANDIDATE'),
+('Premium', 'Chức năng AI nâng cao', 115000, 30, 'CANDIDATE');
 
 CREATE TABLE payment_transaction (
     id INT AUTO_INCREMENT PRIMARY KEY,

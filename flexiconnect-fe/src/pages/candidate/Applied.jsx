@@ -1,8 +1,34 @@
 import { useEffect, useState } from "react";
 import { authApis, endpoints } from "@configs/APIs";
 import { toast } from "sonner";
-import * as Separator from "@radix-ui/react-separator";
-import * as Avatar from "@radix-ui/react-avatar";
+import { UserRound, Briefcase, MapPin, Clock, DollarSign } from "lucide-react";
+
+const Card = ({ children, className = "" }) => (
+  <div className={`p-6 rounded-xl shadow-sm border bg-white dark:bg-[#242424] hover:shadow-md transition ${className}`}>
+    {children}
+  </div>
+);
+
+const CardHeader = ({ children, className = "" }) => (
+  <div className={`flex items-center justify-between mb-4 ${className}`}>{children}</div>
+);
+
+const CardContent = ({ children, className = "" }) => (
+  <div className={`text-sm text-gray-700 dark:text-gray-300 ${className}`}>{children}</div>
+);
+
+const Badge = ({ children, className = "" }) => (
+  <span className={`px-3 py-1 text-xs font-medium rounded-full ${className}`}>{children}</span>
+);
+
+const Separator = () => <div className="bg-gray-200 dark:bg-gray-700 h-px w-full mb-4" />;
+
+const Avatar = ({ src, alt, fallback }) => (
+  <div className="w-12 h-12 rounded-full overflow-hidden border shadow flex items-center justify-center bg-gray-200 dark:bg-gray-600 text-sm font-medium text-gray-700 dark:text-gray-200">
+    {src ? <img src={src} alt={alt} className="w-full h-full object-cover" /> : fallback}
+  </div>
+);
+
 
 const Applied = () => {
   const [applications, setApplications] = useState([]);
@@ -37,7 +63,6 @@ const Applied = () => {
     }
   };
 
-  // 🔹 Hàm parse description
   const parseDescription = (description) => {
     if (!description) return [];
 
@@ -60,23 +85,15 @@ const Applied = () => {
       {applications.length > 0 ? (
         <div className="space-y-6">
           {applications.map((app) => (
-            <div
-              key={app.id}
-              className="p-6 rounded-xl shadow-sm border bg-white dark:bg-[#242424] hover:shadow-md transition"
-            >
+            <Card key={app.id}>
               {/* Header */}
-              <div className="flex items-center justify-between mb-4">
+              <CardHeader>
                 <div className="flex items-center gap-3">
-                  <Avatar.Root className="w-12 h-12 rounded-full overflow-hidden border shadow">
-                    <Avatar.Image
-                      src={app.companyLogo || ""}
-                      alt={app.companyName}
-                      className="w-full h-full object-cover"
-                    />
-                    <Avatar.Fallback className="flex items-center justify-center w-full h-full bg-gray-200 dark:bg-gray-600 text-sm font-medium text-gray-700 dark:text-gray-200">
-                      {app.companyName?.[0] || "C"}
-                    </Avatar.Fallback>
-                  </Avatar.Root>
+                  <Avatar
+                    src={app.companyLogo}
+                    alt={app.companyName}
+                    fallback={app.companyName?.[0] || <UserRound size={16} />}
+                  />
                   <div>
                     <h3 className="text-lg font-semibold text-blue-600">
                       {app.jobPostTitle || app.jobTitle}
@@ -87,71 +104,63 @@ const Applied = () => {
                   </div>
                 </div>
 
-                <span
-                  className={`px-3 py-1 text-xs font-medium rounded-full ${statusStyle(
-                    app.status
-                  )}`}
-                >
-                  {app.status}
-                </span>
-              </div>
+                <Badge className={statusStyle(app.status)}>{app.status}</Badge>
+              </CardHeader>
 
-              <Separator.Root className="bg-gray-200 dark:bg-gray-700 h-px w-full mb-4" />
+              <Separator />
 
               {/* Body */}
-              <div className="grid grid-cols-2 gap-3 text-sm text-gray-700 dark:text-gray-300">
-                <div>
-                  <p className="text-gray-500">Địa điểm</p>
-                  <p className="font-medium">{app.location || "—"}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Loại công việc</p>
-                  <p className="font-medium">{app.jobType || "—"}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Mức lương</p>
-                  <p className="font-medium">
-                    {app.salaryMin && app.salaryMax
-                      ? `${app.salaryMin} - ${app.salaryMax} triệu`
-                      : "Thỏa thuận"}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Ứng tuyển lúc</p>
-                  <p className="font-medium">
-                    {new Date(app.appliedAt).toLocaleString("vi-VN")}
-                  </p>
-                </div>
-              </div>
-
-              {/* Extra info */}
-              <div className="mt-4 space-y-2">
-                {app.coverLetter && (
-                  <p className="italic text-gray-500">“{app.coverLetter}”</p>
-                )}
-
-                
-                
-
-                {app.rejectionReason && (
-                  <p className="text-red-500 font-medium">
-                    Lý do từ chối: {app.rejectionReason}
-                  </p>
-                )}
-
-                {/* 🔹 Render description đẹp hơn */}
-                {app.description && (
-                  <div className="grid grid-cols-2 gap-3 text-sm text-gray-700 dark:text-gray-300">
-                    {parseDescription(app.description).map(({ key, value }, idx) => (
-                      <div key={idx}>
-                        <p className="text-gray-500">{key}</p>
-                        <p className="font-medium">{value}</p>
-                      </div>
-                    ))}
+              <CardContent>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex items-center gap-2">
+                    <MapPin size={14} className="text-gray-500" />
+                    <p className="font-medium">{app.location || "—"}</p>
                   </div>
-                )}
-              </div>
-            </div>
+                  <div className="flex items-center gap-2">
+                    <Briefcase size={14} className="text-gray-500" />
+                    <p className="font-medium">{app.jobType || "—"}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <DollarSign size={14} className="text-gray-500" />
+                    <p className="font-medium">
+                      {app.salaryMin && app.salaryMax
+                        ? `${app.salaryMin} - ${app.salaryMax} triệu`
+                        : "Thỏa thuận"}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock size={14} className="text-gray-500" />
+                    <p className="font-medium">
+                      {new Date(app.appliedAt).toLocaleString("vi-VN")}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Extra info */}
+                <div className="mt-4 space-y-2">
+                  {app.coverLetter && (
+                    <p className="italic text-gray-500">“{app.coverLetter}”</p>
+                  )}
+
+                  {app.rejectionReason && (
+                    <p className="text-red-500 font-medium">
+                      Lý do từ chối: {app.rejectionReason}
+                    </p>
+                  )}
+
+                  {app.description && (
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      {parseDescription(app.description).map(({ key, value }, idx) => (
+                        <div key={idx}>
+                          <p className="text-gray-500">{key}</p>
+                          <p className="font-medium">{value}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       ) : (

@@ -1,17 +1,47 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { authApis, endpoints } from "@configs/APIs";
-import { FaRobot } from "react-icons/fa";
 import JobPostList from "@public/JobPostList";
+import { Bot, FileText, Target, Mic } from "lucide-react";
 
 export default function CandidateDashboard() {
   const [user, setUser] = useState(null);
-  const [, setShowUserMenu] = useState(false);
   const [showAiMenu, setShowAiMenu] = useState(false);
   const [isDark] = useState(() => localStorage.getItem("theme") === "dark");
 
   const aiMenuRef = useRef();
   const navigate = useNavigate();
+
+  // 🔹 UI Primitives
+  const Card = ({ className = "", children }) => (
+    <div className={`rounded-2xl shadow-lg border bg-white dark:bg-[#232323] ${className}`}>
+      {children}
+    </div>
+  );
+  const CardContent = ({ className = "", children }) => (
+    <div className={`p-6 ${className}`}>{children}</div>
+  );
+  const Button = ({ className = "", children, ...props }) => (
+    <button
+      className={`px-6 py-3 rounded-full font-medium shadow-md hover:scale-105 transition ${className}`}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+  const Dropdown = ({ children, className = "" }) => (
+    <div className={`absolute bottom-20 right-0 w-64 rounded-2xl shadow-xl p-4 border bg-[#f5efe6] dark:bg-[#232323] dark:border-[#444] animate-fade-in-up ${className}`}>
+      {children}
+    </div>
+  );
+  const DropdownItem = ({ children, ...props }) => (
+    <button
+      className="w-full text-left px-3 py-2 bg-white dark:bg-[#353535] hover:bg-[#f5f5dc] dark:hover:bg-[#444] rounded-lg text-sm font-medium transition"
+      {...props}
+    >
+      {children}
+    </button>
+  );
 
   // Theme setup
   useEffect(() => {
@@ -50,30 +80,31 @@ export default function CandidateDashboard() {
   return (
     <div className="min-h-screen bg-[#f7f6f3] dark:bg-[#181818] font-inter text-[#222] dark:text-[#f5efe6] transition-all">
       <main className="max-w-6xl mx-auto px-6 py-10 space-y-10">
-
         {/* Hero Section */}
         {user?.role === "CANDIDATE" && (
-          <section className="bg-gradient-to-br from-[#fdf6ec] via-[#f7f0e7] to-[#f3e9df] dark:from-[#2a2a2a] dark:via-[#232323] dark:to-[#1a1a1a] rounded-2xl shadow-lg p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div>
-              <h2 className="text-4xl font-bold mb-3 tracking-tight bg-gradient-to-r from-[#111] via-[#6b7280] to-[#f5efe6] dark:from-[#f5efe6] dark:via-[#aaa] dark:to-[#444] text-transparent bg-clip-text">
-                Chào {user?.fullName || "Ứng viên"}! 👋
-              </h2>
-              <p className="text-gray-700 dark:text-gray-300 text-lg mb-6 max-w-xl">
-                Khám phá công việc mơ ước của bạn ngay hôm nay với hàng ngàn cơ hội hấp dẫn.
-              </p>
-              <button
-                onClick={() => navigate("/candidate-profile")}
-                className="px-6 py-3 bg-black dark:bg-[#f5efe6] text-white dark:text-black rounded-full shadow-md hover:scale-105 transition"
-              >
-                Cập nhật hồ sơ để ứng tuyển ngay
-              </button>
-            </div>
-            <img
-              src="/assets/job-hunt.svg"
-              alt="Job search illustration"
-              className="w-56 md:w-72 drop-shadow-lg hidden md:block"
-            />
-          </section>
+          <Card className="bg-gradient-to-br from-[#fdf6ec] via-[#f7f0e7] to-[#f3e9df] dark:from-[#2a2a2a] dark:via-[#232323] dark:to-[#1a1a1a]">
+            <CardContent className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <div>
+                <h2 className="text-4xl font-bold mb-3 tracking-tight bg-gradient-to-r from-[#111] via-[#6b7280] to-[#f5efe6] dark:from-[#f5efe6] dark:via-[#aaa] dark:to-[#444] text-transparent bg-clip-text">
+                  Chào {user?.fullName || "Ứng viên"}! 👋
+                </h2>
+                <p className="text-gray-700 dark:text-gray-300 text-lg mb-6 max-w-xl">
+                  Khám phá công việc mơ ước của bạn ngay hôm nay với hàng ngàn cơ hội hấp dẫn.
+                </p>
+                <Button
+                  onClick={() => navigate("/candidate-profile")}
+                  className="bg-black dark:bg-[#f5efe6] text-white dark:text-black"
+                >
+                  Cập nhật hồ sơ để ứng tuyển ngay
+                </Button>
+              </div>
+              <img
+                src="/assets/job-hunt.svg"
+                alt="Job search illustration"
+                className="w-56 md:w-72 drop-shadow-lg hidden md:block"
+              />
+            </CardContent>
+          </Card>
         )}
 
         {/* Job List */}
@@ -90,41 +121,32 @@ export default function CandidateDashboard() {
             className="bg-gradient-to-r from-[#111111] to-[#444] dark:from-[#f5efe6] dark:to-[#ccc] text-white dark:text-black p-5 rounded-full shadow-xl hover:scale-110 transition-all duration-300 border-4 border-white dark:border-[#232323] animate-pulse"
             onClick={() => setShowAiMenu((v) => !v)}
           >
-            <FaRobot className="text-2xl" />
+            <Bot className="w-6 h-6" />
           </button>
 
           {/* Compact Floating Menu */}
           {showAiMenu && (
-            <div className="absolute bottom-20 right-0 w-64 bg-[#f5efe6] dark:bg-[#232323] shadow-xl rounded-2xl p-4 border border-[#d1d5db] dark:border-[#444] animate-fade-in-up">
+            <Dropdown>
               <p className="text-sm font-semibold mb-3 flex items-center gap-2">
-                <FaRobot className="text-[#6b7280] dark:text-[#f5efe6]" />
+                <Bot className="w-4 h-4 text-[#6b7280] dark:text-[#f5efe6]" />
                 Trợ lý AI
               </p>
               <div className="space-y-2">
-                <button
-                  className="w-full text-left px-3 py-2 bg-white dark:bg-[#353535] hover:bg-[#f5f5dc] dark:hover:bg-[#444] rounded-lg text-sm font-medium transition"
-                  onClick={() => navigate("/ai-cv")}
-                >
-                  ✍️ Viết lại mô tả CV
-                </button>
-                <button
-                  className="w-full text-left px-3 py-2 bg-white dark:bg-[#353535] hover:bg-[#f5f5dc] dark:hover:bg-[#444] rounded-lg text-sm font-medium transition"
-                  onClick={() => navigate("/ai-job-recommend")}
-                >
-                  🎯 Gợi ý việc làm
-                </button>
-                <button
-                  className="w-full text-left px-3 py-2 bg-white dark:bg-[#353535] hover:bg-[#f5f5dc] dark:hover:bg-[#444] rounded-lg text-sm font-medium transition"
-                  onClick={() => navigate("/ai-interview")}
-                >
-                  🎤 Luyện phỏng vấn
-                </button>
+                <DropdownItem onClick={() => navigate("/candidate-profile")}>
+                  <FileText className="inline-block w-4 h-4 mr-2" /> Viết lại mô tả CV
+                </DropdownItem>
+                <DropdownItem onClick={() => navigate("/ai-interview")}>
+                  <Mic className="inline-block w-4 h-4 mr-2" /> Luyện phỏng vấn
+                </DropdownItem>
+                <DropdownItem onClick={() => navigate("/candidate-upgrade")}>
+                  <Bot className="inline-block w-4 h-4 mr-2" /> Nâng cấp tài khoản AI
+                </DropdownItem>
+
               </div>
-            </div>
+            </Dropdown>
           )}
         </div>
       )}
-
     </div>
   );
 }

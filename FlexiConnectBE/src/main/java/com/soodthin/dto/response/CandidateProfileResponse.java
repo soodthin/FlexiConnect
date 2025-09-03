@@ -11,6 +11,7 @@ import java.time.LocalDate;
  * @author ADMIN
  */
 public class CandidateProfileResponse {
+
     private String fullName;
     private String email;
     private String phoneNumber;
@@ -18,10 +19,19 @@ public class CandidateProfileResponse {
     private String gender;
     private String address;
     private String avatar;
-   
+
     private String title;
     private String bio;
     private String resumeFile;
+    private UserPackageResponse userPackage;
+
+    public UserPackageResponse getUserPackage() {
+        return userPackage;
+    }
+
+    public void setUserPackage(UserPackageResponse userPackage) {
+        this.userPackage = userPackage;
+    }
 
     /**
      * @return the fullName
@@ -120,7 +130,7 @@ public class CandidateProfileResponse {
     public void setBio(String bio) {
         this.bio = bio;
     }
-    
+
     /**
      * @return the resumeFile
      */
@@ -162,5 +172,5 @@ public class CandidateProfileResponse {
     public void setGender(String gender) {
         this.gender = gender;
     }
-    
+
 }

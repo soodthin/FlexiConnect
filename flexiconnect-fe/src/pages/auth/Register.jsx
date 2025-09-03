@@ -1,8 +1,75 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Apis, { endpoints } from "@configs/APIs";
-import { FaUserPlus } from "react-icons/fa";
-import { EyeClosedIcon, EyeOpenIcon } from "@radix-ui/react-icons";
+import { UserPlus, Eye, EyeOff } from "lucide-react";
+
+const Card = ({ children, className = "" }) => (
+  <div className={`bg-white dark:bg-[#232323] shadow-2xl border border-gray-200 dark:border-neutral-700 rounded-3xl p-8 w-full max-w-md space-y-4 relative z-20 ${className}`}>
+    {children}
+  </div>
+);
+
+const Button = ({ children, className = "", ...props }) => (
+  <button
+    className={`w-full bg-gradient-to-r from-gray-700 to-gray-900 text-white py-2 rounded-xl font-semibold shadow hover:opacity-90 transition flex items-center justify-center gap-2 ${className}`}
+    {...props}
+  >
+    {children}
+  </button>
+);
+
+const Label = ({ children }) => (
+  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+    {children}
+  </label>
+);
+
+const Input = ({ className = "", ...props }) => (
+  <input
+    className={`w-full rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 px-3 h-10 text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400 transition ${className}`}
+    {...props}
+  />
+);
+
+const PasswordField = ({ value, onChange, placeholder, show, toggle }) => (
+  <div className="flex items-center gap-2 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 px-3 h-10 focus-within:ring-2 focus-within:ring-blue-400 transition">
+    <input
+      type={show ? "text" : "password"}
+      autoComplete="new-password"
+      className="flex-1 bg-transparent outline-none text-sm ..."
+      value={value || ""}
+      onChange={onChange}
+      placeholder={placeholder}
+      required
+    />
+
+    <button
+      type="button"
+      onClick={toggle}
+      className="outline-none flex items-center justify-center w-5 h-5 text-gray-500 dark:text-gray-300"
+    >
+      {show ? <Eye /> : <EyeOff />}
+    </button>
+  </div>
+);
+
+const StrengthBar = ({ strength }) => (
+  <>
+    <div className="w-full h-2 rounded bg-gray-200 dark:bg-gray-600 mt-1">
+      <div
+        className={`h-2 rounded transition-all duration-300 ${strength.color}`}
+        style={{ width: `${strength.percent || 0}%` }}
+      ></div>
+    </div>
+    {strength.label && (
+      <div
+        className={`text-xs mt-1 font-medium ${strength.color.replace("bg-", "text-")}`}
+      >
+        Độ mạnh mật khẩu: {strength.label}
+      </div>
+    )}
+  </>
+);
 
 export default function Register() {
   const [user, setUser] = useState({});
@@ -73,18 +140,14 @@ export default function Register() {
             Bắt đầu hành trình sự nghiệp!
           </h2>
           <p className="text-gray-700 dark:text-gray-200">
-            Tạo tài khoản ứng viên và tìm việc mơ ước nhanh chóng với{" "}
-            <strong>FlexiConnect AI</strong>.
+            Tạo tài khoản ứng viên và tìm việc mơ ước nhanh chóng với <strong>FlexiConnect AI</strong>.
           </p>
         </div>
       </div>
 
       {/* Right form */}
       <div className="flex-1 flex items-center justify-center p-6">
-        <form
-          onSubmit={register}
-          className="relative bg-white dark:bg-[#232323] shadow-2xl border border-gray-200 dark:border-neutral-700 rounded-3xl p-8 w-full max-w-md space-y-4 z-20"
-        >
+        <Card>
           <div className="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-gray-700 to-gray-900 text-white px-4 py-1 rounded-full shadow-md text-sm font-medium">
             FlexiConnect AI
           </div>
@@ -95,24 +158,20 @@ export default function Register() {
 
           {msg && (
             <div
-              className={`text-sm text-center p-2 rounded-md font-medium ${
-                msg.includes("✅")
+              className={`text-sm text-center p-2 rounded-md font-medium ${msg.includes("✅")
                   ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
                   : "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200"
-              }`}
+                }`}
             >
               {msg}
             </div>
           )}
 
-          {/* Họ và tên */}
+          {/* Full Name */}
           <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-              Họ và tên
-            </label>
-            <input
+            <Label>Họ và tên</Label>
+            <Input
               type="text"
-              className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 px-3 h-10 text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400 transition"
               placeholder="Nhập họ và tên..."
               value={user.fullName || ""}
               onChange={(e) => setState(e.target.value, "fullName")}
@@ -122,12 +181,9 @@ export default function Register() {
 
           {/* Email */}
           <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-              Email
-            </label>
-            <input
+            <Label>Email</Label>
+            <Input
               type="email"
-              className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 px-3 h-10 text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400 transition"
               placeholder="Nhập email..."
               value={user.email || ""}
               onChange={(e) => setState(e.target.value, "email")}
@@ -137,81 +193,33 @@ export default function Register() {
 
           {/* Password */}
           <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-              Mật khẩu
-            </label>
-            <div className="flex items-center gap-2 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 px-3 h-10 focus-within:ring-2 focus-within:ring-blue-400 transition">
-              <input
-                type={showPassword ? "text" : "password"}
-                className="flex-1 bg-transparent outline-none text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300"
-                placeholder="Nhập mật khẩu..."
-                value={user.password || ""}
-                onChange={(e) => setState(e.target.value, "password")}
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="outline-none flex items-center justify-center w-5 h-5 text-gray-500 dark:text-gray-300"
-              >
-                {showPassword ? <EyeOpenIcon /> : <EyeClosedIcon />}
-              </button>
-            </div>
-
-            {/* Strength bar */}
-            {user.password && (
-              <>
-                <div className="w-full h-2 rounded bg-gray-200 dark:bg-gray-600 mt-1">
-                  <div
-                    className={`h-2 rounded transition-all duration-300 ${strength.color}`}
-                    style={{ width: `${strength.percent || 0}%` }}
-                  ></div>
-                </div>
-                {strength.label && (
-                  <div
-                    className={`text-xs mt-1 font-medium ${strength.color.replace(
-                      "bg-",
-                      "text-"
-                    )}`}
-                  >
-                    Độ mạnh mật khẩu: {strength.label}
-                  </div>
-                )}
-              </>
-            )}
+            <Label>Mật khẩu</Label>
+            <PasswordField
+              value={user.password}
+              onChange={(e) => setState(e.target.value, "password")}
+              placeholder="Nhập mật khẩu..."
+              show={showPassword}
+              toggle={() => setShowPassword(!showPassword)}
+            />
+            {user.password && <StrengthBar strength={strength} />}
           </div>
 
           {/* Confirm Password */}
           <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-              Xác nhận mật khẩu
-            </label>
-            <div className="flex items-center gap-2 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 px-3 h-10 focus-within:ring-2 focus-within:ring-blue-400 transition">
-              <input
-                type={showConfirm ? "text" : "password"}
-                className="flex-1 bg-transparent outline-none text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300"
-                placeholder="Xác nhận mật khẩu..."
-                value={user.confirmPassword || ""}
-                onChange={(e) => setState(e.target.value, "confirmPassword")}
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirm(!showConfirm)}
-                className="outline-none flex items-center justify-center w-5 h-5 text-gray-500 dark:text-gray-300"
-              >
-                {showConfirm ? <EyeOpenIcon /> : <EyeClosedIcon />}
-              </button>
-            </div>
+            <Label>Xác nhận mật khẩu</Label>
+            <PasswordField
+              value={user.confirmPassword}
+              onChange={(e) => setState(e.target.value, "confirmPassword")}
+              placeholder="Xác nhận mật khẩu..."
+              show={showConfirm}
+              toggle={() => setShowConfirm(!showConfirm)}
+            />
           </div>
 
           {/* Submit */}
-          <button
-            type="submit"
-            className="w-full bg-gradient-to-r from-gray-700 to-gray-900 text-white py-2 rounded-xl font-semibold shadow hover:opacity-90 transition flex items-center justify-center gap-2"
-          >
-            <FaUserPlus /> Đăng ký
-          </button>
+          <Button type="submit" onClick={register}>
+            <UserPlus className="w-4 h-4" /> Đăng ký
+          </Button>
 
           <div className="text-center text-gray-600 dark:text-gray-300 text-sm">
             <button
@@ -222,7 +230,7 @@ export default function Register() {
               <span className="font-semibold">Bạn là nhà tuyển dụng?</span>
             </button>
           </div>
-        </form>
+        </Card>
       </div>
     </div>
   );

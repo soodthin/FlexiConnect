@@ -8,9 +8,12 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.soodthin.dto.request.CandidateProfileRequest;
 import com.soodthin.dto.response.CandidateProfileResponse;
+import com.soodthin.dto.response.UserPackageResponse;
 import com.soodthin.entity.Candidate;
 import com.soodthin.entity.User;
+import com.soodthin.entity.UserPackage;
 import com.soodthin.repositories.CandidateRepository;
+import com.soodthin.repositories.UserPackageRepository;
 import com.soodthin.repositories.UserRepository;
 import com.soodthin.services.CandidateService;
 import jakarta.transaction.Transactional;
@@ -38,20 +41,45 @@ public class CandidateServiceImpl implements CandidateService {
     private Cloudinary cloudinary;
     @Autowired
     private ModelMapper modelMapper;
-    
+    @Autowired
+    private UserPackageRepository userPackageRepository;
 
     @Override
     public CandidateProfileResponse getProfile(User user) {
         Candidate candidate = candidateRepository.findByUserId(user)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy hồ sơ ứng viên!"));
+                .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "Không tìm thấy hồ sơ ứng viên!"
+        ));
 
-        CandidateProfileResponse response = modelMapper.map(candidate, CandidateProfileResponse.class);
-
+        CandidateProfileResponse response = new CandidateProfileResponse();
         response.setFullName(user.getFullName());
         response.setEmail(user.getEmail());
         response.setPhoneNumber(user.getPhone());
         response.setAddress(user.getAddress());
         response.setAvatar(user.getAvatar());
+        response.setDateOfBirth(user.getDateOfBirth());
+        response.setGender(user.getGender());
+
+        response.setTitle(candidate.getTitle());
+        response.setBio(candidate.getBio());
+        response.setResumeFile(candidate.getResumeFile());
+
+        UserPackage userPackage = userPackageRepository.findByUserId(user)
+                .orElse(null);
+
+        if (userPackage != null) {
+            UserPackageResponse packageResponse = new UserPackageResponse();
+            packageResponse.setId(userPackage.getId());
+            packageResponse.setIsActive(userPackage.getIsActive());
+            packageResponse.setStartDate(userPackage.getStartDate());
+            packageResponse.setEndDate(userPackage.getEndDate());
+
+            if (userPackage.getPackageId() != null) {
+                packageResponse.setName(userPackage.getPackageId().getName());
+            }
+
+            response.setUserPackage(packageResponse);
+        }
 
         return response;
     }
@@ -86,5 +114,4 @@ public class CandidateServiceImpl implements CandidateService {
         }
     }
 
-    
 }

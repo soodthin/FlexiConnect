@@ -1,9 +1,94 @@
 import React, { useEffect, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { Cross2Icon } from "@radix-ui/react-icons";
+import { Heart, HeartOff } from "lucide-react";
 import RadixSelect from "@components/RadixSelect";
 import { useNavigate } from "react-router-dom";
 
+/* ----------------- UI PRIMITIVES ----------------- */
+const Card = ({ className = "", children, ...props }) => (
+  <div
+    className={`rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-neutral-900 shadow hover:shadow-lg hover:scale-[1.02] transition-all ${className}`}
+    {...props}
+  >
+    {children}
+  </div>
+);
+
+const Button = ({ children, variant = "default", className = "", ...props }) => {
+  const base = "rounded-lg px-3 py-1 text-xs font-medium flex items-center gap-1 transition";
+  const variants = {
+    default: "bg-gray-100 dark:bg-neutral-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-neutral-700",
+    ghost: "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white",
+    pagination: "px-3 py-1 border rounded disabled:opacity-50 dark:border-gray-600",
+  };
+  return (
+    <button className={`${base} ${variants[variant]} ${className}`} {...props}>
+      {children}
+    </button>
+  );
+};
+
+const Badge = ({ children, color = "gray" }) => {
+  const colors = {
+    green: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
+    yellow: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
+    blue: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
+    gray: "bg-gray-100 text-gray-700 dark:bg-neutral-800 dark:text-gray-300",
+  };
+  return <span className={`text-xs px-2 py-1 rounded-full ${colors[color]}`}>{children}</span>;
+};
+
+const FilterPopover = ({ triggerLabel, options, selected, onToggle }) => (
+  <Popover.Root>
+    <Popover.Trigger className="px-4 py-2 rounded-full text-sm border bg-gray-100 dark:bg-neutral-800 text-gray-800 dark:text-white shadow-sm hover:shadow-md transition">
+      {selected.length > 0 ? selected.join(", ") : triggerLabel}
+    </Popover.Trigger>
+    <Popover.Portal>
+      <Popover.Content
+        sideOffset={5}
+        className="bg-white dark:bg-neutral-900 border dark:border-gray-700 p-4 rounded shadow-md w-64 max-h-64 overflow-y-auto relative"
+      >
+        {options.map((opt) => (
+          <label
+            key={opt}
+            className="flex items-center gap-2 mb-2 cursor-pointer text-gray-800 dark:text-gray-100"
+          >
+            <input type="checkbox" checked={selected.includes(opt)} onChange={() => onToggle(opt)} />
+            <span>{opt}</span>
+          </label>
+        ))}
+        <Popover.Close className="absolute top-2 right-2 text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white">
+          <Cross2Icon />
+        </Popover.Close>
+      </Popover.Content>
+    </Popover.Portal>
+  </Popover.Root>
+);
+
+const Pagination = ({ currentPage, totalPages, onPrev, onNext }) => (
+  <div className="mt-8 flex justify-center items-center gap-4 text-sm text-gray-800 dark:text-white">
+    <Button
+      variant="pagination"
+      onClick={onPrev}
+      disabled={currentPage === 1}
+    >
+      ←
+    </Button>
+    <span>
+      {currentPage} / {totalPages}
+    </span>
+    <Button
+      variant="pagination"
+      onClick={onNext}
+      disabled={currentPage === totalPages}
+    >
+      →
+    </Button>
+  </div>
+);
+
+/* ----------------- FEATURE COMPONENT ----------------- */
 export default function JobPostList() {
   const [jobPosts, setJobPosts] = useState([]);
   const [filteredPosts, setFilteredPosts] = useState([]);
@@ -116,45 +201,18 @@ export default function JobPostList() {
     <div className="p-2">
       {/* Filters */}
       <div className="mb-6 flex flex-wrap gap-3 items-center">
-        {/* Location filter */}
-        <Popover.Root>
-          <Popover.Trigger className="px-4 py-2 rounded-full text-sm border bg-gray-100 dark:bg-neutral-800 text-gray-800 dark:text-white shadow-sm hover:shadow-md transition">
-            {selectedLocations.length > 0 ? selectedLocations.join(", ") : "Chọn tỉnh/thành"}
-          </Popover.Trigger>
-          <Popover.Portal>
-            <Popover.Content
-              sideOffset={5}
-              className="bg-white dark:bg-neutral-900 border dark:border-gray-700 p-4 rounded shadow-md w-64 max-h-64 overflow-y-auto relative"
-            >
-              {locations.map((loc) => (
-                <label
-                  key={loc}
-                  className="flex items-center gap-2 mb-2 cursor-pointer text-gray-800 dark:text-gray-100"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedLocations.includes(loc)}
-                    onChange={() => handleLocationToggle(loc)}
-                  />
-                  <span>{loc}</span>
-                </label>
-              ))}
-              <Popover.Close className="absolute top-2 right-2 text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white">
-                <Cross2Icon />
-              </Popover.Close>
-            </Popover.Content>
-          </Popover.Portal>
-        </Popover.Root>
-
-        {/* Salary filter */}
+        <FilterPopover
+          triggerLabel="Chọn tỉnh/thành"
+          options={locations}
+          selected={selectedLocations}
+          onToggle={handleLocationToggle}
+        />
         <RadixSelect
           value={selectedSalary}
           onValueChange={setSelectedSalary}
           options={salaryOptions}
           placeholder="Mức lương"
         />
-
-        {/* Job type filter */}
         <RadixSelect
           value={selectedJobType}
           onValueChange={setSelectedJobType}
@@ -166,11 +224,7 @@ export default function JobPostList() {
       {/* Job Cards */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {paginatedPosts.map((job) => (
-          <div
-            key={job.id}
-            className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-neutral-900 p-5 shadow hover:shadow-lg hover:scale-[1.02] transition-all flex flex-col cursor-pointer"
-            onClick={() => goToJobDetail(job.id)}
-          >
+          <Card key={job.id} className="p-5 flex flex-col cursor-pointer" onClick={() => goToJobDetail(job.id)}>
             {/* Company logo & title */}
             <div className="flex items-center mb-4">
               <div className="w-12 h-12 rounded-full mr-3 flex items-center justify-center overflow-hidden bg-gray-100 dark:bg-neutral-800">
@@ -183,28 +237,16 @@ export default function JobPostList() {
                 )}
               </div>
               <div>
-                <h2 className="text-base font-semibold text-gray-800 dark:text-white">
-                  {job.title}
-                </h2>
+                <h2 className="text-base font-semibold text-gray-800 dark:text-white">{job.title}</h2>
                 <p className="text-xs text-gray-500 dark:text-gray-400">{job.companyName}</p>
               </div>
             </div>
 
             {/* Tags */}
             <div className="flex flex-wrap gap-2 text-xs mb-4">
-              <span className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 px-2 py-1 rounded-full">
-                {formatSalary(job.salaryMin, job.salaryMax)}
-              </span>
-              {job.location && (
-                <span className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 px-2 py-1 rounded-full">
-                  {job.location}
-                </span>
-              )}
-              {job.jobType && (
-                <span className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-2 py-1 rounded-full">
-                  {job.jobType}
-                </span>
-              )}
+              <Badge color="green">{formatSalary(job.salaryMin, job.salaryMax)}</Badge>
+              {job.location && <Badge color="yellow">{job.location}</Badge>}
+              {job.jobType && <Badge color="blue">{job.jobType}</Badge>}
             </div>
 
             {/* Expandable description */}
@@ -216,47 +258,33 @@ export default function JobPostList() {
 
             {/* Save & Expand buttons */}
             <div className="mt-auto flex justify-between items-center">
-              <button
-                className="border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-neutral-800 rounded-lg px-3 py-1 text-gray-600 dark:text-gray-300 hover:text-red-500 text-xs flex items-center transition-all"
+              <Button
                 onClick={(e) => e.stopPropagation()}
               >
-                ❤️ Lưu tin
-              </button>
-              <button
+                <Heart className="w-4 h-4" /> Lưu tin
+              </Button>
+              <Button
+                variant="ghost"
                 onClick={(e) => {
                   e.stopPropagation();
                   toggleExpand(job.id);
                 }}
-                className="text-xs text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white"
               >
                 {expandedJobIds.includes(job.id) ? "Ẩn bớt" : "Xem thêm"}
-              </button>
+              </Button>
             </div>
-          </div>
+          </Card>
         ))}
       </div>
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="mt-8 flex justify-center items-center gap-4 text-sm text-gray-800 dark:text-white">
-          <button
-            onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-            disabled={currentPage === 1}
-            className="px-3 py-1 border rounded disabled:opacity-50 dark:border-gray-600"
-          >
-            ←
-          </button>
-          <span>
-            {currentPage} / {totalPages}
-          </span>
-          <button
-            onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
-            disabled={currentPage === totalPages}
-            className="px-3 py-1 border rounded disabled:opacity-50 dark:border-gray-600"
-          >
-            →
-          </button>
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPrev={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+          onNext={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+        />
       )}
     </div>
   );

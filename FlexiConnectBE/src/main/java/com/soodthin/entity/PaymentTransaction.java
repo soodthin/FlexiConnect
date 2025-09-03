@@ -7,6 +7,8 @@ package com.soodthin.entity;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -16,12 +18,10 @@ import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 /**
@@ -40,6 +40,11 @@ import java.util.Set;
     @NamedQuery(name = "PaymentTransaction.findByUpdatedAt", query = "SELECT p FROM PaymentTransaction p WHERE p.updatedAt = :updatedAt")})
 public class PaymentTransaction implements Serializable {
 
+    public enum TransactionStatus {
+    PENDING,
+    SUCCESS,
+    FAILED
+}
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,15 +57,15 @@ public class PaymentTransaction implements Serializable {
     @Size(max = 100)
     @Column(name = "transaction_code")
     private String transactionCode;
-    @Size(max = 7)
-    @Column(name = "status")
-    private String status;
+    @Column(name = "momo_trans_id")
+    private String momoTransId;
+    @Column(name = "status", length = 20)
+    @Enumerated(EnumType.STRING)
+    private TransactionStatus status;
     @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
+    private LocalDateTime createdAt;
     @Column(name = "updated_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
     @JoinColumn(name = "package_id", referencedColumnName = "id")
     @ManyToOne
     private Package packageId;
@@ -101,27 +106,36 @@ public class PaymentTransaction implements Serializable {
         this.transactionCode = transactionCode;
     }
 
-    public String getStatus() {
+    public String getMomoTransId() {
+        return momoTransId;
+    }
+
+    public void setMomoTransId(String momoTransId) {
+        this.momoTransId = momoTransId;
+    }
+
+    
+    public TransactionStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(TransactionStatus status) {
         this.status = status;
     }
 
-    public Date getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Date getUpdatedAt() {
+    public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
+    public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 

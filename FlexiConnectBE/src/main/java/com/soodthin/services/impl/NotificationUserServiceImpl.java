@@ -40,10 +40,11 @@ public class NotificationUserServiceImpl implements NotificationUserService {
     }
 
     @Override
-    public void markAsRead(Integer notificationUserId, User user) {
+    public void markAsRead(Integer notificationId, User user) {
         NotificationUser nu = notificationUserRepository
-                .findByIdAndUserId(notificationUserId, user)
+                .findByIdAndUserId(notificationId, user)
                 .orElseThrow(() -> new IllegalArgumentException("Notification not found for this user"));
+
         nu.setIsRead(true);
         nu.setReadAt(LocalDateTime.now());
         notificationUserRepository.save(nu);
@@ -51,11 +52,14 @@ public class NotificationUserServiceImpl implements NotificationUserService {
 
     @Override
     public void markAllAsRead(User user) {
-        List<NotificationUser> notifications = notificationUserRepository.findByUserIdAndIsReadFalse(user);
+        List<NotificationUser> notifications = notificationUserRepository
+                .findByUserIdAndIsReadFalse(user);
+
         notifications.forEach(n -> {
             n.setIsRead(true);
             n.setReadAt(LocalDateTime.now());
         });
+
         notificationUserRepository.saveAll(notifications);
     }
 

@@ -36,7 +36,7 @@ export const endpoints = {
   'notify-employer': "/users/candidate/follow-employer/notify",
   'save-job': "/users/candidate/save-job",
   'un-save-job': "/users/candidate/un-save-job",
-  
+
 
   /* Employer */
   'employer-profile': "/users/employer/profile",
@@ -49,9 +49,7 @@ export const endpoints = {
   "employer-email-logs": (appId) => `/users/employer/email/logs?applicationId=${appId}`,
 
   "notifications": "users/notifications",
-  "notification-mark-read": (id) => `users/notifications/${id}/read`,
-  "notification-delete-user": (id) => `users/notifications/${id}/user`,
-  "notification-delete": (id) => `users/notifications/${id}`,
+  'momo': "/momo",
 
 }
 

@@ -8,7 +8,9 @@ import {
 } from "lucide-react";
 import { createPortal } from "react-dom";
 
-// -------------------- Base Components --------------------
+// ===================================================
+// 🧱 UI PRIMITIVES (Design System Layer)
+// ===================================================
 const Card = ({ children, className = "" }) => (
   <div className={`bg-white rounded-xl shadow-sm border border-gray-100 ${className}`}>{children}</div>
 );
@@ -20,7 +22,13 @@ const Badge = ({ children, variant = "default", className = "" }) => {
     accepted: "bg-green-100 text-green-800",
     rejected: "bg-red-100 text-red-800"
   };
-  return <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${variants[variant]} ${className}`}>{children}</span>;
+  return (
+    <span
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${variants[variant]} ${className}`}
+    >
+      {children}
+    </span>
+  );
 };
 
 const Button = ({ children, variant = "default", size = "default", className = "", disabled, onClick, ...props }) => {
@@ -31,7 +39,11 @@ const Button = ({ children, variant = "default", size = "default", className = "
     danger: "bg-red-600 text-white hover:bg-red-700",
     secondary: "bg-gray-600 text-white hover:bg-gray-700"
   };
-  const sizes = { default: "px-4 py-2", sm: "px-3 py-1.5 text-sm", lg: "px-6 py-3" };
+  const sizes = {
+    default: "px-4 py-2",
+    sm: "px-3 py-1.5 text-sm",
+    lg: "px-6 py-3"
+  };
   return (
     <button
       className={`inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${variants[variant]} ${sizes[size]} ${className}`}
@@ -56,26 +68,25 @@ const Dialog = ({ open, onClose, children }) => {
   );
 };
 
-// -------------------- Dropdown --------------------
 const DropdownMenu = ({ trigger, children, align = "right" }) => {
   const [open, setOpen] = useState(false);
   const [coords, setCoords] = useState({ top: 0, left: 0 });
   const ref = useRef(null);
 
-  const toggleOpen = e => {
+  const toggleOpen = (e) => {
     e.stopPropagation();
     if (!open && ref.current) {
       const rect = ref.current.getBoundingClientRect();
       setCoords({
         top: rect.bottom + window.scrollY,
-        left: align === "right" ? rect.right - 192 : rect.left // 192px = width của dropdown 48*4
+        left: align === "right" ? rect.right - 192 : rect.left
       });
     }
-    setOpen(prev => !prev);
+    setOpen((prev) => !prev);
   };
 
   useEffect(() => {
-    const handleClickOutside = e => {
+    const handleClickOutside = (e) => {
       if (ref.current && !ref.current.contains(e.target)) {
         setOpen(false);
       }
@@ -103,7 +114,6 @@ const DropdownMenu = ({ trigger, children, align = "right" }) => {
   );
 };
 
-// Dropdown Item
 const DropdownItem = ({ onClick, icon, children, variant = "default" }) => {
   const variants = {
     default: "text-gray-700 hover:bg-gray-50",
@@ -116,7 +126,7 @@ const DropdownItem = ({ onClick, icon, children, variant = "default" }) => {
   return (
     <button
       type="button"
-      onClick={e => {
+      onClick={(e) => {
         e.stopPropagation();
         onClick?.();
       }}
@@ -127,7 +137,9 @@ const DropdownItem = ({ onClick, icon, children, variant = "default" }) => {
   );
 };
 
-// -------------------- Main Component --------------------
+// ===================================================
+// 🎯 FEATURE COMPONENT (Applications Management)
+// ===================================================
 export default function ApplicationsManagement() {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -138,15 +150,18 @@ export default function ApplicationsManagement() {
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [emailDialog, setEmailDialog] = useState(null);
   const [emailPayload, setEmailPayload] = useState({
-    interviewTime: "", location: "",
-    result: "", documents: "", salary: "", startDate: ""
+    interviewTime: "",
+    location: "",
+    result: "",
+    documents: "",
+    salary: "",
+    startDate: ""
   });
-
-  const [errors, setErrors] = useState({});   // ⬅️ lỗi validate
+  const [errors, setErrors] = useState({});
 
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
-  // Validate dữ liệu nhập
+  // ✅ Validation
   const validate = () => {
     const newErrors = {};
 
@@ -167,7 +182,6 @@ export default function ApplicationsManagement() {
       } else {
         const interviewDate = new Date(emailPayload.interviewTime);
         const now = new Date();
-
         if (interviewDate < now) {
           newErrors.interviewTime = "Thời gian phỏng vấn không được trước thời điểm hiện tại";
         }
@@ -193,39 +207,61 @@ export default function ApplicationsManagement() {
     return Object.keys(newErrors).length === 0;
   };
 
-
+  // ✅ Fetch data
   const fetchApplications = async () => {
     try {
       setLoading(true);
-      const res = await authApis().get(endpoints["employer-applications"], { headers: { Authorization: `Bearer ${token}` } });
+      const res = await authApis().get(endpoints["employer-applications"], {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       setApplications(Array.isArray(res.data) ? res.data : []);
     } catch {
       toast.error("Không thể tải danh sách ứng viên");
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   };
+  useEffect(() => {
+    fetchApplications();
+  }, []);
 
-  useEffect(() => { fetchApplications(); }, []);
-
+  // ✅ Filter
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return applications.filter(a => {
+    return applications.filter((a) => {
       const okStatus = statusFilter === "ALL" || a.status === statusFilter;
       if (!q) return okStatus;
-      return okStatus && `${a.candidateName ?? ""} ${a.jobTitle ?? ""}`.toLowerCase().includes(q);
+      return (
+        okStatus &&
+        `${a.candidateName ?? ""} ${a.jobTitle ?? ""}`.toLowerCase().includes(q)
+      );
     });
   }, [applications, query, statusFilter]);
 
+  // ✅ Review action
   const review = async (id, status, rejectionReason = null) => {
     try {
       setSubmitting(true);
-      const res = await authApis().put(`${endpoints["employer-applications"]}/${id}/review`, { status, reason: rejectionReason }, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await authApis().put(
+        `${endpoints["employer-applications"]}/${id}/review`,
+        { status, reason: rejectionReason },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       const updated = res.data;
-      setApplications(prev => prev.map(it => it.id === updated.id ? { ...it, ...updated } : it));
+      setApplications((prev) =>
+        prev.map((it) => (it.id === updated.id ? { ...it, ...updated } : it))
+      );
       toast.success(status === "ACCEPTED" ? "✅ Đã duyệt hồ sơ" : "❌ Đã từ chối hồ sơ");
-      setRejectingId(null); setReason("");
-    } catch { toast.error("Cập nhật thất bại"); } finally { setSubmitting(false); }
+      setRejectingId(null);
+      setReason("");
+    } catch {
+      toast.error("Cập nhật thất bại");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
+  // ✅ Email sending
   const sendEmail = async () => {
     if (!emailDialog) return;
     try {
@@ -242,7 +278,8 @@ export default function ApplicationsManagement() {
       toast.error("❌ Gửi email thất bại!");
     }
   };
-  const getStatusBadge = status => {
+
+  const getStatusBadge = (status) => {
     switch (status) {
       case "PENDING": return <Badge variant="pending">🕒 Chờ duyệt</Badge>;
       case "ACCEPTED": return <Badge variant="accepted">✅ Đã duyệt</Badge>;
@@ -250,17 +287,20 @@ export default function ApplicationsManagement() {
       default: return <Badge>-</Badge>;
     }
   };
+
   const handleSend = () => {
-    if (validate()) {
-      sendEmail();
-    }
+    if (validate()) sendEmail();
   };
-  // -------------------- Render --------------------
+
+  // ===================================================
+  // 🖼️ RENDER
+  // ===================================================
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 p-6">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Quản lý hồ sơ ứng tuyển</h1>
 
+        {/* 🔎 Filter & Search */}
         <Card className="mb-6 p-6 flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -268,14 +308,16 @@ export default function ApplicationsManagement() {
               type="text"
               placeholder="Tìm kiếm..."
               className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-              value={query} onChange={e => setQuery(e.target.value)}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
             />
           </div>
           <div className="relative">
             <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
             <select
               className="pl-10 pr-8 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 appearance-none bg-white min-w-[180px]"
-              value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
             >
               <option value="ALL">Tất cả trạng thái</option>
               <option value="PENDING">Chờ duyệt</option>
@@ -288,6 +330,7 @@ export default function ApplicationsManagement() {
           </Button>
         </Card>
 
+        {/* 📋 Applications Table */}
         <Card>
           <div className="overflow-x-auto">
             <table className="min-w-full">
@@ -346,7 +389,7 @@ export default function ApplicationsManagement() {
           </div>
         </Card>
 
-        {/* Email Dialog */}
+        {/* 📧 Email Dialog */}
         <Dialog open={!!emailDialog} onClose={() => setEmailDialog(null)}>
           <div className="p-6 w-[500px]">
             <div className="flex items-center justify-between mb-6">
@@ -363,17 +406,12 @@ export default function ApplicationsManagement() {
                       <Clock className="w-4 h-4 inline mr-1" />Thời gian phỏng vấn
                     </label>
                     <input
-                      type="datetime-local" 
-                      className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 ${errors.interviewTime ? "border-red-500" : "border-gray-200"
-                        }`}
+                      type="datetime-local"
+                      className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 ${errors.interviewTime ? "border-red-500" : "border-gray-200"}`}
                       value={emailPayload.interviewTime}
-                      onChange={e =>
-                        setEmailPayload({ ...emailPayload, interviewTime: e.target.value })
-                      }
+                      onChange={(e) => setEmailPayload({ ...emailPayload, interviewTime: e.target.value })}
                     />
-                    {errors.interviewTime && (
-                      <p className="text-red-500 text-sm mt-1">{errors.interviewTime}</p>
-                    )}
+                    {errors.interviewTime && <p className="text-red-500 text-sm mt-1">{errors.interviewTime}</p>}
                   </div>
 
                   <div>
@@ -382,16 +420,11 @@ export default function ApplicationsManagement() {
                     </label>
                     <input
                       type="text"
-                      className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 ${errors.location ? "border-red-500" : "border-gray-200"
-                        }`}
+                      className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 ${errors.location ? "border-red-500" : "border-gray-200"}`}
                       value={emailPayload.location}
-                      onChange={e =>
-                        setEmailPayload({ ...emailPayload, location: e.target.value })
-                      }
+                      onChange={(e) => setEmailPayload({ ...emailPayload, location: e.target.value })}
                     />
-                    {errors.location && (
-                      <p className="text-red-500 text-sm mt-1">{errors.location}</p>
-                    )}
+                    {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location}</p>}
                   </div>
                 </>
               )}
@@ -403,23 +436,17 @@ export default function ApplicationsManagement() {
                     <CheckCircle className="w-4 h-4 inline mr-1" />Kết quả (Đậu / Rớt)
                   </label>
                   <select
-                    className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 ${errors.result ? "border-red-500" : "border-gray-200"
-                      }`}
+                    className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 ${errors.result ? "border-red-500" : "border-gray-200"}`}
                     value={emailPayload.result}
-                    onChange={(e) =>
-                      setEmailPayload({ ...emailPayload, result: e.target.value })
-                    }
+                    onChange={(e) => setEmailPayload({ ...emailPayload, result: e.target.value })}
                   >
                     <option value="">-- Chọn kết quả --</option>
                     <option value="Đậu">Đậu</option>
                     <option value="Rớt">Rớt</option>
                   </select>
-                  {errors.result && (
-                    <p className="text-red-500 text-sm mt-1">{errors.result}</p>
-                  )}
+                  {errors.result && <p className="text-red-500 text-sm mt-1">{errors.result}</p>}
                 </div>
               )}
-
 
               {/* REQUEST_DOCUMENTS */}
               {emailDialog?.actionType === "REQUEST_DOCUMENTS" && (
@@ -429,8 +456,7 @@ export default function ApplicationsManagement() {
                   </label>
                   <textarea
                     placeholder="Ví dụ: Bằng cấp, chứng chỉ, giấy khám sức khỏe..."
-                    className={`w-full px-3 py-2.5 border rounded-lg resize-none focus:ring-2 focus:ring-blue-500 ${errors.documents ? "border-red-500" : "border-gray-200"
-                      }`}
+                    className={`w-full px-3 py-2.5 border rounded-lg resize-none focus:ring-2 focus:ring-blue-500 ${errors.documents ? "border-red-500" : "border-gray-200"}`}
                     rows={4}
                     value={emailPayload.documents}
                     onChange={(e) => setEmailPayload({ ...emailPayload, documents: e.target.value })}
@@ -453,8 +479,7 @@ export default function ApplicationsManagement() {
                       value={emailPayload.salary || ""}
                       onChange={(e) => setEmailPayload({ ...emailPayload, salary: e.target.value })}
                       placeholder="VD: 15 "
-                      className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 ${errors.salary ? "border-red-500" : "border-gray-200"
-                        }`}
+                      className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 ${errors.salary ? "border-red-500" : "border-gray-200"}`}
                     />
                     {errors.salary && <p className="text-red-500 text-sm mt-1">{errors.salary}</p>}
                   </div>
@@ -465,22 +490,20 @@ export default function ApplicationsManagement() {
                       type="date"
                       value={emailPayload.startDate || ""}
                       onChange={(e) => setEmailPayload({ ...emailPayload, startDate: e.target.value })}
-                      className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 ${errors.startDate ? "border-red-500" : "border-gray-200"
-                        }`}
+                      className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 ${errors.startDate ? "border-red-500" : "border-gray-200"}`}
                     />
                     {errors.startDate && <p className="text-red-500 text-sm mt-1">{errors.startDate}</p>}
                   </div>
                 </div>
               )}
 
-              {/* INTERVIEW CANCEL */}
+              {/* INTERVIEW_CANCEL */}
               {emailDialog?.actionType === "INTERVIEW_CANCEL" && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     <FileText className="w-4 h-4 inline mr-1" />Gửi thư hủy phỏng vấn
                   </label>
-                 
-          
+                  {/* Giữ nguyên UI, chưa có nội dung cụ thể */}
                 </div>
               )}
             </div>

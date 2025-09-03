@@ -29,7 +29,9 @@ import ApplicationsManagement from '@employer/ApplicationsManagement';
 import CandidateDashboard from '@candidate/CandidateDashboard';
 import CandidateProfile from '@candidateProfile/CandidateProfile';
 import Applied from '@candidate/Applied';
-
+import CandidateUpgrade from '@candidate/payment/CandidateUpgrade';
+import PaymentSuccess from '@candidate/payment/PaymentSuccess';
+import PaymentFailed from '@candidate/payment/PaymentFailed';
 
 
 const userReducer = (current, action) => {
@@ -117,6 +119,14 @@ function App() {
                     </PrivateRoute>
                   }
                 />
+                <Route
+                  path="/candidate-upgrade"
+                  element={
+                    <PrivateRoute allowedRoles={["CANDIDATE"]}>
+                      <CandidateUpgrade />
+                    </PrivateRoute>
+                  }
+                />
                 {/* Employer Routes */}
                 <Route
                   path="/employer-profile"
@@ -126,7 +136,7 @@ function App() {
                     </PrivateRoute>
                   }
                 />
-                
+
                 <Route
                   path="/employer-dashboard"
                   element={
@@ -143,10 +153,14 @@ function App() {
                     </PrivateRoute>
                   }
                 />
-              
+
                 <Route path="/unauthorized" element={<Unauthorized />} />
 
                 <Route path="/job-posts/:id" element={<JobDetails />} />
+
+                <Route path="/payment-success" element={<PaymentSuccess />} />
+                <Route path="/payment-failed" element={<PaymentFailed />} />
+
               </Routes>
             </MainLayout>
           </BrowserRouter>

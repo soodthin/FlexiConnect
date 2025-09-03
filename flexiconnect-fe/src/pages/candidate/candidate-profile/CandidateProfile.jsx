@@ -6,18 +6,168 @@ import Skill from "@candidateProfile/Skill";
 import WorkExperience from "@candidateProfile/WorkExperience";
 import classNames from "classnames";
 import { toast } from "sonner";
-import * as Dialog from "@radix-ui/react-dialog";
-import { Cross2Icon, Pencil2Icon, MagicWandIcon } from "@radix-ui/react-icons";
+import {
+  Pencil,
+  Wand2,
+  X,
+  Camera,
+  Eye,
+  FileText,
+  Share2,
+  Crown,
+  Zap,
+} from "lucide-react";
 
+const Button = ({ className, children, ...props }) => (
+  <button
+    className={classNames(
+      "px-4 py-2 rounded-lg font-medium transition disabled:opacity-60",
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </button>
+);
+
+const Card = ({ className, children }) => (
+  <div
+    className={classNames(
+      "bg-white dark:bg-[#232323] rounded-xl shadow p-6",
+      className
+    )}
+  >
+    {children}
+  </div>
+);
+
+const Section = ({ id, innerRef, children }) => (
+  <section
+    id={id}
+    ref={innerRef}
+    className="bg-white dark:bg-[#232323] rounded-xl shadow p-6"
+  >
+    {children}
+  </section>
+);
+
+const Progress = ({ value }) => (
+  <div className="flex items-center gap-2">
+    <div className="w-32 h-2 bg-gray-200 dark:bg-[#282828] rounded-full overflow-hidden">
+      <div
+        className="h-2 bg-blue-500 rounded-full transition-all"
+        style={{ width: `${value}%` }}
+      />
+    </div>
+    <span className="text-xs text-blue-600 font-bold ml-1">{value}%</span>
+  </div>
+);
+
+const Dialog = ({ open, onClose, title, children }) =>
+  open ? (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div
+        className="absolute inset-0 bg-black/40"
+        onClick={onClose}
+      />
+      <div className="relative bg-white dark:bg-[#2d2d2d] rounded-xl shadow-xl p-6 max-w-lg w-full z-10">
+        <h2 className="text-xl font-bold mb-4">{title}</h2>
+        {children}
+        <button
+          className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-[#444]"
+          onClick={onClose}
+        >
+          <X size={16} />
+        </button>
+      </div>
+    </div>
+  ) : null;
+
+// Upgrade Dialog Component
+const UpgradeDialog = ({ open, onClose, onUpgrade }) => (
+  <Dialog open={open} onClose={onClose} title="">
+    <div className="text-center">
+      <div className="mb-6">
+        <div className="mx-auto w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mb-4">
+          <Crown className="w-8 h-8 text-white" />
+        </div>
+        <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+          Nâng cấp tài khoản AI
+        </h3>
+        <p className="text-gray-600 dark:text-gray-300">
+          Bạn cần nâng cấp tài khoản để sử dụng tính năng AI
+        </p>
+      </div>
+
+      <div className="grid gap-4 mb-6">
+        {/* Basic Package */}
+        <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl p-4 border border-blue-200 dark:border-blue-700">
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="font-bold text-blue-800 dark:text-blue-300">Basic</h4>
+            <span className="text-lg font-bold text-blue-600 dark:text-blue-400">55.000₫</span>
+          </div>
+          <ul className="text-sm text-blue-700 dark:text-blue-300 text-left space-y-1">
+            <li>• Đánh giá CV tự động bằng AI</li>
+            <li>• Gợi ý chỉnh sửa CV</li>
+          </ul>
+        </div>
+
+        {/* Premium Package */}
+        <div className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-xl p-4 border border-purple-200 dark:border-purple-700">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <h4 className="font-bold text-purple-800 dark:text-purple-300">Premium</h4>
+              <span className="bg-purple-200 dark:bg-purple-700 text-purple-800 dark:text-purple-200 px-2 py-1 rounded-full text-xs font-semibold">
+                Phổ biến
+              </span>
+            </div>
+            <span className="text-lg font-bold text-purple-600 dark:text-purple-400">115.000₫</span>
+          </div>
+          <ul className="text-sm text-purple-700 dark:text-purple-300 text-left space-y-1">
+            <li>• Tất cả tính năng Basic</li>
+            <li>• Mock interview với AI</li>
+            <li>• Tạo Cover Letter bằng AI</li>
+          </ul>
+        </div>
+      </div>
+
+      <div className="flex gap-3">
+        <Button
+          onClick={onClose}
+          className="flex-1 bg-gray-200 dark:bg-[#444] text-black dark:text-white hover:bg-gray-300"
+        >
+          Để sau
+        </Button>
+        <Button
+          onClick={onUpgrade}
+          className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold hover:from-purple-600 hover:to-pink-600 flex items-center justify-center gap-2"
+        >
+          <Zap size={16} />
+          Nâng cấp ngay
+        </Button>
+      </div>
+    </div>
+  </Dialog>
+);
+
+// ----------------- Feature Component -----------------
 const SECTIONS = [
   { id: "profile", label: "Thông tin cá nhân", icon: "👤" },
   { id: "education", label: "Học vấn", icon: "🎓" },
   { id: "experience", label: "Kinh nghiệm", icon: "💼" },
-  { id: "skills", label: "Kỹ năng ‑ AI", icon: "🛠️" },
+  { id: "skills", label: "Kỹ năng - AI", icon: "🛠️" },
 ];
+
+// Format date
+const formatDate = (dateStr) => {
+  if (!dateStr) return "Hiện tại";
+  const date = new Date(dateStr);
+  return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+};
 
 export default function CandidateProfilePage() {
   const [profile, setProfile] = useState(null);
+  const [isVerified, setIsVerified] = useState(false);
   const [scrollTarget, setScrollTarget] = useState("");
   const [currentSection, setCurrentSection] = useState("profile");
   const [avatarTimestamp, setAvatarTimestamp] = useState(Date.now());
@@ -28,10 +178,10 @@ export default function CandidateProfilePage() {
     title: "",
     bio: "",
   });
-
-  // 📌 AI Suggestion states
   const [bioSuggestion, setBioSuggestion] = useState("");
   const [isSuggesting, setIsSuggesting] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isUpgradeDialogOpen, setIsUpgradeDialogOpen] = useState(false);
 
   const sectionRefs = useRef({});
   const navigate = useNavigate();
@@ -46,17 +196,25 @@ export default function CandidateProfilePage() {
     try {
       const res = await authApis().get(endpoints["candidate-profile"]);
       setProfile(res.data);
+
+      // Kiểm tra AI access
+      const pkg = res.data.userPackage;
+      setIsVerified(pkg?.isActive === true);
     } catch (err) {
       console.error(err);
     }
   };
 
-  useEffect(() => { loadProfile(); }, []);
+  useEffect(() => {
+    loadProfile();
+  }, []);
 
   useEffect(() => {
     if (scrollTarget) {
-      const el = sectionRefs.current[scrollTarget];
-      el?.scrollIntoView({ behavior: "smooth", block: "start" });
+      sectionRefs.current[scrollTarget]?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
       setScrollTarget("");
     }
   }, [scrollTarget]);
@@ -77,12 +235,23 @@ export default function CandidateProfilePage() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const checkAIAccess = () => isVerified;
+
+  const handleAIFeatureClick = (callback) => {
+    if (checkAIAccess()) {
+      callback();
+    } else {
+      setIsUpgradeDialogOpen(true);
+    }
+  };
+
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
-    alert("Đã copy link hồ sơ!");
+    toast.success("📋 Link hồ sơ đã được copy!");
   };
   const handlePreview = () => window.open("/preview-profile", "_blank");
-  const handleDownloadPDF = () => alert("Chức năng tải PDF sẽ được cập nhật!");
+  const handleDownloadPDF = () =>
+    toast.info("📄 Chức năng tải PDF sẽ được cập nhật!");
 
   const handleAvatarChange = async (e) => {
     const file = e.target.files?.[0];
@@ -110,6 +279,7 @@ export default function CandidateProfilePage() {
       });
       toast.success("✅ Đã cập nhật!");
       loadProfile();
+      setIsDialogOpen(false);
     } catch {
       toast.error("❌ Cập nhật thất bại!");
     }
@@ -125,11 +295,12 @@ export default function CandidateProfilePage() {
       bio: profile.bio || "",
     });
     setBioSuggestion("");
+    setIsDialogOpen(true);
   };
 
   const handleGetSuggestion = async () => {
     if (!form.bio) {
-      toast.info("Vui lòng nhập vài ý chính để AI gợi ý.");
+      toast.info("✍️ Vui lòng nhập vài ý chính để AI gợi ý.");
       return;
     }
     setIsSuggesting(true);
@@ -139,7 +310,7 @@ export default function CandidateProfilePage() {
       });
       if (res.data?.aiSuggestion) {
         setBioSuggestion(res.data.aiSuggestion);
-        toast.success("✅ AI đã tạo gợi ý thành công!");
+        toast.success("✅ AI đã tạo gợi ý!");
       }
     } catch {
       toast.error("❌ AI gợi ý thất bại.");
@@ -148,274 +319,317 @@ export default function CandidateProfilePage() {
     }
   };
 
+  const handleUpgradeRedirect = () => {
+    setIsUpgradeDialogOpen(false);
+    navigate("/candidate-upgrade");
+  };
+
   return (
-    // ✨ SỬA LẠI: Đổi `h-screen overflow-hidden` thành `min-h-screen` để cho phép cả trang được cuộn
     <div className="w-full min-h-screen flex bg-beige-light dark:bg-[#181818]">
-      
-        {/* Sidebar */}
-        {/* Giữ nguyên `sticky top-0 h-screen` để sidebar luôn dính ở trên cùng */}
-        <aside className="hidden sm:flex flex-col gap-2 w-56 h-screen sticky top-0 p-4 bg-white dark:bg-[#232323] border-r dark:border-neutral-700">
-            <button
-                onClick={() => navigate("/candidate-dashboard")}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-black text-beige dark:bg-beige dark:text-black font-semibold shadow hover:bg-gray-800 dark:hover:bg-[#f5f5dc] text-xs"
-            >
-                ← Quay về
-            </button>
-            {SECTIONS.map((sec) => (
-                <button
-                    key={sec.id}
-                    onClick={() => setScrollTarget(sec.id)}
-                    className={classNames(
-                        "flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm transition",
-                        currentSection === sec.id
-                            ? "bg-black dark:bg-beige text-beige dark:text-black shadow"
-                            : "bg-gray-100 dark:bg-[#353535] text-gray-600 dark:text-beige hover:bg-beige-light dark:hover:text-white"
-                    )}
-                >
-                    <span>{sec.icon}</span> {sec.label}
-                </button>
-            ))}
-        </aside>
-
-        {/* Main Content */}
-        {/* ✨ SỬA LẠI: Xóa `overflow-y-auto` để nội dung chính không tự tạo thanh cuộn riêng nữa */}
-        <main className="flex-1 px-4 sm:px-8 py-8 text-gray-800 dark:text-gray-100">
-            {/* Header CTA */}
-            <div className="flex flex-wrap items-center gap-3 mb-6">
-                <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500 dark:text-gray-300">Hoàn thiện hồ sơ</span>
-                    <div className="w-32 h-2 bg-gray-200 dark:bg-[#282828] rounded-full overflow-hidden">
-                        <div className="h-2 bg-blue-500 rounded-full transition-all" style={{ width: `${profileCompletion}%` }}></div>
-                    </div>
-                    <span className="text-xs text-blue-600 font-bold ml-1">{profileCompletion}%</span>
-                </div>
-                <button onClick={handleShare} className="button-util">🔗 Chia sẻ</button>
-                <button onClick={handlePreview} className="button-util">👁️ Xem trước</button>
-                <button onClick={handleDownloadPDF} className="button-util">📄 Tải PDF</button>
-                <div className="button-score">⭐ AI Score: 8.9/10</div>
-            </div>
-
-            {profile ? (
-                <div className="flex flex-col gap-8">
-                    <section
-                        id="profile"
-                        ref={(el) => (sectionRefs.current["profile"] = el)}
-                        className="bg-white dark:bg-[#232323] rounded-xl shadow p-6 flex flex-col sm:flex-row items-start gap-6"
-                    >
-                        {/* Avatar */}
-                        <div className="relative w-24 h-24 shrink-0">
-                            <img
-                                src={
-                                    profile.avatar
-                                        ? `${profile.avatar}?t=${avatarTimestamp}`
-                                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.fullName || "Candidate")}`
-                                }
-                                alt="Avatar"
-                                className="rounded-full w-20 h-20 object-cover border-2 shadow"
-                            />
-                            <label className="absolute bottom-0 right-0 bg-white dark:bg-[#333] rounded-full p-1 cursor-pointer text-xs shadow">
-                                📷
-                                <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
-                            </label>
-                        </div>
-
-                        {/* Profile Info & Edit */}
-                        <div className="flex-1 space-y-2">
-                            <div className="flex justify-between items-start">
-                                <h2 className="text-2xl font-bold dark:text-beige">{profile.fullName}</h2>
-                                <Dialog.Root>
-                                    <Dialog.Trigger asChild>
-                                        <button onClick={handleOpenEdit} className="text-xs text-blue-600 hover:underline flex items-center gap-1">
-                                            <Pencil2Icon className="w-3 h-3" />
-                                            Chỉnh sửa
-                                        </button>
-                                    </Dialog.Trigger>
-                                    <Dialog.Portal>
-                                        <Dialog.Overlay className="fixed inset-0 bg-black/40 z-40" />
-                                        <Dialog.Content className="fixed left-1/2 top-1/2 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white dark:bg-[#2d2d2d] p-8 shadow-xl z-50 max-h-[90vh] overflow-y-auto">
-                                            <Dialog.Title className="text-2xl font-bold mb-4">Cập nhật thông tin</Dialog.Title>
-                                            <form onSubmit={handleUpdateProfile} className="space-y-4">
-                                                {/* Họ tên */}
-                                                <div>
-                                                    <label className="block text-sm font-medium">Họ tên</label>
-                                                    <input
-                                                        type="text"
-                                                        className="w-full px-4 py-2 rounded border dark:bg-[#3a3a3a]"
-                                                        placeholder="Họ tên"
-                                                        value={form.fullName}
-                                                        onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-                                                    />
-                                                </div>
-
-                                                {/* Số điện thoại */}
-                                                <div>
-                                                    <label className="block text-sm font-medium">Số điện thoại</label>
-                                                    <input
-                                                        type="text"
-                                                        className="w-full px-4 py-2 rounded border dark:bg-[#3a3a3a]"
-                                                        placeholder="Số điện thoại"
-                                                        value={form.phoneNumber}
-                                                        onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
-                                                    />
-                                                </div>
-
-                                                {/* Địa chỉ */}
-                                                <div>
-                                                    <label className="block text-sm font-medium">Địa chỉ</label>
-                                                    <input
-                                                        type="text"
-                                                        className="w-full px-4 py-2 rounded border dark:bg-[#3a3a3a]"
-                                                        placeholder="Địa chỉ"
-                                                        value={form.address}
-                                                        onChange={(e) => setForm({ ...form, address: e.target.value })}
-                                                    />
-                                                </div>
-
-                                                {/* Tiêu đề */}
-                                                <div>
-                                                    <label className="block text-sm font-medium">Tiêu đề</label>
-                                                    <input
-                                                        type="text"
-                                                        className="w-full px-4 py-2 rounded border dark:bg-[#3a3a3a]"
-                                                        placeholder="Tiêu đề"
-                                                        value={form.title}
-                                                        onChange={(e) => setForm({ ...form, title: e.target.value })}
-                                                    />
-                                                </div>
-                                                
-                                                {/* Bio + AI Suggestion Section */}
-                                                <div className="space-y-2">
-                                                    <label className="block text-sm font-medium">Giới thiệu bản thân</label>
-                                                    <textarea
-                                                        rows={4}
-                                                        value={form.bio}
-                                                        onChange={(e) => setForm({ ...form, bio: e.target.value })}
-                                                        className="w-full px-4 py-2 rounded border dark:bg-[#3a3a3a]"
-                                                        placeholder="Nhập vài ý chính..."
-                                                    />
-                                                    <button
-                                                        type="button"
-                                                        onClick={handleGetSuggestion}
-                                                        disabled={isSuggesting}
-                                                        className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white text-sm font-semibold transition hover:opacity-90 disabled:opacity-60"
-                                                    >
-                                                        {isSuggesting ? (
-                                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                                        ) : (
-                                                            <MagicWandIcon />
-                                                        )}
-                                                        {isSuggesting ? "Đang xử lý..." : "✨ Gợi ý từ AI"}
-                                                    </button>
-
-                                                    {bioSuggestion && (
-                                                        <div className="mt-3 bg-gradient-to-br from-blue-50 via-blue-100 to-white dark:from-blue-900/20 rounded-xl p-4 border border-blue-300 dark:border-blue-700 shadow-inner">
-                                                            <p className="text-sm text-blue-900 dark:text-blue-200 font-medium mb-2 flex items-center gap-2">
-                                                                <MagicWandIcon /> 🤖 Gợi ý từ AI
-                                                            </p>
-                                                            <p className="text-sm italic text-blue-800 dark:text-blue-300 whitespace-pre-wrap">
-                                                                {bioSuggestion}
-                                                            </p>
-                                                            <div className="mt-2 flex gap-2">
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => {
-                                                                        setForm({ ...form, bio: bioSuggestion });
-                                                                        setBioSuggestion("");
-                                                                    }}
-                                                                    className="flex-1 bg-blue-600 text-white py-1 rounded-lg hover:bg-blue-700"
-                                                                >
-                                                                    Dùng gợi ý
-                                                                </button>
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => setBioSuggestion("")}
-                                                                    className="flex-1 bg-gray-200 dark:bg-[#444] text-black dark:text-white py-1 rounded-lg hover:bg-gray-300"
-                                                                >
-                                                                    Bỏ qua
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </div>
-
-                                                {/* Submit / Cancel */}
-                                                <div className="flex gap-2">
-                                                    <button type="submit" className="flex-1 bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
-                                                        Lưu
-                                                    </button>
-                                                    <Dialog.Close asChild>
-                                                        <button className="flex-1 bg-gray-200 dark:bg-[#444] text-black dark:text-white py-2 rounded">
-                                                            Huỷ
-                                                        </button>
-                                                    </Dialog.Close>
-                                                </div>
-                                            </form>
-
-                                            <Dialog.Close asChild>
-                                                <button className="absolute right-4 top-4 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-[#444]">
-                                                    <Cross2Icon />
-                                                </button>
-                                            </Dialog.Close>
-                                        </Dialog.Content>
-                                    </Dialog.Portal>
-                                </Dialog.Root>
-                            </div>
-
-                            {/* Profile details grid */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-1 text-sm text-gray-700 dark:text-gray-300">
-                                <div><span className="font-semibold">Email:</span> {profile.email}</div>
-                                <div><span className="font-semibold">SĐT:</span> {profile.phoneNumber}</div>
-                                <div><span className="font-semibold">Địa chỉ: </span> {profile.address}</div>
-                                <div><span className="font-semibold">Tiêu đề:</span> {profile.title}</div>
-                            </div>
-
-                            {profile.bio && (
-                                <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                                    <span className="font-semibold">Giới thiệu:</span> {profile.bio}
-                                </div>
-                            )}
-
-                            {profile.resumeFile && (
-                                <a
-                                    href={profile.resumeFile}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="inline-block mt-3 px-4 py-2 bg-beige dark:bg-[#282828] text-[#111] dark:text-beige rounded-full text-xs font-semibold shadow hover:underline"
-                                >
-                                    📄 Xem CV hiện tại
-                                </a>
-                            )}
-                        </div>
-                    </section>
-
-                    <section
-                        id="education"
-                        ref={(el) => (sectionRefs.current["education"] = el)}
-                        className="section-block"
-                    >
-                        <EducationHistory />
-                    </section>
-                    <section
-                        id="experience"
-                        ref={(el) => (sectionRefs.current["experience"] = el)}
-                        className="section-block"
-                    >
-                        <WorkExperience />
-                    </section>
-                    <section
-                        id="skills"
-                        ref={(el) => (sectionRefs.current["skills"] = el)}
-                        className="section-block"
-                    >
-                        <Skill />
-                    </section>
-                </div>
-            ) : (
-                <div className="text-center text-gray-500 dark:text-gray-300 py-16">
-                    Đang tải thông tin hồ sơ...
-                </div>
+      {/* Sidebar */}
+      <aside className="hidden sm:flex flex-col gap-2 w-56 h-screen sticky top-0 p-4 bg-white dark:bg-[#232323] border-r dark:border-neutral-700">
+        <Button
+          onClick={() => navigate("/candidate-dashboard")}
+          className="bg-black text-beige dark:bg-beige dark:text-black text-xs shadow"
+        >
+          ← Quay về
+        </Button>
+        {SECTIONS.map((sec) => (
+          <Button
+            key={sec.id}
+            onClick={() => setScrollTarget(sec.id)}
+            className={classNames(
+              "flex items-center gap-2 text-sm justify-start",
+              currentSection === sec.id
+                ? "bg-black dark:bg-beige text-beige dark:text-black shadow"
+                : "bg-gray-100 dark:bg-[#353535] text-gray-600 dark:text-beige hover:bg-beige-light"
             )}
-        </main>
+          >
+            <span>{sec.icon}</span> {sec.label}
+            {sec.id === "skills" && !checkAIAccess() && (
+              <Crown size={12} className="text-yellow-500" />
+            )}
+          </Button>
+        ))}
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 px-4 sm:px-8 py-8 text-gray-800 dark:text-gray-100">
+        {/* Header CTA */}
+        <div className="flex flex-wrap items-center gap-3 mb-2">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-500 dark:text-gray-300">
+              Hoàn thiện hồ sơ
+            </span>
+            <Progress value={profileCompletion} />
+          </div>
+          <Button onClick={handleShare} className="button-util flex gap-1">
+            <Share2 size={14} /> Chia sẻ
+          </Button>
+          <Button onClick={handlePreview} className="button-util flex gap-1">
+            <Eye size={14} /> Xem trước
+          </Button>
+          <Button
+            onClick={handleDownloadPDF}
+            className="button-util flex gap-1"
+          >
+            <FileText size={14} /> Tải PDF
+          </Button>
+        </div>
+
+       {/* Hiển thị gói hiện tại */}
+{profile?.userPackage && (
+  <div className="flex flex-wrap items-center gap-3 mb-4">
+    <span className="text-sm text-gray-500 dark:text-gray-400">Gói hiện tại:</span>
+
+    <div
+      className={classNames(
+        "px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-2 shadow-sm",
+        profile.userPackage.isActive
+          ? "bg-blue-100 text-blue-800 dark:bg-blue-800/30 dark:text-blue-200"
+          : "bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-200"
+      )}
+    >
+      {profile.userPackage.name}
+      {profile.userPackage.isActive && profile.userPackage.endDate && (
+        <span className="text-xs bg-white/30 dark:bg-gray-700/50 px-2 py-0.5 rounded">
+          Hết hạn {formatDate(profile.userPackage.endDate)}
+        </span>
+      )}
+      {!profile.userPackage.isActive && <span>⛔ Hết hạn</span>}
     </div>
-);
+  </div>
+)}
+
+        {profile ? (
+          <div className="flex flex-col gap-8">
+            {/* Profile Section */}
+            <Section
+              id="profile"
+              innerRef={(el) => (sectionRefs.current["profile"] = el)}
+            >
+              <div className="flex flex-col sm:flex-row items-start gap-6">
+                {/* Avatar */}
+                <div className="relative w-24 h-24 shrink-0">
+                  <img
+                    src={
+                      profile.avatar
+                        ? `${profile.avatar}?t=${avatarTimestamp}`
+                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                          profile.fullName || "Candidate"
+                        )}`
+                    }
+                    alt="Avatar"
+                    className="rounded-full w-20 h-20 object-cover border-2 shadow"
+                  />
+                  <label className="absolute bottom-0 right-0 bg-white dark:bg-[#333] rounded-full p-1 cursor-pointer text-xs shadow">
+                    <Camera size={14} />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleAvatarChange}
+                    />
+                  </label>
+                </div>
+
+                {/* Info */}
+                <div className="flex-1 space-y-2">
+                  <div className="flex justify-between items-start">
+                    <h2 className="text-2xl font-bold dark:text-beige">
+                      {profile.fullName}
+                      {checkAIAccess() && (
+                        <Crown size={16} className="inline ml-2 text-yellow-500" />
+                      )}
+                    </h2>
+                    <Button
+                      onClick={handleOpenEdit}
+                      className="text-xs text-blue-600 hover:underline flex items-center gap-1"
+                    >
+                      <Pencil size={14} /> Chỉnh sửa
+                    </Button>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-1 text-sm text-gray-700 dark:text-gray-300">
+                    <div>
+                      <span className="font-semibold">Email:</span>{" "}
+                      {profile.email}
+                    </div>
+                    <div>
+                      <span className="font-semibold">SĐT:</span>{" "}
+                      {profile.phoneNumber}
+                    </div>
+                    <div>
+                      <span className="font-semibold">Địa chỉ: </span>{" "}
+                      {profile.address}
+                    </div>
+                    <div>
+                      <span className="font-semibold">Tiêu đề:</span>{" "}
+                      {profile.title}
+                    </div>
+                  </div>
+
+                  {profile.bio && (
+                    <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                      <span className="font-semibold">Giới thiệu:</span>{" "}
+                      {profile.bio}
+                    </div>
+                  )}
+
+                  {profile.resumeFile && (
+                    <a
+                      href={profile.resumeFile}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-block mt-3 px-4 py-2 bg-beige dark:bg-[#282828] text-[#111] dark:text-beige rounded-full text-xs font-semibold shadow hover:underline"
+                    >
+                      📄 Xem CV hiện tại
+                    </a>
+                  )}
+                </div>
+              </div>
+            </Section>
+
+            {/* Other Sections */}
+            <Section
+              id="education"
+              innerRef={(el) => (sectionRefs.current["education"] = el)}
+            >
+              <EducationHistory />
+            </Section>
+            <Section id="experience" innerRef={(el) => (sectionRefs.current["experience"] = el)}>
+              <WorkExperience
+                userPackage={profile.userPackage}
+                onUpgradeClick={() => setIsUpgradeDialogOpen(true)}
+              />
+            </Section>
+
+            <Section
+              id="skills"
+              innerRef={(el) => (sectionRefs.current["skills"] = el)}
+            >
+              <Skill onUpgradeClick={() => setIsUpgradeDialogOpen(true)} />
+            </Section>
+          </div>
+        ) : (
+          <div className="text-center text-gray-500 dark:text-gray-300 py-16">
+            Đang tải thông tin hồ sơ...
+          </div>
+        )}
+      </main>
+
+      {/* Edit Dialog */}
+      <Dialog
+        open={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        title="Cập nhật thông tin"
+      >
+        <form onSubmit={handleUpdateProfile} className="space-y-4">
+          {["fullName", "phoneNumber", "address", "title"].map((f) => (
+            <div key={f}>
+              <label className="block text-sm font-medium capitalize">
+                {f}
+              </label>
+              <input
+                type="text"
+                className="w-full px-4 py-2 rounded border dark:bg-[#3a3a3a]"
+                value={form[f]}
+                onChange={(e) => setForm({ ...form, [f]: e.target.value })}
+              />
+            </div>
+          ))}
+
+          <div className="space-y-2">
+            <label className="block text-sm font-medium">
+              Giới thiệu bản thân
+            </label>
+            <textarea
+              rows={4}
+              value={form.bio}
+              onChange={(e) => setForm({ ...form, bio: e.target.value })}
+              className="w-full px-4 py-2 rounded border dark:bg-[#3a3a3a]"
+              placeholder="Nhập vài ý chính..."
+            />
+            <Button
+              type="button"
+              onClick={() => handleAIFeatureClick(handleGetSuggestion)}
+              disabled={isSuggesting}
+              className={classNames(
+                "w-full flex items-center justify-center gap-2 text-sm font-semibold",
+                checkAIAccess()
+                  ? "bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white"
+                  : "bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+              )}
+            >
+              {isSuggesting ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : checkAIAccess() ? (
+                <Wand2 size={16} />
+              ) : (
+                <Crown size={16} />
+              )}
+              {isSuggesting
+                ? "Đang xử lý..."
+                : checkAIAccess()
+                  ? " Gợi ý từ AI"
+                  : "🔒 Nâng cấp để dùng AI"}
+            </Button>
+
+            {bioSuggestion && (
+              <div className="mt-3 bg-gradient-to-br from-blue-50 via-blue-100 to-white dark:from-blue-900/20 rounded-xl p-4 border border-blue-300 dark:border-blue-700 shadow-inner">
+                <p className="text-sm font-medium mb-2 flex items-center gap-2">
+                  <Wand2 size={14} /> 🤖 Gợi ý từ AI
+                </p>
+                <p className="text-sm italic whitespace-pre-wrap">
+                  {bioSuggestion}
+                </p>
+                <div className="mt-2 flex gap-2">
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      setForm({ ...form, bio: bioSuggestion });
+                      setBioSuggestion("");
+                    }}
+                    className="flex-1 bg-blue-600 text-white"
+                  >
+                    Dùng gợi ý
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => setBioSuggestion("")}
+                    className="flex-1 bg-gray-200 dark:bg-[#444] text-black dark:text-white"
+                  >
+                    Bỏ qua
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex gap-2">
+            <Button
+              type="submit"
+              className="flex-1 bg-blue-600 text-white hover:bg-blue-700"
+            >
+              Lưu
+            </Button>
+            <Button
+              type="button"
+              onClick={() => setIsDialogOpen(false)}
+              className="flex-1 bg-gray-200 dark:bg-[#444] text-black dark:text-white"
+            >
+              Huỷ
+            </Button>
+          </div>
+        </form>
+      </Dialog>
+
+      {/* Upgrade Dialog */}
+      <UpgradeDialog
+        open={isUpgradeDialogOpen}
+        onClose={() => setIsUpgradeDialogOpen(false)}
+        onUpgrade={handleUpgradeRedirect}
+      />
+    </div>
+  );
 }

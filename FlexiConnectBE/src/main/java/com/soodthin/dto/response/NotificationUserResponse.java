@@ -4,8 +4,8 @@
  */
 package com.soodthin.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.soodthin.entity.Notification;
-import com.soodthin.entity.User;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -25,6 +25,7 @@ public class NotificationUserResponse {
     private String content;     
     private Notification.NotificationType type;       
     private String linkTo;     
+    @JsonProperty("isRead") 
     private boolean isRead;     
     private LocalDateTime createdAt; 
     private LocalDateTime readAt; 
