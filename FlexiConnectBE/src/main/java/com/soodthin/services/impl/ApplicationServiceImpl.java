@@ -5,6 +5,7 @@
 package com.soodthin.services.impl;
 
 import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
 import com.soodthin.dto.request.ApplicationReviewRequest;
 import com.soodthin.dto.request.NotificationRequest;
@@ -26,6 +27,7 @@ import com.soodthin.services.EmailService;
 import com.soodthin.services.NotificationService;
 import java.util.UUID;
 import jakarta.transaction.Transactional;
+import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -76,22 +78,41 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         String resumeFile;
         try {
-            String safeFilename = UUID.randomUUID().toString();
+            // Lấy tên file gốc
+            String originalFilename = cvFile.getOriginalFilename();
+            if (originalFilename == null || originalFilename.trim().isEmpty()) {
+                originalFilename = "cv.pdf"; // Tên mặc định
+            }
 
+            // 1. Tải file lên Cloudinary
             Map uploadResult = cloudinary.uploader().upload(cvFile.getBytes(), ObjectUtils.asMap(
-                    "resource_type", "auto",
+                    "resource_type", "raw",
                     "folder", "cv_applications",
-                    "public_id", safeFilename,
-                    "type", "upload" // Đảm bảo file là public
+                    "use_filename", true,
+                    "unique_filename", true,
+                    "access_mode", "public"
             ));
 
-            System.out.println("Cloudinary upload result: " + uploadResult);
+            // Lấy public_id từ kết quả upload
+            String publicId = uploadResult.get("public_id").toString();
 
-            resumeFile = uploadResult.get("secure_url").toString();
+            // 2. TẠO URL DOWNLOAD VỚI ĐỊNH DẠNG MONG MUỐN
+            // Chỉ sử dụng "attachment" mà không kèm theo tên file
+            resumeFile = cloudinary.url()
+                    .resourceType("raw")
+                    .publicId(publicId)
+                    // SỬA Ở ĐÂY: Bỏ "+ originalFilename"
+                    .transformation(new Transformation<>().flags("attachment"))
+                    .secure(true)
+                    .generate();
+
+            System.out.println("Cloudinary Public ID: " + publicId);
+            System.out.println("Final Download URL: " + resumeFile);
+
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Không thể upload CV.");
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Không thể upload CV: " + e.getMessage());
         }
-
         Application application = new Application();
         application.setCandidateId(candidate);
         application.setJobPostId(jobPost);
@@ -250,6 +271,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                 .id(application.getId())
                 .candidateName(application.getCandidateId().getUserId().getFullName())
                 .jobTitle(application.getJobPostId().getTitle())
+                .resumeFile(application.getResumeFile())
                 .status(application.getStatus())
                 .rejectionReason(application.getRejectionReason())
                 .appliedAt(application.getAppliedAt())

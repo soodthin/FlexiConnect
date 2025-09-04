@@ -3,7 +3,7 @@ import { MyDispatcherContext } from '@contexts/MyContexts';
 import cookie from 'react-cookies';
 import { authApis, endpoints } from '@configs/APIs';
 import Header from '@layouts/Header';
-
+import Footer from '@layouts/Footer';
 
 export default function MainLayout({ children }) {
   const dispatch = useContext(MyDispatcherContext);
@@ -43,6 +43,8 @@ export default function MainLayout({ children }) {
       <main className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
         {children}
       </main>
+            <Footer />
+
     </>
   );
 }

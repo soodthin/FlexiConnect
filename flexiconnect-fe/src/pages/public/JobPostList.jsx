@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { Cross2Icon } from "@radix-ui/react-icons";
-import { Heart, HeartOff } from "lucide-react";
+import { Heart } from "lucide-react";
 import RadixSelect from "@components/RadixSelect";
 import { useNavigate } from "react-router-dom";
+import { Search } from "lucide-react";
 
 /* ----------------- UI PRIMITIVES ----------------- */
 const Card = ({ className = "", children, ...props }) => (
@@ -16,14 +17,21 @@ const Card = ({ className = "", children, ...props }) => (
 );
 
 const Button = ({ children, variant = "default", className = "", ...props }) => {
-  const base = "rounded-lg px-3 py-1 text-xs font-medium flex items-center gap-1 transition";
+  const base =
+    "rounded-lg px-3 py-1 text-xs font-medium flex items-center gap-1 transition";
   const variants = {
-    default: "bg-gray-100 dark:bg-neutral-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-neutral-700",
-    ghost: "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white",
-    pagination: "px-3 py-1 border rounded disabled:opacity-50 dark:border-gray-600",
+    default:
+      "bg-gray-100 dark:bg-neutral-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-neutral-700",
+    ghost:
+      "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white",
+    pagination:
+      "px-3 py-1 border rounded disabled:opacity-50 dark:border-gray-600",
   };
   return (
-    <button className={`${base} ${variants[variant]} ${className}`} {...props}>
+    <button
+      className={`${base} ${variants[variant]} ${className}`}
+      {...props}
+    >
       {children}
     </button>
   );
@@ -31,12 +39,18 @@ const Button = ({ children, variant = "default", className = "", ...props }) => 
 
 const Badge = ({ children, color = "gray" }) => {
   const colors = {
-    green: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-    yellow: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
+    green:
+      "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
+    yellow:
+      "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
     blue: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
     gray: "bg-gray-100 text-gray-700 dark:bg-neutral-800 dark:text-gray-300",
   };
-  return <span className={`text-xs px-2 py-1 rounded-full ${colors[color]}`}>{children}</span>;
+  return (
+    <span className={`text-xs px-2 py-1 rounded-full ${colors[color]}`}>
+      {children}
+    </span>
+  );
 };
 
 const FilterPopover = ({ triggerLabel, options, selected, onToggle }) => (
@@ -54,7 +68,11 @@ const FilterPopover = ({ triggerLabel, options, selected, onToggle }) => (
             key={opt}
             className="flex items-center gap-2 mb-2 cursor-pointer text-gray-800 dark:text-gray-100"
           >
-            <input type="checkbox" checked={selected.includes(opt)} onChange={() => onToggle(opt)} />
+            <input
+              type="checkbox"
+              checked={selected.includes(opt)}
+              onChange={() => onToggle(opt)}
+            />
             <span>{opt}</span>
           </label>
         ))}
@@ -68,11 +86,7 @@ const FilterPopover = ({ triggerLabel, options, selected, onToggle }) => (
 
 const Pagination = ({ currentPage, totalPages, onPrev, onNext }) => (
   <div className="mt-8 flex justify-center items-center gap-4 text-sm text-gray-800 dark:text-white">
-    <Button
-      variant="pagination"
-      onClick={onPrev}
-      disabled={currentPage === 1}
-    >
+    <Button variant="pagination" onClick={onPrev} disabled={currentPage === 1}>
       ←
     </Button>
     <span>
@@ -92,6 +106,7 @@ const Pagination = ({ currentPage, totalPages, onPrev, onNext }) => (
 export default function JobPostList() {
   const [jobPosts, setJobPosts] = useState([]);
   const [filteredPosts, setFilteredPosts] = useState([]);
+  const [searchTerm, setSearchTerm] = useState(""); // 🔹 Thêm state tìm kiếm
   const [selectedLocations, setSelectedLocations] = useState([]);
   const [selectedSalary, setSelectedSalary] = useState("Tất cả");
   const [selectedJobType, setSelectedJobType] = useState("Tất cả");
@@ -113,7 +128,22 @@ export default function JobPostList() {
   useEffect(() => {
     let posts = jobPosts;
 
-    if (!(selectedLocations.length === 0 || selectedLocations.includes("Tất cả"))) {
+    // 🔹 lọc theo searchTerm
+    if (searchTerm.trim() !== "") {
+      posts = posts.filter(
+        (job) =>
+          job.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          job.companyName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          job.location?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    if (
+      !(
+        selectedLocations.length === 0 ||
+        selectedLocations.includes("Tất cả")
+      )
+    ) {
       posts = posts.filter((job) => selectedLocations.includes(job.location));
     }
 
@@ -140,7 +170,13 @@ export default function JobPostList() {
 
     setFilteredPosts(posts);
     setCurrentPage(1);
-  }, [selectedLocations, selectedSalary, selectedJobType, jobPosts]);
+  }, [
+    searchTerm,
+    selectedLocations,
+    selectedSalary,
+    selectedJobType,
+    jobPosts,
+  ]);
 
   const formatSalary = (min, max) => {
     if (!min && !max) return "Thoả thuận";
@@ -189,7 +225,9 @@ export default function JobPostList() {
 
   const toggleExpand = (id) => {
     setExpandedJobIds((prev) =>
-      prev.includes(id) ? prev.filter((jobId) => jobId !== id) : [...prev, id]
+      prev.includes(id)
+        ? prev.filter((jobId) => jobId !== id)
+        : [...prev, id]
     );
   };
 
@@ -199,6 +237,32 @@ export default function JobPostList() {
 
   return (
     <div className="p-2">
+      {/* 🔹 Simple Modern Search Box */}
+      <div className="mb-8 flex">
+        <div className="relative w-full max-w-xl">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+
+          <input
+            type="text"
+            placeholder="Tìm việc, công ty, địa điểm..."
+            className="w-full pl-12 pr-4 py-3 rounded-2xl 
+                 bg-white dark:bg-neutral-900 
+                 border border-gray-200 dark:border-neutral-700 
+                 shadow-sm 
+                 text-sm md:text-base text-gray-700 dark:text-gray-200 
+                 placeholder:text-gray-400 dark:placeholder:text-gray-500
+                 focus:outline-none focus:ring-2 focus:black dark:focus:ring-indigo-400
+                 transition-all duration-200
+                 hover:border-gray-300 dark:hover:border-neutral-600"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+      </div>
+
+
+
+
       {/* Filters */}
       <div className="mb-6 flex flex-wrap gap-3 items-center">
         <FilterPopover
@@ -224,12 +288,20 @@ export default function JobPostList() {
       {/* Job Cards */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {paginatedPosts.map((job) => (
-          <Card key={job.id} className="p-5 flex flex-col cursor-pointer" onClick={() => goToJobDetail(job.id)}>
+          <Card
+            key={job.id}
+            className="p-5 flex flex-col cursor-pointer"
+            onClick={() => goToJobDetail(job.id)}
+          >
             {/* Company logo & title */}
             <div className="flex items-center mb-4">
               <div className="w-12 h-12 rounded-full mr-3 flex items-center justify-center overflow-hidden bg-gray-100 dark:bg-neutral-800">
                 {job.avatar ? (
-                  <img src={job.avatar} alt="avatar" className="w-full h-full object-cover" />
+                  <img
+                    src={job.avatar}
+                    alt="avatar"
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
                   <span className="text-sm font-semibold text-gray-800 dark:text-white">
                     {job.companyName?.[0]}
@@ -237,14 +309,20 @@ export default function JobPostList() {
                 )}
               </div>
               <div>
-                <h2 className="text-base font-semibold text-gray-800 dark:text-white">{job.title}</h2>
-                <p className="text-xs text-gray-500 dark:text-gray-400">{job.companyName}</p>
+                <h2 className="text-base font-semibold text-gray-800 dark:text-white">
+                  {job.title}
+                </h2>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {job.companyName}
+                </p>
               </div>
             </div>
 
             {/* Tags */}
             <div className="flex flex-wrap gap-2 text-xs mb-4">
-              <Badge color="green">{formatSalary(job.salaryMin, job.salaryMax)}</Badge>
+              <Badge color="green">
+                {formatSalary(job.salaryMin, job.salaryMax)}
+              </Badge>
               {job.location && <Badge color="yellow">{job.location}</Badge>}
               {job.jobType && <Badge color="blue">{job.jobType}</Badge>}
             </div>
@@ -258,9 +336,7 @@ export default function JobPostList() {
 
             {/* Save & Expand buttons */}
             <div className="mt-auto flex justify-between items-center">
-              <Button
-                onClick={(e) => e.stopPropagation()}
-              >
+              <Button onClick={(e) => e.stopPropagation()}>
                 <Heart className="w-4 h-4" /> Lưu tin
               </Button>
               <Button

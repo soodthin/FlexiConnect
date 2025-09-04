@@ -8,6 +8,7 @@ import com.soodthin.entity.JobPost.JobStatus;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.*;
+
 /**
  *
  * @author ADMIN
@@ -31,6 +32,7 @@ public class JobPostResponse {
 
     private Integer employerId;
     private String companyName;
+    private String companyIntro;
     private String avatar;
     private String companyAddress;
     private String website;
@@ -38,6 +40,5 @@ public class JobPostResponse {
 
     private Boolean isFollowed;
     private Boolean notifyJob;
- 
 
 }

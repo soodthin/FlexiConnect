@@ -8,9 +8,7 @@ import {
 } from "lucide-react";
 import { createPortal } from "react-dom";
 
-// ===================================================
-// 🧱 UI PRIMITIVES (Design System Layer)
-// ===================================================
+
 const Card = ({ children, className = "" }) => (
   <div className={`bg-white rounded-xl shadow-sm border border-gray-100 ${className}`}>{children}</div>
 );
@@ -137,9 +135,6 @@ const DropdownItem = ({ onClick, icon, children, variant = "default" }) => {
   );
 };
 
-// ===================================================
-// 🎯 FEATURE COMPONENT (Applications Management)
-// ===================================================
 export default function ApplicationsManagement() {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -214,6 +209,7 @@ export default function ApplicationsManagement() {
       const res = await authApis().get(endpoints["employer-applications"], {
         headers: { Authorization: `Bearer ${token}` }
       });
+      console.log(res.data);
       setApplications(Array.isArray(res.data) ? res.data : []);
     } catch {
       toast.error("Không thể tải danh sách ứng viên");
@@ -292,9 +288,6 @@ export default function ApplicationsManagement() {
     if (validate()) sendEmail();
   };
 
-  // ===================================================
-  // 🖼️ RENDER
-  // ===================================================
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 p-6">
       <div className="max-w-7xl mx-auto">
@@ -339,6 +332,7 @@ export default function ApplicationsManagement() {
                   <th className="text-left py-4 px-6 font-semibold text-gray-700"><div className="flex items-center gap-2"><User className="w-4 h-4" />Ứng viên</div></th>
                   <th className="text-left py-4 px-6 font-semibold text-gray-700">Vị trí</th>
                   <th className="text-center py-4 px-6 font-semibold text-gray-700">Ngày nộp</th>
+                  <th className="text-center py-4 px-6 font-semibold text-gray-700">CV</th>
                   <th className="text-center py-4 px-6 font-semibold text-gray-700">Trạng thái</th>
                   <th className="text-center py-4 px-6 font-semibold text-gray-700">Thao tác</th>
                 </tr>
@@ -352,8 +346,24 @@ export default function ApplicationsManagement() {
                       <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-medium">{app.candidateName?.charAt(0) || "?"}</div>
                       <p className="font-medium text-gray-900">{app.candidateName}</p>
                     </td>
+
                     <td className="px-6 py-4">{app.jobTitle}</td>
+                    
                     <td className="px-6 py-4 text-center">{app.appliedAt && new Date(app.appliedAt).toLocaleString("vi-VN")}</td>
+                    <td className="px-6 py-4 text-center">
+                      {app.resumeFile ? (
+                        <a
+                          href={app.resumeFile}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline"
+                        >
+                          Xem CV (thêm đuôi .pft)
+                        </a>
+                      ) : (
+                        <span className="text-gray-400">Không có</span>
+                      )}
+                    </td>
                     <td className="px-6 py-4 text-center">{getStatusBadge(app.status)}</td>
                     <td className="px-6 py-4 text-center">
                       {app.status === "PENDING" ? (

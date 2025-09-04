@@ -212,6 +212,9 @@ public class JobPostServiceImpl implements JobPostService {
 
             dto.setWebsite(employer.getWebsite());
             dto.setCompanyAddress(employer.getCompanyAddress());
+            dto.setCompanyIntro(
+                    employer.getCompanyIntro() != null ? employer.getCompanyIntro() : "<div>Chưa có giới thiệu</div>"
+            );
 
             if (employer.getUserId() != null) {
                 dto.setAvatar(employer.getUserId().getAvatar());

@@ -11,14 +11,10 @@ package com.soodthin.controllers;
 import com.soodthin.dto.response.JobPostResponse;
 import com.soodthin.entity.User;
 import com.soodthin.repositories.UserRepository;
-import com.soodthin.services.CandidateService;
 import com.soodthin.services.JobPostService;
-import java.security.Principal;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 

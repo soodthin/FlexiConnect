@@ -136,7 +136,7 @@ export default function EmployerDashboard() {
   // Load job posts
   const loadJobPosts = async () => {
     try {
-      const res = await authApis().get(endpoints["jobposts"]);
+      const res = await authApis().get(endpoints["employer-jobposts"]);
       setJobPosts(Array.isArray(res.data) ? res.data : []);
     } catch {
       setJobPosts([]);
@@ -162,9 +162,9 @@ export default function EmployerDashboard() {
         salaryMax: form.salaryMax ? String(Number(form.salaryMax)) : "",
       };
       if (editingJob) {
-        await authApis().put(endpoints["jobpost-id"](editingJob.id), payload);
+        await authApis().put(endpoints["employer-jobpost-id"](editingJob.id), payload);
       } else {
-        await authApis().post(endpoints["jobpost"], payload);
+        await authApis().post(endpoints["employer-jobpost"], payload);
       }
       resetForm();
       setReload((prev) => prev + 1);
@@ -199,7 +199,7 @@ export default function EmployerDashboard() {
 
   const handleStatusChange = async (job, newStatus) => {
     try {
-      await authApis().put(endpoints["jobpost-id"](job.id), { ...job, status: newStatus });
+      await authApis().put(endpoints["employer-jobpost-id"](job.id), { ...job, status: newStatus });
       setReload((prev) => prev + 1);
     } catch (err) {
       console.error(err);

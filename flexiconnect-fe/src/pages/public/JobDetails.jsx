@@ -5,7 +5,6 @@ import { endpoints, authApis } from "@configs/APIs";
 import { MyUserContext } from "@contexts/MyContexts";
 import ApplyDialog from "@applicationForms/ApplyDialog";
 
-/* ----------------- UI PRIMITIVES ----------------- */
 const Card = ({ className = "", children }) => (
   <div className={`bg-white dark:bg-neutral-800 rounded-2xl shadow-md ${className}`}>
     {children}
@@ -29,11 +28,7 @@ const Button = ({ children, className = "", variant = "default", ...props }) => 
   );
 };
 
-const Badge = ({ children, className = "" }) => (
-  <span className={`text-xs px-2 py-0.5 rounded ${className}`}>{children}</span>
-);
 
-/* ----------------- FEATURE: JOB DETAIL ----------------- */
 const getSalaryText = (min, max) => (min && max ? `${min} - ${max} triệu` : "Thương lượng");
 
 export default function JobDetail() {
@@ -54,6 +49,7 @@ export default function JobDetail() {
       const res = await authApis().get(endpoints["jobpost-id"](id));
       const data = res.data;
       setJob(data);
+      console.log(data);
 
       if (initialLoad) {
         setIsFollowed(data.isFollowed ?? false);
@@ -166,6 +162,22 @@ export default function JobDetail() {
             </Card>
 
             <Card className="p-8">
+
+              {/* Nếu có company_intro, hiển thị ảnh */}
+{job.companyIntro && (
+  <div
+    style={{
+      display: "flex",
+      flexWrap: "wrap",
+      gap: "8px",
+      marginBottom: "16px",
+      overflowX: "auto"
+    }}
+    dangerouslySetInnerHTML={{ __html: job.companyIntro }}
+  />
+)}
+
+
               <h2 className="text-xl font-bold mb-3">Mô tả công việc</h2>
               <div className="whitespace-pre-line text-gray-700 dark:text-gray-200">
                 {job.description}

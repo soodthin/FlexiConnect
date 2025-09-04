@@ -11,10 +11,8 @@ import {
   LogOut,
   ChevronDown,
 } from "lucide-react";
-
-/* ---------------------------------- */
-/* 🔹 UI Primitives                   */
-/* ---------------------------------- */
+import { motion } from "framer-motion";
+import { Bot } from "lucide-react";
 
 // Button
 function Button({ children, className = "", ...props }) {
@@ -74,11 +72,10 @@ function DropdownItem({ onClick, children, danger }) {
   return (
     <li
       onClick={onClick}
-      className={`px-6 py-4 cursor-pointer transition ${
-        danger
+      className={`px-6 py-4 cursor-pointer transition ${danger
           ? "text-red-600 hover:bg-red-50 dark:hover:bg-red-900"
           : "hover:bg-[#f5efe6] dark:hover:bg-[#353535]"
-      }`}
+        }`}
     >
       {children}
     </li>
@@ -98,9 +95,65 @@ function Input({ icon: Icon, ...props }) {
   );
 }
 
-/* ---------------------------------- */
-/* 🔹 Feature Components              */
-/* ---------------------------------- */
+
+
+function AIAvatar() {
+  const fullText = "Tìm việc làm, kỹ năng, công ty.... và hơn thế nữa!";
+  const [displayText, setDisplayText] = useState("");
+  const [index, setIndex] = useState(0);
+  const [deleting, setDeleting] = useState(false);
+  const [isDark, setIsDark] = useState(document.documentElement.classList.contains("dark"));
+
+  // Typing effect
+  useEffect(() => {
+    const speed = 200;
+    const timer = setTimeout(() => {
+      if (!deleting) {
+        setDisplayText(fullText.slice(0, index + 1));
+        setIndex(index + 1);
+        if (index + 1 === fullText.length) setDeleting(true);
+      } else {
+        setDisplayText(fullText.slice(0, index - 1));
+        setIndex(index - 1);
+        if (index - 1 === 0) setDeleting(false);
+      }
+    }, speed);
+    return () => clearTimeout(timer);
+  }, [index, deleting]);
+
+  // Observe dark mode changes
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div className="flex items-center gap-3 font-mono text-lg">
+      <Bot className={`w-7 h-7 ${isDark ? "text-[#f5efe6]" : "text-black"}`} />
+      <span className={`${isDark ? "text-[#f5efe6]" : "text-[#222222]"}`}>
+        {displayText}
+        <span className="animate-blink">|</span>
+      </span>
+
+      <style jsx>{`
+        .animate-blink {
+          display: inline-block;
+          width: 1ch;
+          animation: blink 1s step-start infinite;
+        }
+        @keyframes blink {
+          50% { opacity: 0; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+
+
 
 function UserMenu({ user, onLogout }) {
   const navigate = useNavigate();
@@ -151,9 +204,6 @@ function UserMenu({ user, onLogout }) {
   );
 }
 
-/* ---------------------------------- */
-/* 🔹 Header                          */
-/* ---------------------------------- */
 
 export default function Header() {
   const user = useContext(MyUserContext);
@@ -199,10 +249,12 @@ export default function Header() {
         </span>
       </div>
 
-      {/* Search bar */}
-      <div className="flex-grow max-w-2xl mx-auto">
-        <Input placeholder="Tìm việc làm, kỹ năng, công ty..." icon={Search} />
-      </div>
+      {/* AI  */}
+<div className="flex-grow max-w-2xl mx-auto">
+  <AIAvatar />
+</div>
+
+
 
       {/* Right */}
       <div className="flex items-center gap-5 ml-8">

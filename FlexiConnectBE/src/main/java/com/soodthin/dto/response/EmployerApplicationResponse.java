@@ -20,6 +20,7 @@ public class EmployerApplicationResponse {
     private Integer id;
     private String candidateName;
     private String jobTitle;
+    private String resumeFile;
     private ApplicationStatus status;
     private String rejectionReason;
     private LocalDateTime appliedAt;

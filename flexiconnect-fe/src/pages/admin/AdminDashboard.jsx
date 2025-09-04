@@ -11,6 +11,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+const isDark = localStorage.getItem("theme") === "dark";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -102,15 +103,24 @@ const AdminDashboard = () => {
   };
 
   const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: { legend: { position: "top", labels: { color: "#f3f4f6" } } },
-    scales: { 
-      y: { beginAtZero: true, ticks: { color: "#f3f4f6" } }, 
-      x: { ticks: { color: "#f3f4f6" } } 
-    },
-  };
-
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: { 
+    legend: { position: "top", labels: { color: isDark ? "#f5efe6" : "#111111", font: { weight: "600" } } },
+    title: { display: false }
+  },
+  scales: { 
+    y: { 
+      beginAtZero: true, 
+      ticks: { color: isDark ? "#f5efe6" : "#111111", font: { weight: "600" } }, 
+      grid: { color: isDark ? "#444" : "#e5e7eb" }
+    }, 
+    x: { 
+      ticks: { color: isDark ? "#f5efe6" : "#111111", font: { weight: "600" } },
+      grid: { color: isDark ? "#444" : "#e5e7eb" }
+    } 
+  },
+};
   return (
     <div className="p-6 min-h-screen bg-gray-50 dark:bg-[#181818] text-gray-800 dark:text-gray-100 space-y-6">
       <h2 className="text-2xl font-bold">📊 Thống kê Admin</h2>
