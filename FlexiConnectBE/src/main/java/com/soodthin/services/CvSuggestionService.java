@@ -4,8 +4,8 @@
  */
 package com.soodthin.services;
 
-import com.soodthin.dto.request.CvSuggestionRequest;
-import com.soodthin.dto.request.CvSuggestionSubmitRequest;
+import com.soodthin.dto.request.AI.CvSuggestionRequest;
+import com.soodthin.dto.request.AI.CvSuggestionSubmitRequest;
 import com.soodthin.entity.CvSuggestion;
 
 /**

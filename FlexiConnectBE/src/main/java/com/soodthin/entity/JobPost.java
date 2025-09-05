@@ -102,7 +102,7 @@ public class JobPost implements Serializable {
         @JoinColumn(name = "skill_id", referencedColumnName = "id")})
     @ManyToMany
     private Set<Skill> skillSet;
-    @OneToMany(mappedBy = "jobPost")
+    @OneToMany(mappedBy = "jobPostId")
     @JsonIgnore
     private Set<InterviewSession> interviewSessionSet;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "jobPost")
@@ -111,6 +111,7 @@ public class JobPost implements Serializable {
     private Set<Application> applicationSet;
     @JoinColumn(name = "employer_id", referencedColumnName = "id")
     @ManyToOne
+    @JsonIgnore
     private Employer employer;
 
     public JobPost() {

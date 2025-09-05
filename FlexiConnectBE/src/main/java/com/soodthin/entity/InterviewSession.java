@@ -4,9 +4,12 @@
  */
 package com.soodthin.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -39,7 +42,7 @@ import java.util.Set;
     @NamedQuery(name = "InterviewSession.findByTotalScore", query = "SELECT i FROM InterviewSession i WHERE i.totalScore = :totalScore")})
 public class InterviewSession implements Serializable {
 
-    public enum InterviewStatus {
+    public enum SessionStatus {
     IN_PROGRESS,
     COMPLETED
 }
@@ -49,9 +52,9 @@ public class InterviewSession implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-    @Size(max = 11)
-    @Column(name = "status")
-    private InterviewStatus status;
+    @Column(name = "status", length = 20)
+    @Enumerated(EnumType.STRING)
+    private SessionStatus status;
     @Column(name = "started_at")
     private LocalDateTime startedAt;
     @Column(name = "completed_at")
@@ -62,14 +65,17 @@ public class InterviewSession implements Serializable {
     @Size(max = 65535)
     @Column(name = "note")
     private String note;
-    @OneToMany(mappedBy = "session")
+    @OneToMany(mappedBy = "sessionId")
+    @JsonIgnore
     private Set<InterviewTurn> interviewTurnSet;
     @JoinColumn(name = "candidate_id", referencedColumnName = "id")
     @ManyToOne
-    private Candidate candidate;
+    @JsonIgnore
+    private Candidate candidateId;
     @JoinColumn(name = "job_post_id", referencedColumnName = "id")
     @ManyToOne
-    private JobPost jobPost;
+    @JsonIgnore
+    private JobPost jobPostId;
 
     public InterviewSession() {
     }
@@ -86,11 +92,11 @@ public class InterviewSession implements Serializable {
         this.id = id;
     }
 
-    public InterviewStatus getStatus() {
+    public SessionStatus getStatus() {
         return status;
     }
 
-    public void setStatus(InterviewStatus status) {
+    public void setStatus(SessionStatus status) {
         this.status = status;
     }
 
@@ -134,22 +140,23 @@ public class InterviewSession implements Serializable {
         this.interviewTurnSet = interviewTurnSet;
     }
 
-    public void setCandidate(Candidate candidate) {
-        this.candidate = candidate;
+    public Candidate getCandidateId() {
+        return candidateId;
     }
 
-    public void setJobPost(JobPost jobPost) {
-        this.jobPost = jobPost;
+    public void setCandidateId(Candidate candidateId) {
+        this.candidateId = candidateId;
     }
 
-    public Candidate getCandidate() {
-        return candidate;
+    public JobPost getJobPostId() {
+        return jobPostId;
     }
 
-    public JobPost getJobPost() {
-        return jobPost;
+    public void setJobPostId(JobPost jobPostId) {
+        this.jobPostId = jobPostId;
     }
 
+   
     @Override
     public int hashCode() {
         int hash = 0;

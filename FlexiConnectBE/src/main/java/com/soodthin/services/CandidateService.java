@@ -6,6 +6,7 @@ package com.soodthin.services;
 
 import com.soodthin.dto.request.CandidateProfileRequest;
 import com.soodthin.dto.response.CandidateProfileResponse;
+import com.soodthin.entity.Candidate;
 import com.soodthin.entity.User;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,11 +16,12 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface CandidateService {
 
+    Candidate getCandidateByUser(User user);
+
     CandidateProfileResponse getProfile(User user);
 
     void updateProfile(User user, CandidateProfileRequest request);
 
     String updateAvatar(User user, MultipartFile avatar);
-
 
 }

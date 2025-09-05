@@ -6,8 +6,8 @@ package com.soodthin.controllers;
 
 import com.soodthin.dto.FollowEmployerDTO;
 import com.soodthin.dto.request.CandidateProfileRequest;
-import com.soodthin.dto.request.CvSuggestionRequest;
-import com.soodthin.dto.request.CvSuggestionSubmitRequest;
+import com.soodthin.dto.request.AI.CvSuggestionRequest;
+import com.soodthin.dto.request.AI.CvSuggestionSubmitRequest;
 import com.soodthin.dto.request.FollowEmployerRequest;
 import com.soodthin.dto.request.SavedJobRequest;
 

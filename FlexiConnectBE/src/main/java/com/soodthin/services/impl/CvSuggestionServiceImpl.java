@@ -4,9 +4,9 @@
  */
 package com.soodthin.services.impl;
 
-import com.soodthin.dto.request.CvSuggestionRequest;
-import com.soodthin.dto.request.CvSuggestionSubmitRequest;
-import com.soodthin.dto.response.CvSuggestionResponse;
+import com.soodthin.dto.request.AI.CvSuggestionRequest;
+import com.soodthin.dto.request.AI.CvSuggestionSubmitRequest;
+import com.soodthin.dto.response.AI.CvSuggestionResponse;
 import com.soodthin.entity.Candidate;
 import com.soodthin.entity.CandidateSkill;
 import com.soodthin.entity.CvSuggestion;
@@ -29,7 +29,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  *

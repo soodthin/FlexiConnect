@@ -4,6 +4,7 @@
  */
 package com.soodthin.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -124,6 +125,7 @@ public class User implements Serializable {
     @OneToMany(mappedBy = "userId")
     private Set<ActivityLog> activityLogSet;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "userId")
+    @JsonIgnore
     private Candidate candidate;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "userId")
     private Employer employer;

@@ -5,7 +5,7 @@
 package com.soodthin.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.soodthin.dto.response.CvSuggestionResponse;
+import com.soodthin.dto.response.AI.CvSuggestionResponse;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;

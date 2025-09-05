@@ -44,6 +44,11 @@ public class CandidateServiceImpl implements CandidateService {
     @Autowired
     private UserPackageRepository userPackageRepository;
 
+     @Override
+    public Candidate getCandidateByUser(User user) {
+        return candidateRepository.findByUserId(user)
+                .orElseThrow(() -> new RuntimeException("Candidate profile not found"));
+    }
     @Override
     public CandidateProfileResponse getProfile(User user) {
         Candidate candidate = candidateRepository.findByUserId(user)

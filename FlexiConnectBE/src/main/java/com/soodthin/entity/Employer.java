@@ -4,6 +4,7 @@
  */
 package com.soodthin.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -78,6 +79,7 @@ public class Employer implements Serializable {
     @OneToMany(mappedBy = "employerId")
     private Set<CompanyImage> companyImageSet;
     @OneToMany(mappedBy = "employer")
+    @JsonIgnore
     private Set<JobPost> jobPostSet;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne(optional = false)

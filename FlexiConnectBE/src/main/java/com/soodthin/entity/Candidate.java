@@ -67,13 +67,14 @@ public class Candidate implements Serializable {
     private Integer id;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "candidate")
     private Set<FollowEmployer> followEmployerSet;
-    @OneToMany(mappedBy = "candidate")
+    @OneToMany(mappedBy = "candidateId")
     @JsonIgnore
     private Set<InterviewSession> interviewSessionSet;
     @OneToMany(mappedBy = "candidate")
     private Set<EducationHistory> educationHistorySet;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne(optional = false)
+    @JsonIgnore
     private User userId;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "candidate")
     private Set<SavedJob> savedJobSet;

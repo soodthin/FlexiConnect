@@ -4,6 +4,7 @@
  */
 package com.soodthin.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,12 +23,10 @@ import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-
 /**
  *
  * @author ADMIN
  */
-
 @Entity
 @Table(name = "interview_turn")
 @NamedQueries({
@@ -64,7 +63,6 @@ public class InterviewTurn implements Serializable {
     @Column(name = "ai_score")
     private Integer aiScore;
     @Column(name = "created_at")
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
     @Size(max = 8)
     @Column(name = "answer_status")
@@ -82,7 +80,8 @@ public class InterviewTurn implements Serializable {
     private Integer answerTimeSeconds;
     @JoinColumn(name = "session_id", referencedColumnName = "id")
     @ManyToOne
-    private InterviewSession session;
+    @JsonIgnore
+    private InterviewSession sessionId;
 
     public InterviewTurn() {
     }
@@ -180,11 +179,11 @@ public class InterviewTurn implements Serializable {
     }
 
     public InterviewSession getSessionId() {
-        return session;
+        return sessionId;
     }
 
     public void setSessionId(InterviewSession sessionId) {
-        this.session = sessionId;
+        this.sessionId = sessionId;
     }
 
     @Override
@@ -225,5 +224,5 @@ public class InterviewTurn implements Serializable {
     public void setAiScore(Integer aiScore) {
         this.aiScore = aiScore;
     }
-    
+
 }
