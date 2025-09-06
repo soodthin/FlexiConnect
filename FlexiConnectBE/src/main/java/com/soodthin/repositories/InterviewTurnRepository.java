@@ -5,8 +5,10 @@
 package com.soodthin.repositories;
 
 import com.soodthin.entity.InterviewTurn;
+import feign.Param;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 /**
  *
@@ -18,6 +20,7 @@ public interface InterviewTurnRepository extends JpaRepository<InterviewTurn, In
 
     InterviewTurn findTopBySessionId_IdOrderByTurnOrderDesc(Integer sessionId);
 
-    Double findAverageAiScoreBySessionId_Id(Integer sessionId);
+    @Query("SELECT AVG(t.aiScore) FROM InterviewTurn t WHERE t.sessionId.id = :sessionId")
+    Double findAverageAiScoreBySessionId_Id(@Param("sessionId") Integer sessionId);
 
 }

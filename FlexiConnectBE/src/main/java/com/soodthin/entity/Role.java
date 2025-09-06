@@ -4,6 +4,7 @@
  */
 package com.soodthin.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,6 +44,7 @@ public class Role implements Serializable {
     @Column(name = "role_name")
     private String roleName;
     @ManyToMany(mappedBy = "roleSet")
+    @JsonIgnore
     private Set<User> userSet;
 
     public Role() {

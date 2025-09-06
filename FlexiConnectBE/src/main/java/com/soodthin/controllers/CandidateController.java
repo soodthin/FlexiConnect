@@ -15,6 +15,7 @@ import com.soodthin.dto.response.CandidateApplicationResponse;
 import com.soodthin.dto.response.CandidateProfileResponse;
 import com.soodthin.dto.response.SavedJobResponse;
 import com.soodthin.entity.CvSuggestion;
+import com.soodthin.entity.SavedJob;
 import com.soodthin.entity.User;
 import com.soodthin.repositories.UserRepository;
 import com.soodthin.services.ApplicationService;
@@ -24,6 +25,7 @@ import com.soodthin.services.FollowEmployerService;
 import com.soodthin.services.NotificationUserService;
 import com.soodthin.services.SavedJobService;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -165,37 +167,6 @@ public class CandidateController {
         followEmployerService.toggleNotify(candidateId, request.getEmployerId(), request.getNotifyJob());
     }
 
-    @PostMapping("/saved-job/save")
-    public ResponseEntity<String> saveJob(
-            @RequestBody SavedJobRequest request,
-            Authentication authentication) {
-
-        User user = getCurrentUser(authentication);
-        Integer candidateId = user.getCandidate().getId();
-
-        savedJobService.saveJobPost(candidateId, request.getJobPostId());
-        return ResponseEntity.ok("Đã lưu job!");
-    }
-
-    @DeleteMapping("/saved-job/unsave")
-    public ResponseEntity<String> unsaveJob(
-            @RequestBody SavedJobRequest request,
-            Authentication authentication) {
-
-        User user = getCurrentUser(authentication);
-        Integer candidateId = user.getCandidate().getId();
-
-        savedJobService.unsaveJobPost(candidateId, request.getJobPostId());
-        return ResponseEntity.ok("Đã bỏ lưu job!");
-    }
-
-    @GetMapping("/saved-job")
-    public ResponseEntity<List<SavedJobResponse>> getSavedJobs(Authentication authentication) {
-        User user = getCurrentUser(authentication);
-        Integer candidateId = user.getCandidate().getId();
-
-        List<SavedJobResponse> savedJobs = savedJobService.getSavedJobs(candidateId);
-        return ResponseEntity.ok(savedJobs);
-    }
+    
 
 }

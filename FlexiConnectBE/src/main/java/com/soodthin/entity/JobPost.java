@@ -101,13 +101,16 @@ public class JobPost implements Serializable {
         @JoinColumn(name = "job_post_id", referencedColumnName = "id")}, inverseJoinColumns = {
         @JoinColumn(name = "skill_id", referencedColumnName = "id")})
     @ManyToMany
+    @JsonIgnore
     private Set<Skill> skillSet;
     @OneToMany(mappedBy = "jobPostId")
     @JsonIgnore
     private Set<InterviewSession> interviewSessionSet;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "jobPost")
+    @JsonIgnore
     private Set<SavedJob> savedJobSet;
     @OneToMany(mappedBy = "jobPost")
+    @JsonIgnore
     private Set<Application> applicationSet;
     @JoinColumn(name = "employer_id", referencedColumnName = "id")
     @ManyToOne

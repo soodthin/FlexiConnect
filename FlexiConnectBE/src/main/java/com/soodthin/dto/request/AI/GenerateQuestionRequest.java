@@ -4,16 +4,17 @@
  */
 package com.soodthin.dto.request.AI;
 
-
-import lombok.Data;
-
+import lombok.*;
 /**
  *
  * @author ADMIN
  */
-
 @Data
-public class CreateSessionRequest {
-
-  private Integer applicationId;
+@AllArgsConstructor
+public class GenerateQuestionRequest {
+    private String jobTitle;
+    private String jobDescription;
+    private String difficulty; 
+    private String category; 
+    private Integer sessionId; 
 }

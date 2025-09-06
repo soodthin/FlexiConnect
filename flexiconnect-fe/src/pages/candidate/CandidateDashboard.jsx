@@ -150,7 +150,7 @@ export default function CandidateDashboard() {
               <DropdownItem onClick={() => navigate("/candidate-profile")}>
                 <FileText className="w-4 h-4" /> Viết lại mô tả CV
               </DropdownItem>
-              <DropdownItem onClick={() => navigate("/ai-interview")}>
+              <DropdownItem onClick={() => navigate("/mock-interview")}>
                 <Mic className="w-4 h-4" /> Luyện phỏng vấn
               </DropdownItem>
               <DropdownItem onClick={() => navigate("/candidate-upgrade")}>

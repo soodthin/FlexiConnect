@@ -7,9 +7,7 @@ CREATE TABLE role (
 );
 
 INSERT INTO role (role_name) VALUES ('ADMIN'), ('EMPLOYER'), ('CANDIDATE');
-INSERT INTO package (name, description, price, duration_days, target_role) VALUES
-('Basic', 'Chức năng AI cơ bản', 55000, 30, 'CANDIDATE'),
-('Premium', 'Chức năng AI nâng cao', 115000, 30, 'CANDIDATE');
+
 CREATE TABLE user (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(100) UNIQUE NOT NULL,
@@ -33,24 +31,12 @@ CREATE TABLE user_role (
     FOREIGN KEY (role_id) REFERENCES role(id) ON DELETE CASCADE
 );
 
-CREATE TABLE verification (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT,
-    type ENUM('EMAIL', 'PHONE', 'DOCUMENT'),
-    code VARCHAR(100),
-    document_url VARCHAR(255),
-    is_verified BOOLEAN DEFAULT FALSE,
-    expired_at DATETIME,
-    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
-);
-
 CREATE TABLE candidate (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT UNIQUE NOT NULL,
     title VARCHAR(150),
     bio TEXT,
     resume_file VARCHAR(255),
-    profile_vector TEXT,
     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );
 
@@ -99,7 +85,6 @@ CREATE TABLE application (
     candidate_id INT,
     cover_letter TEXT,
 	resume_file VARCHAR(255),
-    download_url VARCHAR(512),
     applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status ENUM('PENDING', 'ACCEPTED', 'REJECTED') DEFAULT 'PENDING',
     rejection_reason TEXT,
@@ -198,19 +183,6 @@ CREATE TABLE saved_job (
     FOREIGN KEY (job_post_id) REFERENCES job_post(id) ON DELETE CASCADE
 );
 
-CREATE TABLE rating (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    application_id INT,
-    from_user_id INT,
-    to_user_id INT,
-    rating TINYINT CHECK (rating BETWEEN 1 AND 5),
-    comment TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (application_id) REFERENCES application(id) ON DELETE SET NULL,
-    FOREIGN KEY (from_user_id) REFERENCES user(id) ON DELETE CASCADE,
-    FOREIGN KEY (to_user_id) REFERENCES user(id) ON DELETE CASCADE
-);
-
 
 
 CREATE TABLE interview_session (
@@ -231,7 +203,7 @@ CREATE TABLE interview_turn (
     answer TEXT,
     ai_feedback TEXT,
     turn_order INT,
-    ai_score INT CHECK (ai_score BETWEEN 0 AND 100),
+    ai_score double CHECK (ai_score BETWEEN 0 AND 100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (session_id) REFERENCES interview_session(id) ON DELETE CASCADE
 );

@@ -14,6 +14,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author ADMIN
  */
 public interface SavedJobRepository extends JpaRepository<SavedJob, SavedJobPK> {
+    
+    List<SavedJob> findBySavedJobPK_CandidateIdOrderBySavedAtDesc(Integer candidateId);
 
-    List<SavedJob> findBySavedJobPK_CandidateId(Integer candidateId);
+    List<SavedJob> findBySavedJobPK_JobPostIdOrderBySavedAtDesc(Integer jobPostId);
+
+    long countBySavedJobPK_CandidateId(Integer candidateId);
+
+    long countBySavedJobPK_JobPostId(Integer jobPostId);
+
+    boolean existsBySavedJobPK_CandidateIdAndSavedJobPK_JobPostId(Integer candidateId, Integer jobPostId);
+
+    void deleteBySavedJobPK_CandidateIdAndSavedJobPK_JobPostId(Integer candidateId, Integer jobPostId);
 }

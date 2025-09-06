@@ -152,10 +152,10 @@ const UpgradeDialog = ({ open, onClose, onUpgrade }) => (
 
 // ----------------- Feature Component -----------------
 const SECTIONS = [
-  { id: "profile", label: "Thông tin cá nhân", icon: "👤" },
-  { id: "education", label: "Học vấn", icon: "🎓" },
-  { id: "experience", label: "Kinh nghiệm", icon: "💼" },
-  { id: "skills", label: "Kỹ năng - AI", icon: "🛠️" },
+  { id: "profile", label: "Thông tin cá nhân" },
+  { id: "education", label: "Học vấn" },
+  { id: "experience", label: "Kinh nghiệm"},
+  { id: "skills", label: "Kỹ năng - Lưu Job"},
 ];
 
 // Format date
@@ -321,6 +321,7 @@ export default function CandidateProfilePage() {
 
   const handleUpgradeRedirect = () => {
     setIsUpgradeDialogOpen(false);
+    
     navigate("/candidate-upgrade");
   };
 
@@ -346,36 +347,14 @@ export default function CandidateProfilePage() {
             )}
           >
             <span>{sec.icon}</span> {sec.label}
-            {sec.id === "skills" && !checkAIAccess() && (
-              <Crown size={12} className="text-yellow-500" />
-            )}
+            {sec.id === "skills" }
           </Button>
         ))}
       </aside>
 
       {/* Main Content */}
       <main className="flex-1 px-4 sm:px-8 py-8 text-gray-800 dark:text-gray-100">
-        {/* Header CTA */}
-        <div className="flex flex-wrap items-center gap-3 mb-2">
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-500 dark:text-gray-300">
-              Hoàn thiện hồ sơ
-            </span>
-            <Progress value={profileCompletion} />
-          </div>
-          <Button onClick={handleShare} className="button-util flex gap-1">
-            <Share2 size={14} /> Chia sẻ
-          </Button>
-          <Button onClick={handlePreview} className="button-util flex gap-1">
-            <Eye size={14} /> Xem trước
-          </Button>
-          <Button
-            onClick={handleDownloadPDF}
-            className="button-util flex gap-1"
-          >
-            <FileText size={14} /> Tải PDF
-          </Button>
-        </div>
+        
 
        {/* Hiển thị gói hiện tại */}
 {profile?.userPackage && (

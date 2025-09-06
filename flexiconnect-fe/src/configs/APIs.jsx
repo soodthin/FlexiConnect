@@ -34,9 +34,15 @@ export const endpoints = {
   'follow-employer': "/users/candidate/follow-employer/follow",
   'unfollow-employer': "/users/candidate/follow-employer/unfollow",
   'notify-employer': "/users/candidate/follow-employer/notify",
-  'save-job': "/users/candidate/save-job",
-  'un-save-job': "/users/candidate/un-save-job",
-
+  'saved-job': "/users/candidate/saved-jobs/toggle",
+  'saved-jobs-count': "/users/candidate/saved-jobs/count",
+  "saved-jobs-list": "/users/candidate/saved-jobs/list",
+  "unsaved-job": "/users/candidate/saved-jobs/unsave",
+  /*Mock Interview*/
+  "create-session": "interview/sessions",
+  "current-question": (id) => `interview/sessions/${id}/current-question`,
+  "submit-answer": (id) => `interview/sessions/${id}/answers`,
+  "complete-session": (id) => `interview/sessions/${id}/complete`,
 
   /* Employer */
   'employer-profile': "/users/employer/profile",

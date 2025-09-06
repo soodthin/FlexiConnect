@@ -62,6 +62,7 @@ public class Employer implements Serializable {
     private Integer follower = 0;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "employerId")
+    @JsonIgnore
     private Set<EmployerEmailLog> employerEmailLogSet;
 
     private static final long serialVersionUID = 1L;
@@ -75,6 +76,7 @@ public class Employer implements Serializable {
     @Column(name = "reason_reject")
     private String reasonReject;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "employer")
+    @JsonIgnore
     private Set<FollowEmployer> followEmployerSet;
     @OneToMany(mappedBy = "employerId")
     private Set<CompanyImage> companyImageSet;
@@ -83,6 +85,7 @@ public class Employer implements Serializable {
     private Set<JobPost> jobPostSet;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne(optional = false)
+    @JsonIgnore
     private User userId;
 
     public Employer() {

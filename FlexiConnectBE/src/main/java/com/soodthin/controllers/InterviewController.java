@@ -4,10 +4,8 @@
  */
 package com.soodthin.controllers;
 
-import com.soodthin.dto.request.AI.CreateSessionRequest;
-import com.soodthin.dto.request.AI.SubmitAnswerRequest;
-import com.soodthin.dto.response.AI.SessionResponse;
-import com.soodthin.dto.response.AI.TurnResponse;
+import com.soodthin.dto.request.AI.*;
+import com.soodthin.dto.response.AI.*;
 import com.soodthin.entity.User;
 import com.soodthin.repositories.UserRepository;
 import com.soodthin.services.InterviewService;
@@ -55,23 +53,44 @@ public class InterviewController {
     }
 
     @PostMapping("/sessions/{sessionId}/answers")
-    public ResponseEntity<TurnResponse> submitAnswer(
+    public ResponseEntity<SubmitAnswerResponse> submitAnswer(
+            Authentication auth,
             @PathVariable Integer sessionId,
-            @Valid @RequestBody SubmitAnswerRequest request,
-            Authentication authentication) {
+            @Valid @RequestBody SubmitAnswerRequest request) {
+        try {
+            User user = getCurrentUser(auth);
+            SubmitAnswerResponse response = interviewService.submitAnswerNextQuest(user, sessionId, request);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            log.error("Error submitting answer: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception e) {
+            log.error("Error submitting answer: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/sessions/{sessionId}/answers/simple")
+    public ResponseEntity<TurnResponse> submitAnswerSimple(
+            Authentication authentication,
+            @PathVariable Integer sessionId,
+            @Valid @RequestBody SubmitAnswerRequest request) {
         try {
             User user = getCurrentUser(authentication);
 
-            // gán sessionId từ path vào request DTO
-            request.setSessionId(sessionId);
+            // convert sang định dạng cũ
+            SubmitAnswerRequest oldRequest = new SubmitAnswerRequest();
+            oldRequest.setSessionId(sessionId);
+            oldRequest.setQuestion(request.getQuestion());
+            oldRequest.setAnswer(request.getAnswer());
 
-            TurnResponse response = interviewService.submitAnswer(user, request);
+            TurnResponse response = interviewService.submitAnswer(user, oldRequest);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
-            log.error("Error submitting answer: {}", e.getMessage());
+            log.error("Error submitting simple answer: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
-            log.error("Error submitting answer: {}", e.getMessage());
+            log.error("Error submitting simple answer: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -130,5 +149,72 @@ public class InterviewController {
     @GetMapping("/health")
     public ResponseEntity<String> health() {
         return ResponseEntity.ok("Interview service is running");
+    }
+
+    @PostMapping("/questions/generate")
+    public ResponseEntity<GenerateQuestionResponse> generateQuestion(
+            Authentication authentication,
+            @Valid @RequestBody GenerateQuestionRequest request) {
+        try {
+            User user = getCurrentUser(authentication);
+            GenerateQuestionResponse response = interviewService.generateQuestion(user, request);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Error generating question: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/sessions/{sessionId}/questions")
+    public ResponseEntity<GenerateQuestionResponse> generateQuestionForSession(
+            Authentication authentication,
+            @PathVariable Integer sessionId,
+            @RequestParam(defaultValue = "MIDDLE") String difficulty,
+            @RequestParam(defaultValue = "TECHNICAL") String category) {
+        try {
+            User user = getCurrentUser(authentication);
+            GenerateQuestionResponse response = interviewService.generateContextualQuestion(
+                    user, sessionId, difficulty, category);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            log.error("Session not found or access denied: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            log.error("Error generating contextual question: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/sessions/{sessionId}/next-question")
+    public ResponseEntity<GenerateQuestionResponse> getNextQuestion(
+            Authentication authentication,
+            @PathVariable Integer sessionId) {
+        try {
+            User user = getCurrentUser(authentication);
+            GenerateQuestionResponse response = interviewService.getNextQuestionForSession(user, sessionId);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            log.error("Session not found or access denied: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            log.error("Error getting next question: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+    }
+
+    // API lấy câu hỏi tiếp theo mà không cần submit answer
+    @GetMapping("/sessions/{sessionId}/current-question")
+    public ResponseEntity<GenerateQuestionResponse> getCurrentQuestion(
+            Authentication authentication,
+            @PathVariable Integer sessionId) {
+        try {
+            User user = getCurrentUser(authentication);
+            GenerateQuestionResponse response = interviewService.getNextQuestionForSession(user, sessionId);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Error getting current question: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

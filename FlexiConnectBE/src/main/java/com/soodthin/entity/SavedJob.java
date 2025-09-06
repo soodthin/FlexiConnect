@@ -4,6 +4,7 @@
  */
 package com.soodthin.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -15,6 +16,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -35,12 +37,14 @@ public class SavedJob implements Serializable {
     protected SavedJobPK savedJobPK;
     @Column(name = "saved_at")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date savedAt;
+    private LocalDateTime savedAt;
     @JoinColumn(name = "candidate_id", referencedColumnName = "id", insertable = false, updatable = false)
     @ManyToOne(optional = false)
+    @JsonIgnore
     private Candidate candidate;
     @JoinColumn(name = "job_post_id", referencedColumnName = "id", insertable = false, updatable = false)
     @ManyToOne(optional = false)
+    @JsonIgnore
     private JobPost jobPost;
 
     public SavedJob() {
@@ -62,11 +66,11 @@ public class SavedJob implements Serializable {
         this.savedJobPK = savedJobPK;
     }
 
-    public Date getSavedAt() {
+    public LocalDateTime getSavedAt() {
         return savedAt;
     }
 
-    public void setSavedAt(Date savedAt) {
+    public void setSavedAt(LocalDateTime savedAt) {
         this.savedAt = savedAt;
     }
 

@@ -28,16 +28,23 @@ export default function Footer() {
 
                 {/* Social */}
                 <div>
-                    <h4 className="font-semibold mb-4">Mạng xã hội</h4>
+                    <h4 className="font-semibold mb-4 text-gray-800 dark:text-gray-200">Mạng xã hội</h4>
                     <div className="flex gap-4">
-                        <a href="#" className="hover:text-blue-600"><Facebook className="w-6 h-6" /></a>
-                        <a href="https://www.instagram.com/_soodthin/" className="w-6 h-6">
-                            <Instagram className="w-6 h-6 stroke-black hover:stroke-pink-500 transition-colors" />
+                        <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                            <Facebook className="w-6 h-6" />
                         </a>
-                        <a href="#" className="hover:text-blue-700"><Linkedin className="w-6 h-6" /></a>
-                        <a href="mailto:flexiconnect.mail@gmail.com" className="hover:text-red-500"><Mail className="w-6 h-6" /></a>
+                        <a href="https://www.instagram.com/_soodthin/" className="text-gray-600 dark:text-gray-400 hover:text-pink-500 dark:hover:text-pink-400 transition-colors">
+                            <Instagram className="w-6 h-6" />
+                        </a>
+                        <a href="#" className="text-gray-600 dark:text-gray-400 hover:text-blue-700 dark:hover:text-blue-500 transition-colors">
+                            <Linkedin className="w-6 h-6" />
+                        </a>
+                        <a href="mailto:flexiconnect.mail@gmail.com" className="text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors">
+                            <Mail className="w-6 h-6" />
+                        </a>
                     </div>
                 </div>
+
 
                 {/* Contact */}
                 <div>

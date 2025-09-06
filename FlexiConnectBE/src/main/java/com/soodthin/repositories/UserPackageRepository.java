@@ -17,7 +17,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserPackageRepository extends JpaRepository<UserPackage, Integer> {
 
-    Optional<UserPackage> findByUserId(User user);
+    Optional<UserPackage> findTopByUserIdAndIsActiveTrueOrderByPackageIdDesc(User user);
 
     Optional<UserPackage> findTopByUserIdOrderByEndDateDesc(User user);
 

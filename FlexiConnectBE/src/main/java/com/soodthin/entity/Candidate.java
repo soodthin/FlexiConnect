@@ -46,17 +46,15 @@ public class Candidate implements Serializable {
     @Size(max = 255)
     @Column(name = "resume_file")
     private String resumeFile;
-    @Lob
-    @Size(max = 65535)
-    @Column(name = "profile_vector")
-    private String profileVector;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "candidateId")
+    @JsonIgnore
     private Set<EmployerEmailLog> employerEmailLogSet;
     @Lob
     @Size(max = 65535)
     @Column(name = "bio_ai_suggestion")
     private String bioAiSuggestion;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "candidateId")
+    @JsonIgnore
     private Set<CvSuggestion> cvSuggestionsSet;
 
     private static final long serialVersionUID = 1L;
@@ -66,24 +64,29 @@ public class Candidate implements Serializable {
     @Column(name = "id")
     private Integer id;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "candidate")
+    @JsonIgnore
     private Set<FollowEmployer> followEmployerSet;
     @OneToMany(mappedBy = "candidateId")
     @JsonIgnore
     private Set<InterviewSession> interviewSessionSet;
     @OneToMany(mappedBy = "candidate")
+    @JsonIgnore
     private Set<EducationHistory> educationHistorySet;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @OneToOne(optional = false)
     @JsonIgnore
     private User userId;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "candidate")
+    @JsonIgnore
     private Set<SavedJob> savedJobSet;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "candidate")
+    @JsonIgnore
     private Set<CandidateSkill> candidateSkillSet;
     @OneToMany(mappedBy = "candidate")
     @JsonIgnore
     private Set<Application> applicationSet;
     @OneToMany(mappedBy = "candidate")
+    @JsonIgnore
     private Set<WorkExperience> workExperienceSet;
 
     public Candidate() {
@@ -109,13 +112,7 @@ public class Candidate implements Serializable {
         this.resumeFile = resumeFile;
     }
 
-    public String getProfileVector() {
-        return profileVector;
-    }
-
-    public void setProfileVector(String profileVector) {
-        this.profileVector = profileVector;
-    }
+   
 
     public Set<FollowEmployer> getFollowEmployerSet() {
         return followEmployerSet;

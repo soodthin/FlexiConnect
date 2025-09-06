@@ -45,7 +45,6 @@ export default function EmployerProfilePage() {
   const [avatarTimestamp, setAvatarTimestamp] = useState(Date.now());
   const navigate = useNavigate();
   const sectionRefs = useRef({});
-  const profileCompletion = 85;
 
   const loadProfile = async () => {
     try {
@@ -129,23 +128,7 @@ export default function EmployerProfilePage() {
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto px-4 sm:px-8 py-8">
-        {/* Progress bar */}
-        <div className="flex flex-wrap gap-3 items-center mb-6">
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-500 dark:text-gray-300">
-              Hoàn thiện hồ sơ
-            </span>
-            <div className="w-32 h-2 bg-gray-200 dark:bg-[#282828] rounded-full overflow-hidden">
-              <div
-                className="h-2 bg-blue-500 rounded-full transition-all"
-                style={{ width: `${profileCompletion}%` }}
-              ></div>
-            </div>
-            <span className="text-xs text-blue-600 font-bold ml-1">
-              {profileCompletion}%
-            </span>
-          </div>
-        </div>
+        
 
         {profile ? (
           <div className="flex flex-col gap-8">

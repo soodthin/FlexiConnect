@@ -96,6 +96,7 @@ public class User implements Serializable {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userId")
+    @JsonIgnore
     private Set<NotificationUser> notificationUserSet;
 
     public enum UserStatus {
@@ -113,28 +114,23 @@ public class User implements Serializable {
         @JoinColumn(name = "user_id", referencedColumnName = "id")}, inverseJoinColumns = {
         @JoinColumn(name = "role_id", referencedColumnName = "id")})
     @ManyToMany
+    @JsonIgnore
+
     private Set<Role> roleSet;
     @OneToMany(mappedBy = "userId")
     private Set<PaymentTransaction> paymentTransactionSet;
     @OneToMany(mappedBy = "userId")
     private Set<UserPackage> userPackageSet;
-    @OneToMany(mappedBy = "fromUserId")
-    private Set<Rating> ratingSet;
-    @OneToMany(mappedBy = "toUserId")
-    private Set<Rating> ratingSet1;
-    @OneToMany(mappedBy = "userId")
-    private Set<ActivityLog> activityLogSet;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "userId")
     @JsonIgnore
     private Candidate candidate;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "userId")
+    @JsonIgnore
     private Employer employer;
     @OneToMany(mappedBy = "user1Id")
     private Set<Conversation> conversationSet;
     @OneToMany(mappedBy = "user2Id")
     private Set<Conversation> conversationSet1;
-    @OneToMany(mappedBy = "userId")
-    private Set<Verification> verificationSet;
 
     public User() {
     }
@@ -213,30 +209,6 @@ public class User implements Serializable {
         this.userPackageSet = userPackageSet;
     }
 
-    public Set<Rating> getRatingSet() {
-        return ratingSet;
-    }
-
-    public void setRatingSet(Set<Rating> ratingSet) {
-        this.ratingSet = ratingSet;
-    }
-
-    public Set<Rating> getRatingSet1() {
-        return ratingSet1;
-    }
-
-    public void setRatingSet1(Set<Rating> ratingSet1) {
-        this.ratingSet1 = ratingSet1;
-    }
-
-    public Set<ActivityLog> getActivityLogSet() {
-        return activityLogSet;
-    }
-
-    public void setActivityLogSet(Set<ActivityLog> activityLogSet) {
-        this.activityLogSet = activityLogSet;
-    }
-
     public Candidate getCandidate() {
         return candidate;
     }
@@ -267,14 +239,6 @@ public class User implements Serializable {
 
     public void setConversationSet1(Set<Conversation> conversationSet1) {
         this.conversationSet1 = conversationSet1;
-    }
-
-    public Set<Verification> getVerificationSet() {
-        return verificationSet;
-    }
-
-    public void setVerificationSet(Set<Verification> verificationSet) {
-        this.verificationSet = verificationSet;
     }
 
     @Override

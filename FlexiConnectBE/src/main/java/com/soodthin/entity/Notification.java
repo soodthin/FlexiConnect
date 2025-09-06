@@ -4,6 +4,7 @@
  */
 package com.soodthin.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -57,6 +58,7 @@ public class Notification implements Serializable {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "notificationId")
+    @JsonIgnore
     private Set<NotificationUser> notificationUserSet;
 
     private static final long serialVersionUID = 1L;

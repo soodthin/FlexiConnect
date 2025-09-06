@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Data
 public class N8nAnalysisResponse {
     @JsonProperty("ai_score")
-    private Integer aiScore;
+    private Double aiScore;
     
     @JsonProperty("feedback")
     private String feedback;

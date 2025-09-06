@@ -17,8 +17,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -61,7 +59,7 @@ public class InterviewTurn implements Serializable {
     @Column(name = "turn_order")
     private Integer turnOrder;
     @Column(name = "ai_score")
-    private Integer aiScore;
+    private Double aiScore;
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     @Size(max = 8)
@@ -214,14 +212,14 @@ public class InterviewTurn implements Serializable {
     /**
      * @return the aiScore
      */
-    public Integer getAiScore() {
+    public Double getAiScore() {
         return aiScore;
     }
 
     /**
      * @param aiScore the aiScore to set
      */
-    public void setAiScore(Integer aiScore) {
+    public void setAiScore(Double aiScore) {
         this.aiScore = aiScore;
     }
 

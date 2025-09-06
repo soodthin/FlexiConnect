@@ -4,6 +4,7 @@
  */
 package com.soodthin.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -55,6 +56,7 @@ public class Application implements Serializable {
     @Column(name = "rejection_reason")
     private String rejectionReason;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "applicationId")
+    @JsonIgnore
     private Set<EmployerEmailLog> employerEmailLogSet;
 
     public enum ApplicationStatus {
@@ -66,15 +68,13 @@ public class Application implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-    @Column(name = "download_url")
-    private String downloadUrl;
-    @OneToMany(mappedBy = "applicationId")
-    private Set<Rating> ratingSet;
     @JoinColumn(name = "candidate_id", referencedColumnName = "id")
     @ManyToOne
+    @JsonIgnore
     private Candidate candidate;
     @JoinColumn(name = "job_post_id", referencedColumnName = "id")
     @ManyToOne
+    @JsonIgnore
     private JobPost jobPost;
 
     public Application() {
@@ -106,14 +106,6 @@ public class Application implements Serializable {
 
     public void setRejectionReason(String rejectionReason) {
         this.rejectionReason = rejectionReason;
-    }
-
-    public Set<Rating> getRatingSet() {
-        return ratingSet;
-    }
-
-    public void setRatingSet(Set<Rating> ratingSet) {
-        this.ratingSet = ratingSet;
     }
 
     public Candidate getCandidateId() {
@@ -169,20 +161,6 @@ public class Application implements Serializable {
      */
     public void setResumeFile(String resumeFile) {
         this.resumeFile = resumeFile;
-    }
-
-    /**
-     * @return the downloadUrl
-     */
-    public String getDownloadUrl() {
-        return downloadUrl;
-    }
-
-    /**
-     * @param downloadUrl the downloadUrl to set
-     */
-    public void setDownloadUrl(String downloadUrl) {
-        this.downloadUrl = downloadUrl;
     }
 
     public LocalDateTime getAppliedAt() {

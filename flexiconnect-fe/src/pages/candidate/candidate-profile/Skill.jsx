@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { authApis, endpoints } from "@configs/APIs";
 import * as RadixDialog from "@radix-ui/react-dialog";
 import { Cross2Icon, Pencil2Icon, TrashIcon, PlusCircledIcon } from "@radix-ui/react-icons";
+import { useNavigate } from "react-router-dom";
+import { Bookmark } from "lucide-react";
 
-/* ---------- UI PRIMITIVES ---------- */
 const Card = ({ children, className = "" }) => (
   <div
     className={`rounded-xl shadow p-6 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white border border-neutral-200 dark:border-neutral-700 ${className}`}
@@ -24,14 +25,14 @@ const Button = ({ children, className = "", ...props }) => (
 const Input = ({ className = "", ...props }) => (
   <input
     {...props}
-    className={`w-full rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white px-4 py-2 focus:ring-2 focus:ring-neutral-900 ${className}`}
+    className={`w-full rounded-lg border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white px-4 py-2 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-yellow-500 ${className}`}
   />
 );
 
 const Select = ({ children, className = "", ...props }) => (
   <select
     {...props}
-    className={`rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white px-4 py-2 focus:ring-2 focus:ring-neutral-900 ${className}`}
+    className={`w-full rounded-lg border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white px-4 py-2 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-yellow-500 ${className}`}
   >
     {children}
   </select>
@@ -59,7 +60,6 @@ const Dialog = ({ open, onOpenChange, title, description, children }) => (
 
 const DialogTrigger = RadixDialog.Trigger;
 
-/* ---------- FEATURE COMPONENT ---------- */
 export default function CandidateSkillList() {
   const [skills, setSkills] = useState([]);
   const [name, setName] = useState("");
@@ -67,6 +67,8 @@ export default function CandidateSkillList() {
   const [editingSkill, setEditingSkill] = useState(null);
   const [open, setOpen] = useState(false);
   const [reload, setReload] = useState(0);
+  const [savedJobCount, setSavedJobCount] = useState(0);
+  const navigate = useNavigate();
 
   const loadSkills = async () => {
     try {
@@ -92,15 +94,9 @@ export default function CandidateSkillList() {
     e.preventDefault();
     try {
       if (editingSkill) {
-        await authApis().put(`${endpoints["skills"]}/${editingSkill.id}`, {
-          skillName: name,
-          level,
-        });
+        await authApis().put(`${endpoints["skills"]}/${editingSkill.id}`, { skillName: name, level });
       } else {
-        await authApis().post(endpoints["skills"], {
-          skillName: name,
-          level,
-        });
+        await authApis().post(endpoints["skills"], { skillName: name, level });
       }
       resetForm();
       setReload((prev) => prev + 1);
@@ -121,53 +117,58 @@ export default function CandidateSkillList() {
     setOpen(true);
   };
 
+  useEffect(() => {
+    const loadSavedJobCount = async () => {
+      try {
+        const res = await authApis().get(endpoints["saved-jobs-count"]);
+        if (res.data.success) setSavedJobCount(res.data.count);
+      } catch (err) {
+        console.error("Lấy số job đã lưu thất bại:", err);
+      }
+    };
+    loadSavedJobCount();
+  }, []);
+
   return (
     <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* Left - Skills list */}
       <Card>
         <RadixDialog.Root open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-neutral-900 dark:bg-beige dark:text-black text-white px-5 py-3 rounded-xl font-semibold shadow hover:bg-neutral-800 dark:hover:bg-[#f5f5dc] mb-4">
-              <PlusCircledIcon className="w-5 h-5" /> Thêm kỹ năng
-            </Button>
-          </DialogTrigger>
-          <Dialog
-            open={open}
-            onOpenChange={setOpen}
-            title="Kỹ năng"
-            description={editingSkill ? "Chỉnh sửa kỹ năng." : "Thêm kỹ năng mới."}
+  <DialogTrigger asChild>
+    <Button className="bg-neutral-900 dark:bg-beige text-white dark:text-black px-5 py-3 rounded-xl font-semibold shadow hover:bg-neutral-800 dark:hover:bg-gray-200 mb-4">
+      <PlusCircledIcon className="w-5 h-5" /> Thêm kỹ năng
+    </Button>
+  </DialogTrigger>
+  <Dialog
+    open={open}
+    onOpenChange={setOpen}
+    title="Kỹ năng"
+    description={editingSkill ? "Chỉnh sửa kỹ năng." : "Thêm kỹ năng mới."}
+  >
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <Input placeholder="Tên kỹ năng" value={name} onChange={(e) => setName(e.target.value)} />
+      <Input placeholder="Cấp độ (VD: Thành thạo)" value={level} onChange={(e) => setLevel(e.target.value)} />
+      <div className="flex gap-2">
+        <Button
+          type="submit"
+          className="flex-1 bg-neutral-900 dark:bg-beige text-white dark:text-black py-2 rounded-lg font-semibold hover:bg-neutral-800 dark:hover:bg-gray-200"
+        >
+          {editingSkill ? "Cập nhật" : "Thêm mới"}
+        </Button>
+        {editingSkill && (
+          <Button
+            onClick={resetForm}
+            type="button"
+            className="flex-1 bg-neutral-100 dark:bg-neutral-700 text-neutral-900 dark:text-white py-2 rounded-lg font-semibold hover:bg-neutral-200 dark:hover:bg-neutral-600"
           >
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <Input
-                placeholder="Tên kỹ năng"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-              <Input
-                placeholder="Cấp độ (VD: Thành thạo)"
-                value={level}
-                onChange={(e) => setLevel(e.target.value)}
-              />
-              <div className="flex gap-2">
-                <Button
-                  type="submit"
-                  className="flex-1 bg-neutral-900 text-white py-2 rounded-lg font-semibold hover:bg-neutral-800"
-                >
-                  {editingSkill ? "Cập nhật" : "Thêm mới"}
-                </Button>
-                {editingSkill && (
-                  <Button
-                    onClick={resetForm}
-                    type="button"
-                    className="flex-1 bg-neutral-100 dark:bg-neutral-700 text-neutral-900 dark:text-white py-2 rounded-lg font-semibold hover:bg-neutral-200 dark:hover:bg-neutral-600"
-                  >
-                    Huỷ
-                  </Button>
-                )}
-              </div>
-            </form>
-          </Dialog>
-        </RadixDialog.Root>
+            Huỷ
+          </Button>
+        )}
+      </div>
+    </form>
+  </Dialog>
+</RadixDialog.Root>
+
 
         <div className="space-y-5 w-full">
           {skills.length === 0 && (
@@ -209,21 +210,23 @@ export default function CandidateSkillList() {
         </div>
       </Card>
 
-      {/* Right - AI Suggestion placeholder */}
-      <Card className="flex flex-col gap-4">
-        <h3 className="text-xl font-bold">Gợi ý từ AI</h3>
-        <p className="text-neutral-600 dark:text-neutral-400">
-          (Tuỳ chọn) Chọn tính năng AI để gợi ý kỹ năng phù hợp với CV của bạn.
-        </p>
-        <Select>
-          <option>Chọn lĩnh vực AI...</option>
-          <option>Web Development</option>
-          <option>Machine Learning</option>
-          <option>UI/UX Design</option>
-          <option>Marketing Digital</option>
-        </Select>
-        <Button className="mt-auto bg-neutral-900 text-white py-2 rounded-lg font-semibold hover:bg-neutral-800">
-          Áp dụng gợi ý AI
+      {/* Right - Saved Jobs */}
+      <Card className="flex flex-col gap-4 items-center justify-center text-center p-6 rounded-2xl bg-white dark:bg-neutral-900 shadow-lg dark:shadow-gray-700 transition-colors relative">
+        <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">JOB ĐÃ LƯU</h3>
+        <div className="relative">
+          <Bookmark className="w-16 h-16 text-yellow-500 dark:text-yellow-400" />
+          {savedJobCount > 0 && (
+            <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-6 h-6 rounded-full flex items-center justify-center font-bold shadow-md">
+              {savedJobCount}
+            </div>
+          )}
+        </div>
+
+        <Button
+          onClick={() => navigate("/saved-jobs")}
+          className="mt-2 w-32 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-white py-2 rounded-lg font-semibold shadow-md transition-all duration-200 dark:from-yellow-400 dark:to-yellow-500 dark:hover:from-yellow-500 dark:hover:to-yellow-600"
+        >
+          Xem chi tiết
         </Button>
       </Card>
     </div>

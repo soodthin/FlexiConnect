@@ -186,17 +186,18 @@ export default function WorkExperience({ userPackage, onUpgradeClick }) {
 };
 
 
-  const handleAIFeatureClick = (callback) => {
-    if (checkAIAccess()) {
-      callback();
+const handleAIFeatureClick = (callback) => {
+  if (checkAIAccess()) {
+    callback();
+  } else {
+    setOpen(false); 
+    if (onUpgradeClick) {
+      onUpgradeClick();
     } else {
-      if (onUpgradeClick) {
-        onUpgradeClick();
-      } else {
-        setIsUpgradeDialogOpen(true);
-      }
+      setIsUpgradeDialogOpen(true);
     }
-  };
+  }
+};
 
   const handleUpgradeRedirect = () => {
     console.log("🚀 Navigating to upgrade page...");

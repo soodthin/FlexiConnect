@@ -4,7 +4,9 @@
  */
 package com.soodthin.services;
 
-import com.soodthin.dto.response.SavedJobResponse;
+import com.soodthin.dto.SavedJobDTO;
+import com.soodthin.entity.JobPost;
+import com.soodthin.entity.SavedJob;
 import java.util.List;
 
 /**
@@ -13,9 +15,15 @@ import java.util.List;
  */
 public interface SavedJobService {
 
-    void saveJobPost(Integer candidateId, Integer jobPostId);
+    SavedJob saveJobPost(Integer candidateId, Integer jobPostId);
 
     void unsaveJobPost(Integer candidateId, Integer jobPostId);
 
-  List<SavedJobResponse> getSavedJobs(Integer candidateId);
+    boolean isJobSaved(Integer candidateId, Integer jobPostId);
+
+    List<SavedJobDTO> getSavedJobsByCandidate(Integer candidateId);
+
+    long countSavedJobsByCandidate(Integer candidateId);
+
+    boolean toggleSaveJobPost(Integer candidateId, Integer jobPostId);
 }

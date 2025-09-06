@@ -28,11 +28,12 @@ import ApplicationsManagement from '@employer/ApplicationsManagement';
 
 import CandidateDashboard from '@candidate/CandidateDashboard';
 import CandidateProfile from '@candidateProfile/CandidateProfile';
+import SavedJobs from '@candidate/candidate-profile/SavedJobs';
 import Applied from '@candidate/Applied';
 import CandidateUpgrade from '@candidate/payment/CandidateUpgrade';
 import PaymentSuccess from '@candidate/payment/PaymentSuccess';
 import PaymentFailed from '@candidate/payment/PaymentFailed';
-
+import MockInterview from '@candidate/MockInterview';
 
 const userReducer = (current, action) => {
   switch (action.type) {
@@ -111,6 +112,12 @@ function App() {
                     </PrivateRoute>
                   }
                 />
+                <Route 
+                path="/saved-jobs" element={
+                  <PrivateRoute allowedRoles={["CANDIDATE"]}>
+                    <SavedJobs />
+                  </PrivateRoute>
+                } />
                 <Route
                   path="/applied"
                   element={
@@ -124,6 +131,14 @@ function App() {
                   element={
                     <PrivateRoute allowedRoles={["CANDIDATE"]}>
                       <CandidateUpgrade />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/mock-interview"
+                  element={
+                    <PrivateRoute allowedRoles={["CANDIDATE"]}>
+                      <MockInterview />
                     </PrivateRoute>
                   }
                 />

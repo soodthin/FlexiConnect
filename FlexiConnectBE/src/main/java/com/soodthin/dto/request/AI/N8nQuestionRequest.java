@@ -4,7 +4,6 @@
  */
 package com.soodthin.dto.request.AI;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 /**
@@ -12,14 +11,13 @@ import lombok.Data;
  * @author ADMIN
  */
 @Data
-public class SubmitAnswerRequest {
-
-    private Integer sessionId;
-    @NotBlank(message = "Answer is required")
-    private String answer;
-
-    private String question;
+public class N8nQuestionRequest {
+    private String jobTitle;
+    private String jobDescription;
     private String difficulty;
     private String category;
+    private Integer questionNumber; 
 
+   
+    
 }
