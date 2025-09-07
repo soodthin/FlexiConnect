@@ -1,17 +1,15 @@
 import { useContext, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+
 import { MyUserContext, MyDispatcherContext } from "@contexts/MyContexts";
-import cookie from "react-cookies";
 import Notifications from "@components/notifications/Notifications";
 import {
-  Search,
   Sun,
   Moon,
   User,
   LogOut,
   ChevronDown,
 } from "lucide-react";
-import { motion } from "framer-motion";
 import { Bot } from "lucide-react";
 
 // Button
@@ -73,8 +71,8 @@ function DropdownItem({ onClick, children, danger }) {
     <li
       onClick={onClick}
       className={`px-6 py-4 cursor-pointer transition ${danger
-          ? "text-red-600 hover:bg-red-50 dark:hover:bg-red-900"
-          : "hover:bg-[#f5efe6] dark:hover:bg-[#353535]"
+        ? "text-red-600 hover:bg-red-50 dark:hover:bg-red-900"
+        : "hover:bg-[#f5efe6] dark:hover:bg-[#353535]"
         }`}
     >
       {children}
@@ -82,23 +80,14 @@ function DropdownItem({ onClick, children, danger }) {
   );
 }
 
-// Input (search box)
-function Input({ icon: Icon, ...props }) {
-  return (
-    <div className="flex items-center bg-white/90 dark:bg-[#232323] border border-gray-200 dark:border-[#333] rounded-full px-5 py-2.5 shadow transition">
-      {Icon && <Icon className="text-gray-400 dark:text-gray-500 mr-3 text-lg" />}
-      <input
-        {...props}
-        className="w-full text-base bg-transparent outline-none placeholder-gray-400 dark:placeholder-gray-500 text-[#222222] dark:text-[#f5efe6]"
-      />
-    </div>
-  );
-}
+function AIAvatar({ role }) {
+  const roleTexts = {
+    CANDIDATE: "Chào bạn, cùng tìm việc làm, công ty... và hơn thế nữa!",
+    EMPLOYER: "Chào nhà tuyển dụng, cùng đăng tuyển dụng, quản lý ứng viên...",
+    ADMIN: "Chào quản trị viên, cùng quản lý hệ thống, thống kê, ..."
+  };
 
-
-
-function AIAvatar() {
-  const fullText = "Tìm việc làm, kỹ năng, công ty.... và hơn thế nữa!";
+  const fullText = roleTexts[role] || roleTexts.CANDIDATE;
   const [displayText, setDisplayText] = useState("");
   const [index, setIndex] = useState(0);
   const [deleting, setDeleting] = useState(false);
@@ -106,7 +95,7 @@ function AIAvatar() {
 
   // Typing effect
   useEffect(() => {
-    const speed = 200;
+    const speed = 80;
     const timer = setTimeout(() => {
       if (!deleting) {
         setDisplayText(fullText.slice(0, index + 1));
@@ -119,9 +108,9 @@ function AIAvatar() {
       }
     }, speed);
     return () => clearTimeout(timer);
-  }, [index, deleting]);
+  }, [index, deleting, fullText]);
 
-  // Observe dark mode changes
+  // Observe dark mode
   useEffect(() => {
     const observer = new MutationObserver(() => {
       setIsDark(document.documentElement.classList.contains("dark"));
@@ -134,30 +123,20 @@ function AIAvatar() {
     <div className="flex items-center gap-3 font-mono text-lg">
       <Bot className={`w-7 h-7 ${isDark ? "text-[#f5efe6]" : "text-black"}`} />
       <span className={`${isDark ? "text-[#f5efe6]" : "text-[#222222]"}`}>
-        {displayText}
-        <span className="animate-blink">|</span>
+        {displayText}<span className="animate-blink">|</span>
       </span>
-
       <style jsx>{`
-        .animate-blink {
-          display: inline-block;
-          width: 1ch;
-          animation: blink 1s step-start infinite;
-        }
-        @keyframes blink {
-          50% { opacity: 0; }
-        }
+        .animate-blink { display: inline-block; width: 1ch; animation: blink 1s step-start infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
       `}</style>
     </div>
   );
 }
 
-
-
-
 function UserMenu({ user, onLogout }) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const roleMenus = {
     ADMIN: [
@@ -176,31 +155,82 @@ function UserMenu({ user, onLogout }) {
   };
 
   return (
-    <Dropdown
-      open={open}
-      onClose={() => setOpen(false)}
-      trigger={
-        <Button
-          className="flex items-center gap-2 bg-white dark:bg-[#232323] hover:bg-[#f5efe6] dark:hover:bg-[#353535]"
-          onClick={() => setOpen((v) => !v)}
-        >
-          <User className="text-xl text-[#6b7280] dark:text-[#aaa]" />
-          <span className="font-medium">{user?.fullName?.split(" ")[0] || "Bạn"}</span>
-          <ChevronDown className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-        </Button>
-      }
-    >
-      <ul className="text-base text-gray-700 dark:text-[#f5efe6]">
-        {roleMenus[user.role]?.map((item) => (
-          <DropdownItem key={item.to} onClick={() => navigate(item.to)}>
-            {item.label}
+    <>
+      <Dropdown
+        open={open}
+        onClose={() => setOpen(false)}
+        trigger={
+          <Button
+            className="flex items-center gap-2 bg-white dark:bg-[#232323] hover:bg-[#f5efe6] dark:hover:bg-[#353535]"
+            onClick={() => setOpen((v) => !v)}
+          >
+            <User className="text-xl text-[#6b7280] dark:text-[#aaa]" />
+            <span className="font-medium">{user?.fullName?.split(" ")[0] || "Bạn"}</span>
+            <ChevronDown className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+          </Button>
+        }
+      >
+        <ul className="text-base text-gray-700 dark:text-[#f5efe6]">
+          {roleMenus[user.role]?.map((item) => (
+            <DropdownItem key={item.to} onClick={() => navigate(item.to)}>
+              {item.label}
+            </DropdownItem>
+          ))}
+          <DropdownItem danger onClick={() => setShowConfirm(true)}>
+            <LogOut className="inline-block mr-2 w-4 h-4" /> Đăng xuất
           </DropdownItem>
-        ))}
-        <DropdownItem danger onClick={onLogout}>
-          <LogOut className="inline-block mr-2 w-4 h-4" /> Đăng xuất
-        </DropdownItem>
-      </ul>
-    </Dropdown>
+        </ul>
+      </Dropdown>
+
+      {/* Confirm logout dialog */}
+      {showConfirm && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          {/* Overlay mờ */}
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
+            onClick={() => setShowConfirm(false)}
+          ></div>
+
+          {/* Dialog box */}
+          <div className="relative z-10 w-80 bg-white dark:bg-[#1f1f1f] rounded-2xl shadow-2xl p-6 flex flex-col items-center text-center animate-scaleUp">
+            {/* Icon logout */}
+            <LogOut className="w-10 h-10 text-red-500 mb-3" />
+            <h3 className="text-lg font-semibold mb-2 dark:text-[#f5efe6]">Xác nhận đăng xuất</h3>
+            <p className="mb-6 text-gray-700 dark:text-gray-300 text-sm">
+              Bạn có chắc chắn muốn đăng xuất khỏi tài khoản không?
+            </p>
+            <div className="flex justify-center gap-4 w-full">
+              <Button
+                className="flex-1 bg-gray-200 dark:bg-[#2c2c2c] text-gray-800 dark:text-[#f5efe6] hover:bg-gray-300 dark:hover:bg-[#3a3a3a]"
+                onClick={() => setShowConfirm(false)}
+              >
+                Hủy
+              </Button>
+              <Button
+                className="flex-1 bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                onClick={() => {
+                  setShowConfirm(false);
+                  onLogout();
+                }}
+              >
+                Đăng xuất
+              </Button>
+            </div>
+          </div>
+
+          <style jsx>{`
+      .animate-scaleUp {
+        animation: scaleUp 0.15s ease-out;
+      }
+      @keyframes scaleUp {
+        0% { transform: scale(0.9); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+      }
+    `}</style>
+        </div>
+      )}
+
+    </>
   );
 }
 
@@ -220,11 +250,11 @@ export default function Header() {
 
   const toggleDarkMode = () => setIsDark((prev) => !prev);
 
- const logout = () => {
-  localStorage.removeItem("user");
-  dispatch({ type: "logout" });
-  navigate("/login");
-};
+  const logout = () => {
+    localStorage.removeItem("user");
+    dispatch({ type: "logout" });
+    navigate("/login");
+  };
 
 
   return (
@@ -251,17 +281,21 @@ export default function Header() {
       </div>
 
       {/* AI  */}
-<div className="flex-grow max-w-2xl mx-auto">
-  <AIAvatar />
-</div>
+      <div className="flex-grow max-w-2xl mx-auto">
+        <AIAvatar role={user?.role} />
+      </div>
+
 
 
 
       {/* Right */}
       <div className="flex items-center gap-5 ml-8">
-        <Button onClick={() => navigate("/employer-register")}>
-          Bạn là nhà tuyển dụng?
-        </Button>
+        {user?.role !== "ADMIN" && (
+          <Button onClick={() => navigate("/employer-register")}>
+            Bạn là nhà tuyển dụng?
+          </Button>
+        )}
+
 
         {!user && <Button onClick={() => navigate("/login")}>Đăng nhập</Button>}
 

@@ -4,14 +4,18 @@ import Apis, { endpoints } from "@configs/APIs";
 import { UserPlus, Eye, EyeOff } from "lucide-react";
 
 const Card = ({ children, className = "" }) => (
-  <div className={`bg-white dark:bg-[#232323] shadow-2xl border border-gray-200 dark:border-neutral-700 rounded-3xl p-8 w-full max-w-md space-y-4 relative z-20 ${className}`}>
+  <div
+    className={`bg-white/90 dark:bg-[#232323]/90 shadow-xl border border-gray-200/50 dark:border-neutral-700/50 
+                rounded-2xl p-8 w-full max-w-md space-y-5 backdrop-blur-md relative z-20 ${className}`}
+  >
     {children}
   </div>
 );
 
 const Button = ({ children, className = "", ...props }) => (
   <button
-    className={`w-full bg-gradient-to-r from-gray-700 to-gray-900 text-white py-2 rounded-xl font-semibold shadow hover:opacity-90 transition flex items-center justify-center gap-2 ${className}`}
+    className={`w-full bg-gradient-to-r from-black to-gray-500 text-white py-2.5 rounded-xl font-semibold 
+                shadow-md hover:opacity-90 transition flex items-center justify-center gap-2 ${className}`}
     {...props}
   >
     {children}
@@ -26,29 +30,33 @@ const Label = ({ children }) => (
 
 const Input = ({ className = "", ...props }) => (
   <input
-    className={`w-full rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 px-3 h-10 text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400 transition ${className}`}
+    className={`w-full rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 
+                px-3 h-10 text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300 
+                outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400 transition ${className}`}
     {...props}
   />
 );
 
 const PasswordField = ({ value, onChange, placeholder, show, toggle }) => (
-  <div className="flex items-center gap-2 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 px-3 h-10 focus-within:ring-2 focus-within:ring-blue-400 transition">
+  <div
+    className="flex items-center gap-2 rounded-md border border-gray-300 dark:border-gray-600 
+               bg-gray-100 dark:bg-gray-700 px-3 h-10 focus-within:ring-2 focus-within:ring-blue-400 transition"
+  >
     <input
       type={show ? "text" : "password"}
       autoComplete="new-password"
-      className="flex-1 bg-transparent outline-none text-sm ..."
+      className="flex-1 bg-transparent outline-none text-sm text-gray-800 dark:text-gray-100"
       value={value || ""}
       onChange={onChange}
       placeholder={placeholder}
       required
     />
-
     <button
       type="button"
       onClick={toggle}
       className="outline-none flex items-center justify-center w-5 h-5 text-gray-500 dark:text-gray-300"
     >
-      {show ? <Eye /> : <EyeOff />}
+      {show ? <Eye size={16} /> : <EyeOff size={16} />}
     </button>
   </div>
 );
@@ -127,110 +135,128 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-beige-50 dark:bg-[#181818]">
-      {/* Left illustration */}
-      <div className="hidden md:flex flex-[0.45] relative items-center justify-center overflow-hidden bg-beige-100 dark:bg-[#1e1e1e] p-8">
-        <img
-          src="https://images.unsplash.com/photo-1556155092-490a1ba16284?q=80&w=708&auto=format&fit=crop"
-          alt="Job search illustration"
-          className="absolute inset-0 w-full h-full object-cover opacity-30"
-        />
-        <div className="relative z-10 text-left space-y-6 max-w-sm">
-          <h2 className="text-4xl font-bold text-gray-800 dark:text-gray-50">
+    <div className="min-h-screen flex flex-col md:flex-row bg-gradient-to-br from-gray-50 to-gray-100 dark:from-[#181818] dark:to-[#101010]">
+      {/* Left Panel */}
+      <div className="hidden md:flex flex-[0.45] flex-col justify-center items-start px-10 py-16 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-[#1e1e1e] dark:via-[#2a2a2a] dark:to-[#181818] relative overflow-hidden">
+        <div className="relative z-10 space-y-6 max-w-sm">
+          <h2 className="text-4xl font-bold text-gray-800 dark:text-gray-50 leading-snug">
             Bắt đầu hành trình sự nghiệp!
           </h2>
-          <p className="text-gray-700 dark:text-gray-200">
-            Tạo tài khoản ứng viên và tìm việc mơ ước nhanh chóng với <strong>FlexiConnect AI</strong>.
+          <p className="text-gray-700 dark:text-gray-300 text-lg">
+            Tạo tài khoản và kết nối nhanh chóng với{" "}
+            <span className="text-black dark:text-gray-500 font-semibold">FlexiConnect AI</span>.
           </p>
+
+          {/* AI highlights */}
+          <div className="grid gap-3 mt-6">
+            <div className="p-3 rounded-lg bg-white/80 dark:bg-[#2a2a2a]/80 border border-gray-200/40 dark:border-neutral-700/40 backdrop-blur-md shadow-sm">
+              <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-100">
+                Gợi ý viết hồ sơ với AI
+              </h3>
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                Làm nổi bật kỹ năng & kinh nghiệm quan trọng để chinh phục NTD.
+              </p>
+            </div>
+            <div className="p-3 rounded-lg bg-white/80 dark:bg-[#2a2a2a]/80 border border-gray-200/40 dark:border-neutral-700/40 backdrop-blur-md shadow-sm">
+              <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-100">
+                Luyện tập phỏng vấn ảo
+              </h3>
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                Trải nghiệm phỏng vấn mô phỏng với AI để tự tin hơn.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Right form */}
+      {/* Right Form */}
       <div className="flex-1 flex items-center justify-center p-6">
-        <Card>
-          <div className="absolute top-[-20px] left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-gray-700 to-gray-900 text-white px-4 py-1 rounded-full shadow-md text-sm font-medium">
-            FlexiConnect AI
-          </div>
-
-          <h2 className="text-3xl font-bold text-center text-gray-800 dark:text-gray-100 mb-2">
-            Đăng ký Ứng Viên
-          </h2>
-
-          {msg && (
-            <div
-              className={`text-sm text-center p-2 rounded-md font-medium ${msg.includes("✅")
-                  ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                  : "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200"
-                }`}
-            >
-              {msg}
+        <form onSubmit={register} className="w-full max-w-md">
+          <Card>
+            {/* Badge */}
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-black to-gray-500 text-white px-4 py-1 rounded-full text-xs font-medium shadow">
+              FlexiConnect AI
             </div>
-          )}
 
-          {/* Full Name */}
-          <div className="space-y-1">
-            <Label>Họ và tên</Label>
-            <Input
-              type="text"
-              placeholder="Nhập họ và tên..."
-              value={user.fullName || ""}
-              onChange={(e) => setState(e.target.value, "fullName")}
-              required
-            />
-          </div>
+            <h2 className="text-3xl font-bold text-center text-gray-800 dark:text-gray-100">
+              Đăng ký Ứng Viên
+            </h2>
 
-          {/* Email */}
-          <div className="space-y-1">
-            <Label>Email</Label>
-            <Input
-              type="email"
-              placeholder="Nhập email..."
-              value={user.email || ""}
-              onChange={(e) => setState(e.target.value, "email")}
-              required
-            />
-          </div>
+            {msg && (
+              <div
+                className={`text-sm text-center p-2 rounded-md font-medium ${
+                  msg.includes("✅")
+                    ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                    : "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200"
+                }`}
+              >
+                {msg}
+              </div>
+            )}
 
-          {/* Password */}
-          <div className="space-y-1">
-            <Label>Mật khẩu</Label>
-            <PasswordField
-              value={user.password}
-              onChange={(e) => setState(e.target.value, "password")}
-              placeholder="Nhập mật khẩu..."
-              show={showPassword}
-              toggle={() => setShowPassword(!showPassword)}
-            />
-            {user.password && <StrengthBar strength={strength} />}
-          </div>
+            {/* Full Name */}
+            <div className="space-y-1">
+              <Label>Họ và tên</Label>
+              <Input
+                type="text"
+                placeholder="Nhập họ và tên..."
+                value={user.fullName || ""}
+                onChange={(e) => setState(e.target.value, "fullName")}
+              />
+            </div>
 
-          {/* Confirm Password */}
-          <div className="space-y-1">
-            <Label>Xác nhận mật khẩu</Label>
-            <PasswordField
-              value={user.confirmPassword}
-              onChange={(e) => setState(e.target.value, "confirmPassword")}
-              placeholder="Xác nhận mật khẩu..."
-              show={showConfirm}
-              toggle={() => setShowConfirm(!showConfirm)}
-            />
-          </div>
+            {/* Email */}
+            <div className="space-y-1">
+              <Label>Email</Label>
+              <Input
+                type="email"
+                placeholder="Nhập email..."
+                value={user.email || ""}
+                onChange={(e) => setState(e.target.value, "email")}
+              />
+            </div>
 
-          {/* Submit */}
-          <Button type="submit" onClick={register}>
-            <UserPlus className="w-4 h-4" /> Đăng ký
-          </Button>
+            {/* Password */}
+            <div className="space-y-1">
+              <Label>Mật khẩu</Label>
+              <PasswordField
+                value={user.password}
+                onChange={(e) => setState(e.target.value, "password")}
+                placeholder="Nhập mật khẩu..."
+                show={showPassword}
+                toggle={() => setShowPassword(!showPassword)}
+              />
+              {user.password && <StrengthBar strength={strength} />}
+            </div>
 
-          <div className="text-center text-gray-600 dark:text-gray-300 text-sm">
-            <button
-              type="button"
-              onClick={() => navigate("/employer-register")}
-              className="text-sm hover:text-black dark:hover:text-white hover:underline transition mt-2"
-            >
-              <span className="font-semibold">Bạn là nhà tuyển dụng?</span>
-            </button>
-          </div>
-        </Card>
+            {/* Confirm Password */}
+            <div className="space-y-1">
+              <Label>Xác nhận mật khẩu</Label>
+              <PasswordField
+                value={user.confirmPassword}
+                onChange={(e) => setState(e.target.value, "confirmPassword")}
+                placeholder="Xác nhận mật khẩu..."
+                show={showConfirm}
+                toggle={() => setShowConfirm(!showConfirm)}
+              />
+            </div>
+
+            {/* Submit */}
+            <Button type="submit">
+              <UserPlus size={16} /> Đăng ký
+            </Button>
+
+            <div className="text-center text-gray-600 dark:text-gray-300 text-sm mt-2">
+              <button
+                type="button"
+                onClick={() => navigate("/employer-register")}
+                className="hover:text-black dark:hover:text-white hover:underline font-semibold transition"
+              >
+                Bạn là nhà tuyển dụng?
+              </button>
+            </div>
+          </Card>
+        </form>
       </div>
     </div>
   );

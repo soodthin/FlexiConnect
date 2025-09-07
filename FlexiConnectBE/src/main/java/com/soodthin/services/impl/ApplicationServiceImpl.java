@@ -115,7 +115,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
         Application application = new Application();
         application.setCandidateId(candidate);
-        application.setCoverLetter(toString());
+        application.setCoverLetter(application.getCoverLetter());
         application.setJobPostId(jobPost);
         application.setResumeFile(resumeFile);
         application.setAppliedAt(LocalDateTime.now());

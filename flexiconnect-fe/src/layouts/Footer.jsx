@@ -1,6 +1,38 @@
-import { Facebook, Twitter, Linkedin, Instagram, Mail, Inspect } from "lucide-react";
+import { Facebook, Twitter, Linkedin, Instagram, Mail } from "lucide-react";
+import { useContext } from "react";
+import { MyUserContext } from "@contexts/MyContexts";
 
 export default function Footer() {
+    const user = useContext(MyUserContext);
+
+    // Links theo role
+    const roleLinks = {
+        CANDIDATE: [
+            { label: "Tìm việc", onClick: () => navigate("/") },
+            { label: "Hồ sơ của tôi", onClick: () => navigate("/candidate-profile") },
+            { label: "Về chúng tôi", onClick: () => navigate("/about") },
+            { label: "Liên hệ", onClick: () => navigate("/contact") },
+
+
+        ],
+        EMPLOYER: [
+            { label: "Đăng tuyển dụng", onClick: () => navigate("/employer-job-posts") },
+            { label: "Ứng viên đã ứng tuyển", onClick: () => navigate("/employer-applications-management") },
+        ],
+        ADMIN: [
+            { label: "Duyệt nhà tuyển dụng", onClick: () => navigate("/admin-pending-employers") },
+            { label: "Quản lý người dùng", onClick: () => navigate("/admin-users-management") },
+            { label: "Quản lý tin tuyển dụng", onClick: () => navigate("/admin-jobposts-management") },
+        ],
+        GUEST: [
+            { label: "Về chúng tôi", onClick: () => navigate("/about") },
+            { label: "Tìm việc", onClick: () => navigate("/jobs") },
+            { label: "Liên hệ", onClick: () => navigate("/contact") },
+        ]
+    };
+
+    const links = roleLinks[user?.role] || roleLinks["GUEST"];
+
     return (
         <footer className="bg-gray-100 dark:bg-[#111111] text-gray-800 dark:text-[#f5efe6] font-inter">
             <div className="max-w-7xl mx-auto px-6 py-12 grid md:grid-cols-4 gap-8">
@@ -15,14 +47,15 @@ export default function Footer() {
                     </p>
                 </div>
 
-                {/* Quick Links */}
+                {/* Links */}
                 <div>
                     <h4 className="font-semibold mb-4">Quick Links</h4>
                     <ul className="flex flex-col gap-2 text-gray-700 dark:text-gray-300">
-                        <li><a href="/about" className="hover:underline">Về chúng tôi</a></li>
-                        <li><a href="/jobs" className="hover:underline">Tìm việc</a></li>
-                        <li><a href="/employers" className="hover:underline">Nhà tuyển dụng</a></li>
-                        <li><a href="/contact" className="hover:underline">Liên hệ</a></li>
+                        {links.map((link) => (
+                            <li key={link.href}>
+                                <a href={link.href} className="hover:underline">{link.label}</a>
+                            </li>
+                        ))}
                     </ul>
                 </div>
 
@@ -45,7 +78,6 @@ export default function Footer() {
                     </div>
                 </div>
 
-
                 {/* Contact */}
                 <div>
                     <h4 className="font-semibold mb-4">Liên hệ</h4>
@@ -55,7 +87,7 @@ export default function Footer() {
                 </div>
             </div>
 
-            <div className="border-t border-gray-200 dark:border-[#444] mt-4 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+            <div className="border-t border-gray-200 dark:border-[#444] py-4 text-center text-sm text-gray-500 dark:text-gray-400">
                 &copy; {new Date().getFullYear()} FlexiConnect. All rights reserved.
             </div>
         </footer>

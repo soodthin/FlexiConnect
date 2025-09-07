@@ -106,17 +106,29 @@ export default function CandidateDashboard() {
                 <p className="text-gray-600 dark:text-gray-300 text-lg mb-6">
                   Khám phá công việc mơ ước của bạn ngay hôm nay với hàng ngàn cơ hội hấp dẫn.
                 </p>
-                <Button onClick={() => navigate("/candidate-profile")}>
+
+              </div>
+              <div className="flex flex-col items-center md:items-start gap-3">
+                <Button
+                  className="px-4 py-2 text-base font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-200"
+                  onClick={() => navigate("/candidate-profile")}
+                >
                   Cập nhật hồ sơ để ứng tuyển ngay
                 </Button>
+
+                <span className="text-gray-500 dark:text-gray-400 font-medium my-1">hay bạn muốn?</span>
+
+                <Button
+                  className="px-4 py-2 text-base font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-200"
+                  onClick={() => navigate("/candidate-upgrade")}
+                >
+                  Trải nghiệm Trợ lý AI
+                </Button>
               </div>
-              <div className="flex justify-center">
-                <img
-                  src="/assets/job-hunt.svg"
-                  alt="Job search illustration"
-                  className="w-64 md:w-80 drop-shadow-lg"
-                />
-              </div>
+
+
+
+
             </CardContent>
           </Card>
         )}

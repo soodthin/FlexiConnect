@@ -84,9 +84,9 @@ function JobPostManagement() {
               <td className="p-3">{job.companyName}</td>
               <td className="p-3 font-medium">
                 <span className={`px-3 py-1 rounded-full text-white font-medium text-xs ${
-                  job.status === "OPEN" ? "bg-green-600" :
-                  job.status === "CLOSED" ? "bg-red-600" :
-                  "bg-orange-500"
+                  job.status === "OPEN" ? "bg-green-600 dark:bg-green-500" :
+                  job.status === "CLOSED" ? "bg-red-600 dark:bg-red-500" :
+                  "bg-orange-500 dark:bg-orange-400"
                 }`}>{job.status}</span>
               </td>
               <td className="p-3">{dayjs(job.createdAt).format("YYYY-MM-DD HH:mm")}</td>
@@ -94,7 +94,7 @@ function JobPostManagement() {
                 <td className="p-3">
                   <button
                     onClick={() => openDetail(job)}
-                    className="px-4 py-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg shadow hover:scale-105 transform transition"
+                    className="px-4 py-1 bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 text-white rounded-lg shadow hover:scale-105 transform transition"
                   >
                     Chi tiết
                   </button>
@@ -114,8 +114,8 @@ function JobPostManagement() {
   );
 
   return (
-    <div className="p-6 min-h-screen bg-beige-light dark:bg-[#181818] text-gray-800 dark:text-gray-100">
-      <h2 className="text-2xl font-bold mb-6">📋 Job Post Management</h2>
+    <div className="p-6 min-h-screen bg-gray-50 dark:bg-[#181818] text-gray-800 dark:text-gray-100">
+      <h2 className="text-2xl font-bold mb-6">TRANG QUẢN LÝ VIỆC LÀM</h2>
 
       {/* Search + size */}
       <div className="flex flex-wrap gap-2 mb-4">
@@ -124,12 +124,12 @@ function JobPostManagement() {
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(0); }}
           placeholder="🔍 Tìm kiếm..."
-          className="p-2 border rounded dark:bg-[#2d2d2d] dark:text-gray-100 dark:border-neutral-600"
+          className="p-2 border rounded dark:bg-[#2d2d2d] dark:text-gray-100 dark:border-neutral-600 focus:ring-2 focus:ring-blue-500 transition"
         />
         <select
           value={size}
           onChange={(e) => { setSize(Number(e.target.value)); setPage(0); }}
-          className="p-2 border rounded dark:bg-[#2d2d2d] dark:text-gray-100 dark:border-neutral-600"
+          className="p-2 border rounded dark:bg-[#2d2d2d] dark:text-gray-100 dark:border-neutral-600 focus:ring-2 focus:ring-blue-500 transition"
         >
           <option value={5}>5 / trang</option>
           <option value={10}>10 / trang</option>
@@ -140,24 +140,26 @@ function JobPostManagement() {
 
       {/* Tabs */}
       <Tabs.Root
-        defaultValue="OPEN"
+        value={activeTab}
         onValueChange={(v) => { setActiveTab(v); setPage(0); }}
       >
         <Tabs.List className="flex space-x-4 border-b pb-2 mb-4 dark:border-neutral-700">
-          <Tabs.Trigger value="OPEN" className="px-4 py-2 data-[state=active]:border-b-2 border-green-500 font-medium">
-            Mở
-          </Tabs.Trigger>
-          <Tabs.Trigger value="CLOSED" className="px-4 py-2 data-[state=active]:border-b-2 border-red-500 font-medium">
-            Đóng
-          </Tabs.Trigger>
-          <Tabs.Trigger value="HIDDEN" className="px-4 py-2 data-[state=active]:border-b-2 border-orange-500 font-medium">
-            Ẩn
-          </Tabs.Trigger>
+          {["OPEN","CLOSED","HIDDEN"].map(tab => (
+            <Tabs.Trigger
+              key={tab}
+              value={tab}
+              className={`px-4 py-2 data-[state=active]:border-b-2 font-medium ${
+                tab === "OPEN" ? "data-[state=active]:border-green-500" :
+                tab === "CLOSED" ? "data-[state=active]:border-red-500" :
+                "data-[state=active]:border-orange-500"
+              }`}
+            >
+              {tab === "OPEN" ? "Mở" : tab === "CLOSED" ? "Đóng" : "Ẩn"}
+            </Tabs.Trigger>
+          ))}
         </Tabs.List>
 
-        <Tabs.Content value="OPEN">{renderTable(jobPosts, true)}</Tabs.Content>
-        <Tabs.Content value="CLOSED">{renderTable(jobPosts, true)}</Tabs.Content>
-        <Tabs.Content value="HIDDEN">{renderTable(jobPosts, true)}</Tabs.Content>
+        <Tabs.Content value={activeTab}>{renderTable(jobPosts, true)}</Tabs.Content>
       </Tabs.Root>
 
       {/* Pagination */}
@@ -165,7 +167,7 @@ function JobPostManagement() {
         <button
           onClick={() => setPage(p => Math.max(p - 1, 0))}
           disabled={page === 0}
-          className="px-3 py-1 border rounded disabled:opacity-50"
+          className="px-3 py-1 border rounded disabled:opacity-50 dark:border-neutral-600"
         >
           ◀ Trang trước
         </button>
@@ -173,7 +175,7 @@ function JobPostManagement() {
         <button
           onClick={() => setPage(p => Math.min(p + 1, totalPages - 1))}
           disabled={page + 1 >= totalPages}
-          className="px-3 py-1 border rounded disabled:opacity-50"
+          className="px-3 py-1 border rounded disabled:opacity-50 dark:border-neutral-600"
         >
           Trang sau ▶
         </button>
@@ -183,39 +185,36 @@ function JobPostManagement() {
       <Dialog.Root open={openModal} onOpenChange={setOpenModal}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-md" />
-          <Dialog.Content className="fixed top-1/2 left-1/2 w-[520px] max-w-full -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-[#232323] rounded-2xl shadow-2xl p-6 space-y-4">
+          <Dialog.Content className="fixed top-1/2 left-1/2 w-[90%] max-w-3xl -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-[#232323] rounded-2xl shadow-2xl p-6 space-y-4">
             {selectedJob && (
               <>
-                <h3 className="text-xl font-bold">{selectedJob.title}</h3>
-                <p className="text-gray-700 dark:text-gray-300">{selectedJob.description}</p>
+                <h3 className="text-xl font-bold text-gray-700 dark:text-white">{selectedJob.title}</h3>
+                <p className="text-gray-700 dark:text-gray-200">{selectedJob.description}</p>
                 <div className="flex justify-between mt-4 text-sm text-gray-500 dark:text-gray-400">
                   <span>{selectedJob.companyName}</span>
-                  <span>{dayjs(selectedJob.createdAt).format("YYYY-MM-DD HH:mm")}</span>
+                  <span >{dayjs(selectedJob.createdAt).format("YYYY-MM-DD HH:mm")}</span>
                 </div>
 
-                <div className="flex justify-end space-x-3 mt-6">
-                  <button
-                    onClick={() => updateStatus(selectedJob.id, "OPEN")}
-                    disabled={selectedJob.status === "OPEN"}
-                    className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-md disabled:opacity-50 transition"
-                  >
-                    ✅ Mở
-                  </button>
-                  <button
-                    onClick={() => updateStatus(selectedJob.id, "CLOSED")}
-                    disabled={selectedJob.status === "CLOSED"}
-                    className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-md disabled:opacity-50 transition"
-                  >
-                    🔒 Đóng
-                  </button>
-                  <button
-                    onClick={() => updateStatus(selectedJob.id, "HIDDEN")}
-                    disabled={selectedJob.status === "HIDDEN"}
-                    className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-full shadow-md disabled:opacity-50 transition"
-                  >
-                    👁️‍🗨️ Ẩn
-                  </button>
-                </div>
+               <div className="flex justify-end space-x-3 mt-6">
+  {["OPEN","CLOSED","HIDDEN"].map(status => {
+    const isCurrent = selectedJob.status === status;
+    return (
+      <button
+        key={status}
+        onClick={() => updateStatus(selectedJob.id, status)}
+        disabled={isCurrent} // nút hiện tại mờ và không click được
+        className={`px-4 py-2 rounded-full shadow-md text-white transition
+          ${status === "OPEN" ? "bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-500" :
+            status === "CLOSED" ? "bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-500" :
+            "bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-500"
+          } ${isCurrent ? "opacity-40 cursor-not-allowed" : ""}`}
+      >
+        {status === "OPEN" ? "Mở" : status === "CLOSED" ? "Đóng" : "Ẩn"}
+      </button>
+    );
+  })}
+</div>
+
               </>
             )}
           </Dialog.Content>

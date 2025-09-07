@@ -29,7 +29,6 @@ import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Set;
 
 /**
@@ -130,11 +129,7 @@ public class User implements Serializable {
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "userId")
     @JsonIgnore
     private Employer employer;
-    @OneToMany(mappedBy = "user1Id")
-    private Set<Conversation> conversationSet;
-    @OneToMany(mappedBy = "user2Id")
-    private Set<Conversation> conversationSet1;
-
+    
     public User() {
     }
 
@@ -226,22 +221,6 @@ public class User implements Serializable {
 
     public void setEmployer(Employer employer) {
         this.employer = employer;
-    }
-
-    public Set<Conversation> getConversationSet() {
-        return conversationSet;
-    }
-
-    public void setConversationSet(Set<Conversation> conversationSet) {
-        this.conversationSet = conversationSet;
-    }
-
-    public Set<Conversation> getConversationSet1() {
-        return conversationSet1;
-    }
-
-    public void setConversationSet1(Set<Conversation> conversationSet1) {
-        this.conversationSet1 = conversationSet1;
     }
 
     @Override

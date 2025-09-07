@@ -22,7 +22,7 @@ import { Cross2Icon } from "@radix-ui/react-icons";
 
 import { authApis, endpoints } from '@configs/APIs';
 import { toast } from 'sonner';
-
+import { useNavigate } from 'react-router-dom';
 
 const normalizeSession = (s) => {
     if (!s) return null;
@@ -282,7 +282,8 @@ const MockInterview = ({ userPackage, onUpgradeClick }) => {
     const [isUpgradeDialogOpen, setIsUpgradeDialogOpen] = useState(false);
     const [isLoadingPackage, setIsLoadingPackage] = useState(false);
     const [currentPackage, setCurrentPackage] = useState(userPackage ?? null);
-
+    const navigate = useNavigate();
+    const [elapsedTime, setElapsedTime] = useState(0);
     const checkAIAccess = (pkg) => {
         if (!pkg) return false;
 
@@ -304,194 +305,211 @@ const MockInterview = ({ userPackage, onUpgradeClick }) => {
     const hasAIAccess = useMemo(() => checkAIAccess(currentPackage), [currentPackage]);
 
     useEffect(() => {
-    const fetchPackage = async () => {
-        try {
-            setIsLoadingPackage(true);
-            const res = await authApis().get(endpoints['current-package']); // ✅ xóa { headers: authHeader }
-            setCurrentPackage(res.data);
-        } catch (err) {
-            console.error('Load current package error:', err);
-        } finally {
-            setIsLoadingPackage(false);
+        const fetchPackage = async () => {
+            try {
+                setIsLoadingPackage(true);
+                const res = await authApis().get(endpoints['current-package']); // ✅ xóa { headers: authHeader }
+                setCurrentPackage(res.data);
+            } catch (err) {
+                console.error('Load current package error:', err);
+            } finally {
+                setIsLoadingPackage(false);
+            }
+        };
+
+        if (localStorage.getItem('user')) fetchPackage(); // kiểm tra token có trong user
+    }, []);
+
+    // Handle AI feature click
+    const handleAIFeatureClick = (callback) => {
+        if (hasAIAccess) {
+            callback();
+        } else {
+            if (onUpgradeClick) {
+                onUpgradeClick();
+            } else {
+                setIsUpgradeDialogOpen(true);
+            }
         }
     };
 
-    if (localStorage.getItem('user')) fetchPackage(); // kiểm tra token có trong user
-}, []);
+    const handleUpgradeRedirect = () => {
+        console.log("🚀 Navigating to upgrade page...");
+        setIsUpgradeDialogOpen(false);
+        navigate("/candidate-upgrade");
+    };
 
-// Handle AI feature click
-const handleAIFeatureClick = (callback) => {
-    if (hasAIAccess) {
-        callback();
-    } else {
-        if (onUpgradeClick) {
-            onUpgradeClick();
-        } else {
-            setIsUpgradeDialogOpen(true);
+    // Load applications
+    useEffect(() => {
+        const loadApplications = async () => {
+            try {
+                if (!token) return;
+
+                setIsLoadingApps(true);
+
+                const res = await authApis().get(endpoints['candidate-applied'], {
+                });
+
+                const apps = Array.isArray(res.data) ? res.data : [];
+                setApplications(apps);
+
+                if (apps.length > 0 && !selectedApplicationId) {
+                    setSelectedApplicationId(apps[0].id);
+                }
+            } catch (err) {
+                console.error(err);
+                toast.error('Không thể tải danh sách ứng tuyển!');
+            } finally {
+                setIsLoadingApps(false);
+            }
+        };
+
+        loadApplications();
+    }, [token, selectedApplicationId]);
+
+
+    // API functions
+    const createSession = async (applicationId) => {
+        if (!applicationId) {
+            setError('Vui lòng chọn đơn ứng tuyển!');
+            return;
         }
-    }
-};
-
-const handleUpgradeRedirect = () => {
-    console.log("🚀 Navigating to upgrade page...");
-    setIsUpgradeDialogOpen(false);
-    window.location.href = "/candidate-upgrade";
-};
-
-// Load applications
-useEffect(() => {
-    const loadApplications = async () => {
         try {
-            if (!token) return;
+            setIsCreatingSession(true);
+            setError('');
 
-            setIsLoadingApps(true);
+            const response = await authApis().post(
+                endpoints['create-session'],
+                { applicationId }
+            );
 
-            const res = await authApis().get(endpoints['candidate-applied'], {
-            });
+            const session = normalizeSession(response.data);
+            setCurrentSession(session);
+            setSessionStatus('IN_PROGRESS');
+            setTurns([]);
+            setSessionStats(null);
 
-            const apps = Array.isArray(res.data) ? res.data : [];
-            setApplications(apps);
+            if (session?.id) {
+                await fetchCurrentQuestion(session.id);
+            }
+        } catch (err) {
+            console.error('Create session error:', err);
+            setError(
+                'Không thể bắt đầu phiên phỏng vấn: ' +
+                (err?.response?.data?.message || err?.message || 'Lỗi không xác định')
+            );
+        } finally {
+            setIsCreatingSession(false);
+        }
+    };
 
-            if (apps.length > 0 && !selectedApplicationId) {
-                setSelectedApplicationId(apps[0].id);
+    const fetchCurrentQuestion = async (sessionId) => {
+        try {
+            setIsLoadingQ(true);
+            const res = await authApis().get(endpoints['current-question'](sessionId));
+            setNextQuestion(normalizeQuestion(res?.data));
+        } catch (err) {
+            console.error(err);
+            setError(
+                'Không lấy được câu hỏi hiện tại: ' +
+                (err?.response?.data?.message || err?.message || 'Lỗi không xác định')
+            );
+        } finally {
+            setIsLoadingQ(false);
+        }
+    };
+
+    const submitAnswer = async () => {
+        if (!currentSession?.id) return setError('Chưa có phiên phỏng vấn hợp lệ.');
+        if (!currentAnswer.trim()) return setError('Vui lòng nhập câu trả lời.');
+
+        try {
+            setIsSubmitting(true);
+            setError('');
+
+            const response = await authApis().post(
+                endpoints['submit-answer'](currentSession.id),
+                {
+                    question: nextQuestion?.question,
+                    answer: currentAnswer.trim(),
+                    difficulty: nextQuestion?.difficulty,
+                    category: nextQuestion?.category,
+                }
+            );
+
+            const result = response.data;
+            if (result?.currentTurn) setTurns((prev) => [...prev, result.currentTurn]);
+            setNextQuestion(result?.nextQuestion || null);
+            setSessionStats(result?.sessionStats || null);
+            setCurrentAnswer('');
+
+            if (!result?.nextQuestion?.question) {
+                await fetchCurrentQuestion(currentSession.id);
             }
         } catch (err) {
             console.error(err);
-            toast.error('Không thể tải danh sách ứng tuyển!');
+            setError(
+                'Gửi câu trả lời thất bại: ' +
+                (err?.response?.data?.message || err?.message || 'Lỗi không xác định')
+            );
         } finally {
-            setIsLoadingApps(false);
+            setIsSubmitting(false);
         }
     };
 
-    loadApplications();
-}, [token, selectedApplicationId]);
+    const completeSession = async () => {
+        if (!currentSession?.id) return;
+        try {
+            setIsCompletingSession(true);
 
+            const response = await authApis().put(
+                endpoints['complete-session'](currentSession.id),
+                {}
+            );
 
-// API functions
-const createSession = async (applicationId) => {
-    if (!applicationId) {
-        setError('Vui lòng chọn đơn ứng tuyển!');
-        return;
-    }
-    try {
-        setIsCreatingSession(true);
-        setError('');
-
-        const response = await authApis().post(
-            endpoints['create-session'],
-            { applicationId } 
-        );
-
-        const session = normalizeSession(response.data);
-        setCurrentSession(session);
-        setSessionStatus('IN_PROGRESS');
-        setTurns([]);
-        setSessionStats(null);
-
-        if (session?.id) {
-            await fetchCurrentQuestion(session.id);
+            const completedSession = normalizeSession(response.data);
+            setCurrentSession(completedSession);
+            setSessionStatus('COMPLETED');
+            setNextQuestion(null);
+        } catch (err) {
+            console.error(err);
+            setError(
+                'Kết thúc phiên thất bại: ' +
+                (err?.response?.data?.message || err?.message || 'Lỗi không xác định')
+            );
+        } finally {
+            setIsCompletingSession(false);
         }
-    } catch (err) {
-        console.error('Create session error:', err);
-        setError(
-            'Không thể bắt đầu phiên phỏng vấn: ' +
-            (err?.response?.data?.message || err?.message || 'Lỗi không xác định')
-        );
-    } finally {
-        setIsCreatingSession(false);
-    }
-};
+    };
 
-const fetchCurrentQuestion = async (sessionId) => {
-    try {
-        setIsLoadingQ(true);
-        const res = await authApis().get(endpoints['current-question'](sessionId));
-        setNextQuestion(normalizeQuestion(res?.data));
-    } catch (err) {
-        console.error(err);
-        setError(
-            'Không lấy được câu hỏi hiện tại: ' +
-            (err?.response?.data?.message || err?.message || 'Lỗi không xác định')
-        );
-    } finally {
-        setIsLoadingQ(false);
-    }
-};
-
-const submitAnswer = async () => {
-    if (!currentSession?.id) return setError('Chưa có phiên phỏng vấn hợp lệ.');
-    if (!currentAnswer.trim()) return setError('Vui lòng nhập câu trả lời.');
-
-    try {
-        setIsSubmitting(true);
-        setError('');
-
-        const response = await authApis().post(
-            endpoints['submit-answer'](currentSession.id),
-            {
-                question: nextQuestion?.question,
-                answer: currentAnswer.trim(),
-                difficulty: nextQuestion?.difficulty,
-                category: nextQuestion?.category,
-            }
-        );
-
-        const result = response.data;
-        if (result?.currentTurn) setTurns((prev) => [...prev, result.currentTurn]);
-        setNextQuestion(result?.nextQuestion || null);
-        setSessionStats(result?.sessionStats || null);
-        setCurrentAnswer('');
-
-        if (!result?.nextQuestion?.question) {
-            await fetchCurrentQuestion(currentSession.id);
+    useEffect(() => {
+        let interval = null;
+        if (sessionStatus === 'IN_PROGRESS') {
+            interval = setInterval(() => {
+                setElapsedTime(prev => prev + 1000); // tăng 1 giây
+            }, 1000);
+        } else if (sessionStatus !== 'IN_PROGRESS') {
+            clearInterval(interval);
         }
-    } catch (err) {
-        console.error(err);
-        setError(
-            'Gửi câu trả lời thất bại: ' +
-            (err?.response?.data?.message || err?.message || 'Lỗi không xác định')
-        );
-    } finally {
-        setIsSubmitting(false);
-    }
-};
+        return () => clearInterval(interval);
+    }, [sessionStatus]);
 
-const completeSession = async () => {
-    if (!currentSession?.id) return;
-    try {
-        setIsCompletingSession(true);
-
-        const response = await authApis().put(
-            endpoints['complete-session'](currentSession.id),
-            {} 
-        );
-
-        const completedSession = normalizeSession(response.data);
-        setCurrentSession(completedSession);
-        setSessionStatus('COMPLETED');
-        setNextQuestion(null);
-    } catch (err) {
-        console.error(err);
-        setError(
-            'Kết thúc phiên thất bại: ' +
-            (err?.response?.data?.message || err?.message || 'Lỗi không xác định')
-        );
-    } finally {
-        setIsCompletingSession(false);
-    }
-};
-
-
-    const resetSession = () => {
+   const resetSession = () => {
         setCurrentSession(null);
         setSessionStatus('IDLE');
         setCurrentAnswer('');
         setTurns([]);
         setNextQuestion(null);
         setSessionStats(null);
+        setElapsedTime(0);
         setError('');
     };
 
+    const formatElapsedTime = (ms) => {
+        const minutes = Math.floor(ms / 60000);
+        const seconds = Math.floor((ms % 60000) / 1000);
+        return `${minutes}m ${seconds}s`;
+    };
     const selectedApp = applications.find(app => app.id === selectedApplicationId);
 
     return (
@@ -900,11 +918,12 @@ const completeSession = async () => {
                                                 </div>
                                                 <div className="text-center">
                                                     <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                                                        {Math.floor((sessionStats.duration || 0) / 60000)}m
+                                                        {formatElapsedTime(elapsedTime)}
                                                     </div>
                                                     <div className="text-sm text-neutral-600 dark:text-neutral-400">
                                                         Thời gian
                                                     </div>
+
                                                 </div>
                                             </div>
                                         </div>
@@ -918,7 +937,7 @@ const completeSession = async () => {
                                             <RefreshCw className="w-4 h-4" />
                                             Luyện Tập Mới
                                         </Button>
-                                       
+
                                     </div>
                                 </Card>
 
@@ -994,7 +1013,7 @@ const completeSession = async () => {
                                                         </div>
                                                     )}
 
-                                                   
+
                                                 </motion.div>
                                             ))}
                                         </div>

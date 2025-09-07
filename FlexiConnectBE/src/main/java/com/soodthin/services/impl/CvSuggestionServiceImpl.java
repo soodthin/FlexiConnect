@@ -84,7 +84,6 @@ public class CvSuggestionServiceImpl implements CvSuggestionService {
         CvSuggestion suggestion = suggestionRepo.findById(suggestionId)
                 .orElseThrow(() -> new EntityNotFoundException("Suggestion not found"));
 
-        suggestion.setEditedVersion(request.getEditedVersion());
         suggestion.setStatus(CvSuggestion.SuggestionStatus.SUBMITTED);
         suggestion.setUpdatedAt(LocalDateTime.now());
         suggestionRepo.save(suggestion);

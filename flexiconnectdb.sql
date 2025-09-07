@@ -18,7 +18,7 @@ CREATE TABLE user (
     gender ENUM('MALE', 'FEMALE', 'OTHER'),
     address VARCHAR(100),
     avatar VARCHAR(255),
-    status ENUM('ACTIVE', 'INACTIVE', 'BANNED') DEFAULT 'ACTIVE',
+    status ENUM('ACTIVE', 'INACTIVE', 'BANNED','DELETED') DEFAULT 'ACTIVE',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP
 );
@@ -54,14 +54,6 @@ CREATE TABLE employer (
     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );
 
-CREATE TABLE company_image (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    employer_id INT,
-    image_url VARCHAR(255) NOT NULL,
-    caption VARCHAR(255),
-    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (employer_id) REFERENCES employer(id) ON DELETE CASCADE
-);
 
 CREATE TABLE job_post (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -158,7 +150,6 @@ CREATE TABLE cv_suggestion (
     section ENUM('INTRODUCTION', 'SKILLS', 'EXPERIENCE') NOT NULL,
     original_input TEXT NOT NULL,
     ai_suggestion TEXT NOT NULL,
-    edited_version TEXT,
     status ENUM('SUGGESTED', 'EDITED', 'SUBMITTED') DEFAULT 'SUGGESTED',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -268,14 +259,5 @@ CREATE TABLE notification_user (
 );
 
 
-CREATE TABLE conversation (
-    id VARCHAR(100) PRIMARY KEY,
-    user1_id INT,
-    user2_id INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_message_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user1_id) REFERENCES user(id) ON DELETE CASCADE,
-    FOREIGN KEY (user2_id) REFERENCES user(id) ON DELETE CASCADE,
-    UNIQUE(user1_id, user2_id)
-);
+
 

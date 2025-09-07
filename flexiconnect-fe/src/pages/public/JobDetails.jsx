@@ -28,6 +28,7 @@ import { endpoints, authApis } from "@configs/APIs";
 import { MyUserContext } from "@contexts/MyContexts";
 import ApplyDialog from "@applicationForms/ApplyDialog";
 import parse from "html-react-parser";
+import { toast } from "sonner";
 
 const Card = ({ className = "", children, subtle = false }) => (
   <div className={`
@@ -171,7 +172,7 @@ export default function JobDetail() {
 
   const requireLogin = () => {
     if (!myUser) {
-      alert("Bạn cần đăng nhập để sử dụng chức năng này");
+      toast.message("Vui lòng đăng nhập để thực hiện hành động này.");
       return false;
     }
     return true;
@@ -485,7 +486,7 @@ export default function JobDetail() {
               <Card className="p-6">
                 <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                   <Building2 className="text-blue-500" size={18} />
-                  Việc làm tương tự
+                  Việc làm khác
                 </h3>
                 <div className="space-y-3">
                   <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
@@ -493,8 +494,8 @@ export default function JobDetail() {
                     <div className="text-xs text-gray-500">ABC Company • 20-25 triệu</div>
                   </div>
                   <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <div className="font-semibold text-sm">Full-stack Developer</div>
-                    <div className="text-xs text-gray-500">XYZ Tech • 18-22 triệu</div>
+                    <div className="font-semibold text-sm">Marketing</div>
+                    <div className="text-xs text-gray-500">Shopee • 18-22 triệu</div>
                   </div>
                 </div>
               </Card>

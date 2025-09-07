@@ -2,10 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Bell } from "lucide-react";
 import { authApis, endpoints } from "@configs/APIs";
 import { toast } from "sonner";
-
-//
-// === UI Primitives ===
-//
+import { useNavigate } from "react-router-dom";
 
 const Card = ({ children, className }) => (
   <div
@@ -63,7 +60,7 @@ export default function Notifications() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedNotif, setSelectedNotif] = useState(null);
   const notifRef = useRef();
-
+  const navigate = useNavigate();
   // đóng dropdown khi click ngoài
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -180,9 +177,8 @@ export default function Notifications() {
             {notifications.map((n) => (
               <li
                 key={n.id}
-                className={`p-4 flex justify-between items-start cursor-pointer hover:bg-[#f5efe6] dark:hover:bg-[#353535] ${
-                  !n.isRead ? "font-semibold" : ""
-                }`}
+                className={`p-4 flex justify-between items-start cursor-pointer hover:bg-[#f5efe6] dark:hover:bg-[#353535] ${!n.isRead ? "font-semibold" : ""
+                  }`}
                 onClick={() => setSelectedNotif(n)}
               >
                 <div>
@@ -230,13 +226,18 @@ export default function Notifications() {
       >
         <p className="mb-2">{selectedNotif?.content}</p>
         {selectedNotif?.linkTo && (
-          <a
-            href={selectedNotif.linkTo}
+          <button
+            onClick={() => {
+              navigate(selectedNotif.linkTo);
+              setSelectedNotif(null);
+              setShowDropdown(false);
+            }}
             className="text-blue-600 hover:underline text-sm"
           >
             Xem chi tiết
-          </a>
+          </button>
         )}
+
         <div className="text-xs text-gray-400 mt-3">
           {selectedNotif?.createdAt
             ? new Date(selectedNotif.createdAt).toLocaleString("vi-VN")

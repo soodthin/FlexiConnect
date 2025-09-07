@@ -149,6 +149,7 @@ public class AdminServiceImpl implements AdminService {
             Long activeJobs = jobPostRepository.countByStatus(JobPost.JobStatus.OPEN);
             Long pendingVerifications = employerRepository.countByIsVerified(false);
             Long bannedUsers = userRepository.countByStatus(UserStatus.BANNED);
+            Long deletedUsers=userRepository.countByStatus(UserStatus.DELETED);
 
             LocalDateTime startOfYear = LocalDate.of(year, 1, 1).atStartOfDay();
             LocalDateTime endOfYear = LocalDate.of(year, 12, 31).atTime(23, 59, 59);
@@ -168,6 +169,7 @@ public class AdminServiceImpl implements AdminService {
                     .activeJobs(activeJobs)
                     .pendingEmployerVerifications(pendingVerifications)
                     .bannedUsers(bannedUsers)
+                    .deletedUsers(deletedUsers)
                     .userRegistrationStats(userRegistrationStats)
                     .jobPostStats(jobPostStats)
                     .build();

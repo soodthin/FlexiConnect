@@ -14,13 +14,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -38,8 +36,7 @@ import java.util.Set;
     @NamedQuery(name = "InterviewSession.findById", query = "SELECT i FROM InterviewSession i WHERE i.id = :id"),
     @NamedQuery(name = "InterviewSession.findByStatus", query = "SELECT i FROM InterviewSession i WHERE i.status = :status"),
     @NamedQuery(name = "InterviewSession.findByStartedAt", query = "SELECT i FROM InterviewSession i WHERE i.startedAt = :startedAt"),
-    @NamedQuery(name = "InterviewSession.findByCompletedAt", query = "SELECT i FROM InterviewSession i WHERE i.completedAt = :completedAt"),
-    @NamedQuery(name = "InterviewSession.findByTotalScore", query = "SELECT i FROM InterviewSession i WHERE i.totalScore = :totalScore")})
+    @NamedQuery(name = "InterviewSession.findByCompletedAt", query = "SELECT i FROM InterviewSession i WHERE i.completedAt = :completedAt")})
 public class InterviewSession implements Serializable {
 
     public enum SessionStatus {
@@ -59,12 +56,6 @@ public class InterviewSession implements Serializable {
     private LocalDateTime startedAt;
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
-    @Column(name = "total_score")
-    private Integer totalScore;
-    @Lob
-    @Size(max = 65535)
-    @Column(name = "note")
-    private String note;
     @OneToMany(mappedBy = "sessionId")
     @JsonIgnore
     private Set<InterviewTurn> interviewTurnSet;
@@ -116,21 +107,6 @@ public class InterviewSession implements Serializable {
         this.completedAt = completedAt;
     }
 
-    public Integer getTotalScore() {
-        return totalScore;
-    }
-
-    public void setTotalScore(Integer totalScore) {
-        this.totalScore = totalScore;
-    }
-
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
-    }
 
     public Set<InterviewTurn> getInterviewTurnSet() {
         return interviewTurnSet;

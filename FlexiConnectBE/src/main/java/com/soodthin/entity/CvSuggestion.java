@@ -67,10 +67,6 @@ public class CvSuggestion implements Serializable {
     @Size(min = 1, max = 65535)
     @Column(name = "ai_suggestion")
     private String aiSuggestion;
-    @Lob
-    @Size(max = 65535)
-    @Column(name = "edited_version")
-    private String editedVersion;
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private SuggestionStatus status = SuggestionStatus.SUGGESTED;
@@ -120,16 +116,6 @@ public class CvSuggestion implements Serializable {
     public void setAiSuggestion(String aiSuggestion) {
         this.aiSuggestion = aiSuggestion;
     }
-
-    public String getEditedVersion() {
-        return editedVersion;
-    }
-
-    public void setEditedVersion(String editedVersion) {
-        this.editedVersion = editedVersion;
-    }
-
-   
 
     public LocalDateTime getCreatedAt() {
         return createdAt;

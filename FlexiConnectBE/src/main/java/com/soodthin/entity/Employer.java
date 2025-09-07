@@ -78,8 +78,6 @@ public class Employer implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "employer")
     @JsonIgnore
     private Set<FollowEmployer> followEmployerSet;
-    @OneToMany(mappedBy = "employerId")
-    private Set<CompanyImage> companyImageSet;
     @OneToMany(mappedBy = "employer")
     @JsonIgnore
     private Set<JobPost> jobPostSet;
@@ -138,14 +136,6 @@ public class Employer implements Serializable {
 
     public void setFollowEmployerSet(Set<FollowEmployer> followEmployerSet) {
         this.followEmployerSet = followEmployerSet;
-    }
-
-    public Set<CompanyImage> getCompanyImageSet() {
-        return companyImageSet;
-    }
-
-    public void setCompanyImageSet(Set<CompanyImage> companyImageSet) {
-        this.companyImageSet = companyImageSet;
     }
 
     public Set<JobPost> getJobPostSet() {

@@ -6,7 +6,6 @@ import { FileText, X, Send, Eye, Sparkles } from "lucide-react";
 import { authApis, endpoints } from "@configs/APIs";
 import cookie from "react-cookies";
 
-/* ----------------- UI PRIMITIVES ----------------- */
 const Button = ({ children, variant = "default", className = "", ...props }) => {
     const base =
         "px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition";
@@ -81,7 +80,6 @@ const DialogContainer = ({ isOpen, setIsOpen, children }) => (
     </Dialog.Root>
 );
 
-/* ----------------- FEATURE COMPONENT ----------------- */
 export default function ApplyDialog({ jobId, isOpen, setIsOpen, hasApplied }) {
     const [coverLetter, setCoverLetter] = useState("");
     const [file, setFile] = useState(null);
@@ -103,22 +101,13 @@ export default function ApplyDialog({ jobId, isOpen, setIsOpen, hasApplied }) {
         }
     };
 
-    const handleSuggest = async () => {
-        setLoading(true);
-        try {
-            const res = await authApis().post(endpoints["ai-cover-letter"], { jobId });
-            setCoverLetter(res.data.suggestion);
-        } catch {
-            toast.error("Không thể gợi ý thư giới thiệu");
-        } finally {
-            setLoading(false);
-        }
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const token = cookie.load("token");
+        // Lấy token trực tiếp từ localStorage (khớp với authApis)
+        const savedUser = localStorage.getItem("user");
+        const token = savedUser ? JSON.parse(savedUser).token : null;
+
         if (!token) {
             toast.error("⚠️ Bạn chưa đăng nhập hoặc phiên đã hết hạn");
             return;
@@ -135,12 +124,16 @@ export default function ApplyDialog({ jobId, isOpen, setIsOpen, hasApplied }) {
         }
 
         setLoading(true);
+
         try {
             const formData = new FormData();
             formData.append("resumeFile", file);
             formData.append("jobPostId", jobId);
 
-            await authApis().post(endpoints["apply-job"], formData);
+            // Dùng authApis() như trước
+            await authApis().post(endpoints["apply-job"], formData, {
+                headers: { "Content-Type": "multipart/form-data" }, // thêm Content-Type cho FormData
+            });
 
             toast.success("🎉 Bạn đã ứng tuyển thành công!");
             setIsOpen(false);
@@ -159,6 +152,7 @@ export default function ApplyDialog({ jobId, isOpen, setIsOpen, hasApplied }) {
             setLoading(false);
         }
     };
+
 
     return (
         <DialogContainer isOpen={isOpen} setIsOpen={setIsOpen}>
@@ -200,13 +194,7 @@ export default function ApplyDialog({ jobId, isOpen, setIsOpen, hasApplied }) {
                                 placeholder="Viết vài dòng ấn tượng để gây chú ý với nhà tuyển dụng..."
                                 disabled={hasApplied}
                             />
-                            <IconButton
-                                icon={Sparkles}
-                                label="Gợi ý bằng AI"
-                                type="button"
-                                onClick={handleSuggest}
-                                disabled={loading || hasApplied}
-                            />
+
                         </div>
                     </div>
 

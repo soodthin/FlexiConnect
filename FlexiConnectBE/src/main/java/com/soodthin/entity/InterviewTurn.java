@@ -31,11 +31,7 @@ import java.time.LocalDateTime;
     @NamedQuery(name = "InterviewTurn.findAll", query = "SELECT i FROM InterviewTurn i"),
     @NamedQuery(name = "InterviewTurn.findById", query = "SELECT i FROM InterviewTurn i WHERE i.id = :id"),
     @NamedQuery(name = "InterviewTurn.findByTurnOrder", query = "SELECT i FROM InterviewTurn i WHERE i.turnOrder = :turnOrder"),
-    @NamedQuery(name = "InterviewTurn.findByCreatedAt", query = "SELECT i FROM InterviewTurn i WHERE i.createdAt = :createdAt"),
-    @NamedQuery(name = "InterviewTurn.findByAnswerStatus", query = "SELECT i FROM InterviewTurn i WHERE i.answerStatus = :answerStatus"),
-    @NamedQuery(name = "InterviewTurn.findByQuestionType", query = "SELECT i FROM InterviewTurn i WHERE i.questionType = :questionType"),
-    @NamedQuery(name = "InterviewTurn.findByManualScore", query = "SELECT i FROM InterviewTurn i WHERE i.manualScore = :manualScore"),
-    @NamedQuery(name = "InterviewTurn.findByAnswerTimeSeconds", query = "SELECT i FROM InterviewTurn i WHERE i.answerTimeSeconds = :answerTimeSeconds")})
+    @NamedQuery(name = "InterviewTurn.findByCreatedAt", query = "SELECT i FROM InterviewTurn i WHERE i.createdAt = :createdAt")})
 public class InterviewTurn implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -62,20 +58,7 @@ public class InterviewTurn implements Serializable {
     private Double aiScore;
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-    @Size(max = 8)
-    @Column(name = "answer_status")
-    private String answerStatus;
-    @Size(max = 10)
-    @Column(name = "question_type")
-    private String questionType;
-    @Column(name = "manual_score")
-    private Integer manualScore;
-    @Lob
-    @Size(max = 65535)
-    @Column(name = "manual_feedback")
-    private String manualFeedback;
-    @Column(name = "answer_time_seconds")
-    private Integer answerTimeSeconds;
+    
     @JoinColumn(name = "session_id", referencedColumnName = "id")
     @ManyToOne
     @JsonIgnore
@@ -136,45 +119,6 @@ public class InterviewTurn implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public String getAnswerStatus() {
-        return answerStatus;
-    }
-
-    public void setAnswerStatus(String answerStatus) {
-        this.answerStatus = answerStatus;
-    }
-
-    public String getQuestionType() {
-        return questionType;
-    }
-
-    public void setQuestionType(String questionType) {
-        this.questionType = questionType;
-    }
-
-    public Integer getManualScore() {
-        return manualScore;
-    }
-
-    public void setManualScore(Integer manualScore) {
-        this.manualScore = manualScore;
-    }
-
-    public String getManualFeedback() {
-        return manualFeedback;
-    }
-
-    public void setManualFeedback(String manualFeedback) {
-        this.manualFeedback = manualFeedback;
-    }
-
-    public Integer getAnswerTimeSeconds() {
-        return answerTimeSeconds;
-    }
-
-    public void setAnswerTimeSeconds(Integer answerTimeSeconds) {
-        this.answerTimeSeconds = answerTimeSeconds;
-    }
 
     public InterviewSession getSessionId() {
         return sessionId;

@@ -4,6 +4,7 @@ import * as RadixDialog from "@radix-ui/react-dialog";
 import { Cross2Icon, Pencil2Icon, TrashIcon, PlusCircledIcon } from "@radix-ui/react-icons";
 import { useNavigate } from "react-router-dom";
 import { Bookmark } from "lucide-react";
+import { toast } from "sonner";
 
 const Card = ({ children, className = "" }) => (
   <div
@@ -100,6 +101,7 @@ export default function CandidateSkillList() {
       }
       resetForm();
       setReload((prev) => prev + 1);
+      toast.success(`Kỹ năng đã được ${editingSkill ? "cập nhật" : "thêm"}!`);
     } catch {}
   };
 
@@ -107,6 +109,7 @@ export default function CandidateSkillList() {
     try {
       await authApis().delete(`${endpoints["skills"]}/${id}`);
       setReload((prev) => prev + 1);
+      toast.success("Kỹ năng đã được xoá!");
     } catch {}
   };
 

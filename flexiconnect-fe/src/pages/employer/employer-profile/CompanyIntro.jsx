@@ -240,13 +240,16 @@ export default function CompanyIntro({ profile, onUpdated }) {
             alt="Zoomed"
             className="w-full h-auto rounded-lg object-contain max-h-[80vh] mx-auto"
           />
-          <RadixDialog.Close asChild>
-            <Button variant="icon" className="absolute top-4 right-4">
-              <X />
-            </Button>
-          </RadixDialog.Close>
+          <Button
+            variant="icon"
+            className="absolute top-4 right-4"
+            onClick={() => setZoomedImage(null)}
+          >
+            <X />
+          </Button>
         </div>
       </Dialog>
+
     </Card>
   );
 }

@@ -14,6 +14,7 @@ import {
   TrashIcon,
   PlusCircledIcon,
 } from "@radix-ui/react-icons";
+import { toast } from "sonner";
 
 const Card = ({ children, className = "" }) => (
   <div
@@ -103,6 +104,7 @@ export default function EducationHistory() {
       }
       resetForm();
       setReload((prev) => prev + 1);
+      toast.success(`Học vấn đã được ${editingEdu ? "cập nhật" : "thêm mới"}!`);
     } catch {}
   };
 
@@ -110,6 +112,7 @@ export default function EducationHistory() {
     try {
       await authApis().delete(endpoints["education-id"](id));
       setReload((prev) => prev + 1);
+      toast.success("Học vấn đã được xoá!");
     } catch {}
   };
 

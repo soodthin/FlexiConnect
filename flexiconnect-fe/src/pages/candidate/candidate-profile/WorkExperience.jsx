@@ -149,7 +149,7 @@ const ExperienceCard = ({ exp, onEdit, onDelete, hasAIAccess }) => (
     {exp.descriptionAiSuggestion && hasAIAccess && (
       <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded-md">
         <p className="text-sm text-blue-800 dark:text-blue-300 italic whitespace-pre-wrap">
-          <span className="font-semibold not-italic">🤖 Gợi ý từ AI:</span> {exp.descriptionAiSuggestion}
+          <span className="font-semibold not-italic"> Gợi ý từ AI:</span> {exp.descriptionAiSuggestion}
         </p>
       </div>
     )}
@@ -178,41 +178,31 @@ export default function WorkExperience({ userPackage, onUpgradeClick }) {
   const [isUpgradeDialogOpen, setIsUpgradeDialogOpen] = useState(false);
   const [reload, setReload] = useState(0);
   const [isSuggesting, setIsSuggesting] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteExpId, setDeleteExpId] = useState(null);
   const firstInputRef = useRef(null);
 
-  // Check if user has AI access
-  const checkAIAccess = () => {
-  return userPackage?.isActive === true;
-};
+  const checkAIAccess = () => userPackage?.isActive === true;
 
-
-const handleAIFeatureClick = (callback) => {
-  if (checkAIAccess()) {
-    callback();
-  } else {
-    setOpen(false); 
-    if (onUpgradeClick) {
-      onUpgradeClick();
+  const handleAIFeatureClick = (callback) => {
+    if (checkAIAccess()) {
+      callback();
     } else {
-      setIsUpgradeDialogOpen(true);
+      setOpen(false); 
+      if (onUpgradeClick) {
+        onUpgradeClick();
+      } else {
+        setIsUpgradeDialogOpen(true);
+      }
     }
-  }
-};
+  };
 
   const handleUpgradeRedirect = () => {
-    console.log("🚀 Navigating to upgrade page...");
     setIsUpgradeDialogOpen(false);
-    
     try {
       navigate("/candidate-upgrade", { replace: true });
-    } catch (error1) {
-      console.error("Navigate failed:", error1);
-      try {
-        window.location.href = "/candidate-upgrade";
-      } catch (error2) {
-        console.error("Window location failed:", error2);
-        window.location.replace("/candidate-upgrade");
-      }
+    } catch {
+      window.location.href = "/candidate-upgrade";
     }
   };
 
@@ -249,10 +239,10 @@ const handleAIFeatureClick = (callback) => {
       const res = await authApis().post(endpoints["cv-suggestion"], { originalInput: description });
       if (res.data?.aiSuggestion) {
         setDescriptionAiSuggestion(res.data.aiSuggestion);
-        toast.success("✅ AI đã tạo gợi ý!");
+        toast.success(" AI đã tạo gợi ý!");
       }
     } catch {
-      toast.error("❌ Lỗi tạo gợi ý.");
+      toast.error(" Lỗi tạo gợi ý, vui lòng thử lại.");
     } finally {
       setIsSuggesting(false);
     }
@@ -269,7 +259,7 @@ const handleAIFeatureClick = (callback) => {
         await authApis().post(endpoints["workexperience"], data);
         toast.success("Thêm mới thành công!");
       }
-      setReload((prev) => prev + 1);
+      setReload(prev => prev + 1);
       resetForm();
     } catch {
       toast.error("Thao tác thất bại.");
@@ -287,19 +277,28 @@ const handleAIFeatureClick = (callback) => {
     setOpen(true);
   };
 
-  const deleteExperience = (id) => {
-    if (window.confirm("Bạn có chắc muốn xóa kinh nghiệm này?")) {
-      authApis().delete(`${endpoints["workexperience"]}/${id}`)
-        .then(() => {
-          toast.success("Đã xóa kinh nghiệm.");
-          setReload(prev => prev + 1);
-        })
-        .catch(() => toast.error("Xóa thất bại."));
+  // Dialog Xóa
+  const confirmDeleteExperience = (id) => {
+    setDeleteExpId(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteExperience = async () => {
+    try {
+      await authApis().delete(`${endpoints["workexperience"]}/${deleteExpId}`);
+      toast.success("✅ Đã xóa kinh nghiệm!");
+      setReload(prev => prev + 1);
+    } catch {
+      toast.error("❌ Xóa thất bại.");
+    } finally {
+      setDeleteDialogOpen(false);
+      setDeleteExpId(null);
     }
   };
 
   return (
     <div className="w-full">
+      {/* Thêm/Sửa Dialog */}
       <Dialog.Root open={open} onOpenChange={(isOpen) => !isOpen && resetForm()}>
         <Dialog.Trigger asChild>
           <Button
@@ -315,9 +314,7 @@ const handleAIFeatureClick = (callback) => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <Dialog.Title className="text-2xl font-bold mb-4">
                 Kinh nghiệm làm việc
-                {checkAIAccess() && (
-                  <Crown size={20} className="inline ml-2 text-yellow-500" />
-                )}
+                {checkAIAccess() && <Crown size={20} className="inline ml-2 text-yellow-500" />}
               </Dialog.Title>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <input ref={firstInputRef} placeholder="Công ty" className="w-full px-4 py-2 rounded-lg border dark:border-neutral-600 bg-white dark:bg-[#3a3a3a]" value={company} onChange={(e) => setCompany(e.target.value)} required />
@@ -349,7 +346,7 @@ const handleAIFeatureClick = (callback) => {
                   ) : checkAIAccess() ? (
                     <><MagicWandIcon /> Viết lại với AI</>
                   ) : (
-                    <><Crown size={16} /> 🔒 Nâng cấp để dùng AI</>
+                    <><Crown size={16} />  Nâng cấp để dùng AI</>
                   )}
                 </Button>
                 {descriptionAiSuggestion && checkAIAccess() && (
@@ -397,17 +394,25 @@ const handleAIFeatureClick = (callback) => {
                 </Dialog.Close>
               </div>
             </form>
-            <Dialog.Close asChild>
-              <IconButton className="absolute right-4 top-4 hover:bg-gray-200 dark:hover:bg-[#444]">
-                <Cross2Icon />
-              </IconButton>
-            </Dialog.Close>
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
 
-      {/* Standalone Upgrade Dialog - only show if onUpgradeClick is not provided */}
-      {!onUpgradeClick && (
+      {/* Danh sách trải nghiệm */}
+      <div className="grid gap-4 mt-6">
+        {experiences.map((exp) => (
+          <ExperienceCard
+            key={exp.id}
+            exp={exp}
+            hasAIAccess={checkAIAccess()}
+            onEdit={() => startEdit(exp)}
+            onDelete={() => confirmDeleteExperience(exp.id)}
+          />
+        ))}
+      </div>
+
+      {/* Dialog nâng cấp */}
+      {isUpgradeDialogOpen && (
         <UpgradeDialog
           open={isUpgradeDialogOpen}
           onClose={() => setIsUpgradeDialogOpen(false)}
@@ -415,20 +420,25 @@ const handleAIFeatureClick = (callback) => {
         />
       )}
 
-      <div className="space-y-4 mt-6">
-        <AnimatePresence>
-          {experiences.map((exp) => (
-            <motion.div key={exp.id} layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <ExperienceCard 
-                exp={exp} 
-                onEdit={() => startEdit(exp)} 
-                onDelete={() => deleteExperience(exp.id)}
-                hasAIAccess={checkAIAccess()}
-              />
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
+      {/* Dialog xóa */}
+      <Dialog.Root open={deleteDialogOpen} onOpenChange={(open) => !open && setDeleteDialogOpen(false)}>
+        <Dialog.Portal>
+          <Dialog.Overlay />
+          <Dialog.Content>
+            <div className="text-center">
+              <p className="text-lg font-medium mb-4">Bạn có chắc muốn xóa kinh nghiệm này?</p>
+              <div className="flex gap-3 justify-center">
+                <Button onClick={handleDeleteExperience} className="bg-red-600 text-white flex-1">
+                  Xóa
+                </Button>
+                <Button onClick={() => setDeleteDialogOpen(false)} className="bg-gray-200 dark:bg-[#444] flex-1">
+                  Hủy
+                </Button>
+              </div>
+            </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
     </div>
   );
 }

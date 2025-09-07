@@ -25,6 +25,7 @@ public class AdminDashboardResponse {
     private Long activeJobs;
     private Long pendingEmployerVerifications;
     private Long bannedUsers;
+    private Long deletedUsers;
     private List<UserRegistrationStatsDTO> userRegistrationStats;
     private List<JobPostStatsDTO> jobPostStats;
 

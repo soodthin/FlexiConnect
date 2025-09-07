@@ -1,20 +1,20 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Apis, { endpoints } from "@configs/APIs";
 import { FaUserPlus } from "react-icons/fa";
 import { unstable_PasswordToggleField as PasswordToggleField } from "radix-ui";
-import { EyeClosedIcon, EyeOpenIcon } from "@radix-ui/react-icons";
-
-/* ---------------------------------- */
-/* 🔹 UI Primitives                   */
-/* ---------------------------------- */
+import { EyeClosedIcon, EyeOpenIcon, ArrowLeftIcon } from "@radix-ui/react-icons";
+import { motion, AnimatePresence } from "framer-motion";
 
 // Input field
-function InputField({ label, type = "text", value, onChange, placeholder }) {
+function InputField({ label, type = "text", value, onChange, placeholder, error }) {
   const inputClass =
     "flex-1 bg-gray-100 dark:bg-[#2d2d2d] text-gray-800 dark:text-gray-100 placeholder-gray-400 outline-none text-sm";
   const wrapperClass =
-    "flex items-center gap-2 rounded-md border border-gray-300 dark:border-neutral-600 bg-gray-100 dark:bg-[#2d2d2d] px-3 h-10 hover:border-blue-400 focus-within:ring-2 focus-within:ring-blue-400 transition";
+    "flex items-center gap-2 rounded-md border px-3 h-10 transition " +
+    (error
+      ? "border-red-500 focus-within:ring-2 focus-within:ring-red-400"
+      : "border-gray-300 dark:border-neutral-600 bg-gray-100 dark:bg-[#2d2d2d] hover:border-blue-400 focus-within:ring-2 focus-within:ring-blue-400");
 
   return (
     <div className="space-y-1">
@@ -29,16 +29,20 @@ function InputField({ label, type = "text", value, onChange, placeholder }) {
           required
         />
       </div>
+      {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
     </div>
   );
 }
 
 // Password field
-function PasswordField({ label, value, onChange, placeholder }) {
+function PasswordField({ label, value, onChange, placeholder, error }) {
   const inputClass =
     "flex-1 bg-gray-100 dark:bg-[#2d2d2d] text-gray-800 dark:text-gray-100 placeholder-gray-400 outline-none text-sm";
   const wrapperClass =
-    "flex items-center gap-2 rounded-md border border-gray-300 dark:border-neutral-600 bg-gray-100 dark:bg-[#2d2d2d] px-3 h-10 hover:border-blue-400 focus-within:ring-2 focus-within:ring-blue-400 transition";
+    "flex items-center gap-2 rounded-md border px-3 h-10 transition " +
+    (error
+      ? "border-red-500 focus-within:ring-2 focus-within:ring-red-400"
+      : "border-gray-300 dark:border-neutral-600 bg-gray-100 dark:bg-[#2d2d2d] hover:border-blue-400 focus-within:ring-2 focus-within:ring-blue-400");
 
   return (
     <div className="space-y-1">
@@ -58,6 +62,7 @@ function PasswordField({ label, value, onChange, placeholder }) {
           </PasswordToggleField.Toggle>
         </div>
       </PasswordToggleField.Root>
+      {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
     </div>
   );
 }
@@ -67,21 +72,20 @@ function Alert({ msg }) {
   if (!msg) return null;
   return (
     <div
-      className={`text-sm text-center p-2 rounded-md font-medium ${
-        msg.includes("✅")
-          ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-          : "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200"
-      }`}
+      className={`text-sm text-center p-2 rounded-md font-medium ${msg.includes("✅")
+        ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+        : "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200"
+        }`}
     >
       {msg}
     </div>
   );
 }
 
-// File upload
-function FileUpload({ images, onChange }) {
+// File upload with preview
+function FileUpload({ images, onChange, onRemove }) {
   return (
-    <div className="space-y-1">
+    <div className="space-y-2">
       <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
         Ảnh môi trường làm việc <span className="text-gray-400">(3-5 ảnh)</span>
       </label>
@@ -115,12 +119,28 @@ function FileUpload({ images, onChange }) {
             Hỗ trợ ảnh JPG, PNG. Tối đa 5 ảnh.
           </span>
         </div>
-        {images.length > 0 && (
-          <div className="absolute left-4 bottom-4 flex items-center gap-2 text-xs text-gray-800 dark:text-gray-100 bg-white/30 dark:bg-black/30 px-2 py-1 rounded shadow">
-            Đã chọn {images.length} ảnh
-          </div>
-        )}
       </div>
+
+      {images.length > 0 && (
+        <div className="grid grid-cols-3 gap-2 mt-3">
+          {images.map((img, idx) => (
+            <div key={idx} className="relative group">
+              <img
+                src={URL.createObjectURL(img)}
+                alt={`preview-${idx}`}
+                className="w-full h-24 object-cover rounded-md shadow"
+              />
+              <button
+                type="button"
+                onClick={() => onRemove(idx)}
+                className="absolute top-1 right-1 bg-black/60 text-white rounded-full px-2 py-0.5 text-xs opacity-0 group-hover:opacity-100 transition"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -147,11 +167,32 @@ export default function EmployerRegister() {
   const [msg, setMsg] = useState(null);
   const [step, setStep] = useState(1);
   const [strength, setStrength] = useState({});
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
   const setState = (value, field) => {
     setEmployer({ ...employer, [field]: value });
     if (field === "password") setStrength(evaluatePasswordStrength(value));
+    validateField(field, value);
+  };
+
+  const validateField = (field, value) => {
+    let newErrors = { ...errors };
+
+    if (field === "email") {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      newErrors.email = emailRegex.test(value) ? null : "Email không hợp lệ.";
+    }
+
+    if (field === "password") {
+      newErrors.password = value.length < 8 ? "Mật khẩu phải ít nhất 8 ký tự." : null;
+    }
+
+    if (field === "confirmPassword") {
+      newErrors.confirmPassword = value !== employer.password ? "Mật khẩu không khớp." : null;
+    }
+
+    setErrors(newErrors);
   };
 
   const evaluatePasswordStrength = (password) => {
@@ -173,6 +214,10 @@ export default function EmployerRegister() {
     setImages(files.slice(0, 5));
   };
 
+  const handleRemoveImage = (idx) => {
+    setImages(images.filter((_, i) => i !== idx));
+  };
+
   const nextStep = (e) => {
     e.preventDefault();
     const { fullName, email, password, confirmPassword, companyName, taxCode } = employer;
@@ -180,8 +225,8 @@ export default function EmployerRegister() {
       setMsg("❌ Vui lòng nhập đầy đủ các trường.");
       return;
     }
-    if (password !== confirmPassword) {
-      setMsg("❌ Mật khẩu KHÔNG khớp!");
+    if (errors.email || errors.password || errors.confirmPassword) {
+      setMsg("❌ Vui lòng sửa lỗi trước khi tiếp tục.");
       return;
     }
     if (strength.label !== "Khá" && strength.label !== "Mạnh") {
@@ -222,95 +267,147 @@ export default function EmployerRegister() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-beige-50 dark:bg-[#181818] p-4">
       <form className="bg-white dark:bg-[#232323] shadow-lg border border-gray-200 dark:border-gray-700 rounded-2xl p-8 w-full max-w-md space-y-4">
-        <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100 mb-4">
+        {/* Stepper */}
+        <div className="flex items-center justify-center gap-4 mb-4">
+          <div
+            className={`w-8 h-8 flex items-center justify-center rounded-full font-bold ${step === 1 ? "bg-blue-600 text-white" : "bg-gray-300 text-gray-600"
+              }`}
+          >
+            1
+          </div>
+          <div className="h-0.5 w-12 bg-gray-400"></div>
+          <div
+            className={`w-8 h-8 flex items-center justify-center rounded-full font-bold ${step === 2 ? "bg-blue-600 text-white" : "bg-gray-300 text-gray-600"
+              }`}
+          >
+            2
+          </div>
+        </div>
+
+        <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100 mb-2">
           Đăng ký Nhà Tuyển Dụng
         </h2>
 
         <Alert msg={msg} />
 
-        {step === 1 && (
-          <>
-            <InputField
-              label="Họ và tên"
-              type="text"
-              value={employer.fullName || ""}
-              onChange={(e) => setState(e.target.value, "fullName")}
-              placeholder="Nhập họ và tên..."
-            />
-            <InputField
-              label="Email"
-              type="email"
-              value={employer.email || ""}
-              onChange={(e) => setState(e.target.value, "email")}
-              placeholder="Nhập email..."
-            />
-            <InputField
-              label="Tên công ty"
-              type="text"
-              value={employer.companyName || ""}
-              onChange={(e) => setState(e.target.value, "companyName")}
-              placeholder="Nhập tên công ty..."
-            />
-            <InputField
-              label="Mã số thuế"
-              type="text"
-              value={employer.taxCode || ""}
-              onChange={(e) => setState(e.target.value, "taxCode")}
-              placeholder="Nhập mã số thuế..."
-            />
+        {/* Animate step content */}
+        <AnimatePresence mode="wait">
+          {step === 1 && (
+            <motion.div
+              key="step1"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="space-y-4"
+            >
+              <InputField
+                label="Họ và tên"
+                type="text"
+                value={employer.fullName || ""}
+                onChange={(e) => setState(e.target.value, "fullName")}
+                placeholder="Nhập họ và tên..."
+              />
+              <InputField
+                label="Email"
+                type="email"
+                value={employer.email || ""}
+                onChange={(e) => setState(e.target.value, "email")}
+                placeholder="Nhập email..."
+                error={errors.email}
+              />
+              <InputField
+                label="Tên công ty"
+                type="text"
+                value={employer.companyName || ""}
+                onChange={(e) => setState(e.target.value, "companyName")}
+                placeholder="Nhập tên công ty..."
+              />
+              <InputField
+                label="Mã số thuế"
+                type="text"
+                value={employer.taxCode || ""}
+                onChange={(e) => setState(e.target.value, "taxCode")}
+                placeholder="Nhập mã số thuế..."
+              />
 
-            <PasswordField
-              label="Mật khẩu"
-              value={employer.password || ""}
-              onChange={(e) => setState(e.target.value, "password")}
-              placeholder="Nhập mật khẩu..."
-            />
-            {employer.password && (
-              <>
-                <div className="w-full h-2 rounded bg-gray-200 dark:bg-gray-600 mt-1">
-                  <div
-                    className={`h-2 rounded ${strength.color}`}
-                    style={{ width: `${strength.percent || 0}%` }}
-                  />
-                </div>
-                {strength.label && (
-                  <div className={`text-xs mt-1 font-medium ${strength.color.replace("bg-", "text-")}`}>
-                    Độ mạnh mật khẩu: {strength.label}
+              <PasswordField
+                label="Mật khẩu"
+                value={employer.password || ""}
+                onChange={(e) => setState(e.target.value, "password")}
+                placeholder="Nhập mật khẩu..."
+                error={errors.password}
+              />
+              {employer.password && (
+                <>
+                  <div className="w-full h-2 rounded bg-gray-200 dark:bg-gray-600 mt-1">
+                    <div
+                      className={`h-2 rounded ${strength.color}`}
+                      style={{ width: `${strength.percent || 0}%` }}
+                    />
                   </div>
-                )}
-              </>
-            )}
+                  {strength.label && (
+                    <div
+                      className={`text-xs mt-1 font-medium ${strength.color.replace("bg-", "text-")}`}
+                    >
+                      Độ mạnh mật khẩu: {strength.label}
+                    </div>
+                  )}
+                </>
+              )}
 
-            <PasswordField
-              label="Xác nhận mật khẩu"
-              value={employer.confirmPassword || ""}
-              onChange={(e) => setState(e.target.value, "confirmPassword")}
-              placeholder="Nhập lại mật khẩu..."
-            />
+              <PasswordField
+                label="Xác nhận mật khẩu"
+                value={employer.confirmPassword || ""}
+                onChange={(e) => setState(e.target.value, "confirmPassword")}
+                placeholder="Nhập lại mật khẩu..."
+                error={errors.confirmPassword}
+              />
 
-            <ActionButton onClick={nextStep}>
-              <FaUserPlus /> Tiếp theo
-            </ActionButton>
-          </>
-        )}
-
-        {step === 2 && (
-          <>
-            <FileUpload images={images} onChange={handleImageChange} />
-            <div className="flex gap-2 mt-4">
-              <button
-                type="button"
-                onClick={() => setStep(1)}
-                className="flex-1 bg-gray-200 dark:bg-neutral-700 text-gray-800 dark:text-gray-100 py-2 rounded-xl font-semibold shadow hover:opacity-90 transition"
-              >
-                Quay lại
-              </button>
-              <ActionButton onClick={register}>
-                <FaUserPlus /> Hoàn tất đăng ký
+              <ActionButton onClick={nextStep}>
+                <FaUserPlus /> Tiếp theo
               </ActionButton>
-            </div>
-          </>
-        )}
+
+              <p className="text-sm text-center text-gray-600 dark:text-gray-400 mt-2">
+                Đã có tài khoản?{" "}
+                <Link to="/login" className="text-blue-600 hover:underline">
+                  Quay lại đăng nhập
+                </Link>
+              </p>
+            </motion.div>
+          )}
+
+          {step === 2 && (
+            <motion.div
+              key="step2"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="space-y-4"
+            >
+              <FileUpload images={images} onChange={handleImageChange} onRemove={handleRemoveImage} />
+              <div className="flex gap-2 mt-4">
+                <button
+                  type="button"
+                  onClick={() => setStep(1)}
+                  className="flex-1 bg-gray-200 dark:bg-neutral-700 text-gray-800 dark:text-gray-100 
+             py-2 px-6 rounded-xl font-semibold shadow hover:opacity-90 transition 
+             flex items-center justify-center"
+                >
+                  <ArrowLeftIcon className="w-5 h-5 ml-1" />
+                </button>
+
+
+
+                <ActionButton onClick={register} className="flex-[2] w-full">
+                  <FaUserPlus /> Hoàn tất đăng ký
+                </ActionButton>
+              </div>
+
+            </motion.div>
+          )}
+        </AnimatePresence>
       </form>
     </div>
   );

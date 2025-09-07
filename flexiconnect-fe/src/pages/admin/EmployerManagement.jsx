@@ -32,7 +32,7 @@ function EmployerManagement() {
   const handleVerify = async (id) => {
     try {
       await authApis().put(endpoints["admin-employer-verify"](id));
-      toast.success("✅ Duyệt thành công!");
+      toast.success("Duyệt thành công!");
       await loadEmployers();
     } catch (err) {
       console.error(err);
@@ -47,7 +47,7 @@ function EmployerManagement() {
     }
     try {
       await authApis().put(endpoints["admin-employer-reject"](rejectId), { reason });
-      toast.error(`❌ Rejected: ${reason}`);
+      toast.error(` Từ chối thành công, lý do: ${reason}`);
       await loadEmployers();
       setOpen(false);
       setReason("");
@@ -93,13 +93,13 @@ function EmployerManagement() {
                     onClick={() => handleVerify(emp.id)}
                     className="px-4 py-1 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-full shadow hover:scale-105 transform transition"
                   >
-                    ✅ Verify
+                     Verify
                   </button>
                   <button
                     onClick={() => { setRejectId(emp.id); setOpen(true); }}
                     className="px-4 py-1 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-full shadow hover:scale-105 transform transition"
                   >
-                    ❌ Reject
+                     Reject
                   </button>
                 </td>
               )}
@@ -118,7 +118,7 @@ function EmployerManagement() {
 
   return (
     <div className="p-6 min-h-screen bg-beige-light dark:bg-[#181818] text-gray-800 dark:text-gray-100">
-      <h2 className="text-2xl font-bold mb-6">📋 Employers Management</h2>
+      <h2 className="text-2xl font-bold mb-6">TRANG DUYỆT NHÀ TUYỂN DỤNG</h2>
 
       <Tabs.Root defaultValue="pending">
         <Tabs.List className="flex space-x-4 border-b pb-2 mb-4 dark:border-neutral-700">

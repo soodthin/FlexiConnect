@@ -11,9 +11,6 @@ import {
   Wand2,
   X,
   Camera,
-  Eye,
-  FileText,
-  Share2,
   Crown,
   Zap,
 } from "lucide-react";
@@ -30,16 +27,6 @@ const Button = ({ className, children, ...props }) => (
   </button>
 );
 
-const Card = ({ className, children }) => (
-  <div
-    className={classNames(
-      "bg-white dark:bg-[#232323] rounded-xl shadow p-6",
-      className
-    )}
-  >
-    {children}
-  </div>
-);
 
 const Section = ({ id, innerRef, children }) => (
   <section
@@ -51,17 +38,6 @@ const Section = ({ id, innerRef, children }) => (
   </section>
 );
 
-const Progress = ({ value }) => (
-  <div className="flex items-center gap-2">
-    <div className="w-32 h-2 bg-gray-200 dark:bg-[#282828] rounded-full overflow-hidden">
-      <div
-        className="h-2 bg-blue-500 rounded-full transition-all"
-        style={{ width: `${value}%` }}
-      />
-    </div>
-    <span className="text-xs text-blue-600 font-bold ml-1">{value}%</span>
-  </div>
-);
 
 const Dialog = ({ open, onClose, title, children }) =>
   open ? (
@@ -83,7 +59,7 @@ const Dialog = ({ open, onClose, title, children }) =>
     </div>
   ) : null;
 
-// Upgrade Dialog Component
+
 const UpgradeDialog = ({ open, onClose, onUpgrade }) => (
   <Dialog open={open} onClose={onClose} title="">
     <div className="text-center">
@@ -154,8 +130,8 @@ const UpgradeDialog = ({ open, onClose, onUpgrade }) => (
 const SECTIONS = [
   { id: "profile", label: "Thông tin cá nhân" },
   { id: "education", label: "Học vấn" },
-  { id: "experience", label: "Kinh nghiệm"},
-  { id: "skills", label: "Kỹ năng - Lưu Job"},
+  { id: "experience", label: "Kinh nghiệm" },
+  { id: "skills", label: "Kỹ năng - Lưu Job" },
 ];
 
 // Format date
@@ -177,7 +153,9 @@ export default function CandidateProfilePage() {
     address: "",
     title: "",
     bio: "",
+    gender: "",
   });
+
   const [bioSuggestion, setBioSuggestion] = useState("");
   const [isSuggesting, setIsSuggesting] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -185,7 +163,6 @@ export default function CandidateProfilePage() {
 
   const sectionRefs = useRef({});
   const navigate = useNavigate();
-  const profileCompletion = 78;
 
   useEffect(() => {
     const html = document.documentElement;
@@ -245,13 +222,6 @@ export default function CandidateProfilePage() {
     }
   };
 
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    toast.success("📋 Link hồ sơ đã được copy!");
-  };
-  const handlePreview = () => window.open("/preview-profile", "_blank");
-  const handleDownloadPDF = () =>
-    toast.info("📄 Chức năng tải PDF sẽ được cập nhật!");
 
   const handleAvatarChange = async (e) => {
     const file = e.target.files?.[0];
@@ -263,9 +233,9 @@ export default function CandidateProfilePage() {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setAvatarTimestamp(Date.now());
-      toast.success("✅ Ảnh đại diện đã được cập nhật!");
+      toast.success(" Ảnh đại diện đã được cập nhật!");
     } catch {
-      toast.error("❌ Lỗi khi cập nhật ảnh đại diện.");
+      toast.error(" Lỗi khi cập nhật ảnh đại diện.");
     }
   };
 
@@ -277,11 +247,11 @@ export default function CandidateProfilePage() {
         bio: bioSuggestion || form.bio,
         avatar: profile.avatar,
       });
-      toast.success("✅ Đã cập nhật!");
+      toast.success(" Đã cập nhật!");
       loadProfile();
       setIsDialogOpen(false);
     } catch {
-      toast.error("❌ Cập nhật thất bại!");
+      toast.error(" Cập nhật thất bại!");
     }
   };
 
@@ -293,6 +263,7 @@ export default function CandidateProfilePage() {
       address: profile.address || "",
       title: profile.title || "",
       bio: profile.bio || "",
+      gender: profile.gender || "",
     });
     setBioSuggestion("");
     setIsDialogOpen(true);
@@ -300,7 +271,7 @@ export default function CandidateProfilePage() {
 
   const handleGetSuggestion = async () => {
     if (!form.bio) {
-      toast.info("✍️ Vui lòng nhập vài ý chính để AI gợi ý.");
+      toast.info(" Vui lòng nhập vài ý chính để AI gợi ý.");
       return;
     }
     setIsSuggesting(true);
@@ -310,10 +281,10 @@ export default function CandidateProfilePage() {
       });
       if (res.data?.aiSuggestion) {
         setBioSuggestion(res.data.aiSuggestion);
-        toast.success("✅ AI đã tạo gợi ý!");
+        toast.success(" AI đã tạo gợi ý!");
       }
     } catch {
-      toast.error("❌ AI gợi ý thất bại.");
+      toast.error(" AI gợi ý thất bại.");
     } finally {
       setIsSuggesting(false);
     }
@@ -321,7 +292,7 @@ export default function CandidateProfilePage() {
 
   const handleUpgradeRedirect = () => {
     setIsUpgradeDialogOpen(false);
-    
+
     navigate("/candidate-upgrade");
   };
 
@@ -347,38 +318,38 @@ export default function CandidateProfilePage() {
             )}
           >
             <span>{sec.icon}</span> {sec.label}
-            {sec.id === "skills" }
+            {sec.id === "skills"}
           </Button>
         ))}
       </aside>
 
       {/* Main Content */}
       <main className="flex-1 px-4 sm:px-8 py-8 text-gray-800 dark:text-gray-100">
-        
 
-       {/* Hiển thị gói hiện tại */}
-{profile?.userPackage && (
-  <div className="flex flex-wrap items-center gap-3 mb-4">
-    <span className="text-sm text-gray-500 dark:text-gray-400">Gói hiện tại:</span>
 
-    <div
-      className={classNames(
-        "px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-2 shadow-sm",
-        profile.userPackage.isActive
-          ? "bg-blue-100 text-blue-800 dark:bg-blue-800/30 dark:text-blue-200"
-          : "bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-200"
-      )}
-    >
-      {profile.userPackage.name}
-      {profile.userPackage.isActive && profile.userPackage.endDate && (
-        <span className="text-xs bg-white/30 dark:bg-gray-700/50 px-2 py-0.5 rounded">
-          Hết hạn {formatDate(profile.userPackage.endDate)}
-        </span>
-      )}
-      {!profile.userPackage.isActive && <span>⛔ Hết hạn</span>}
-    </div>
-  </div>
-)}
+        {/* Hiển thị gói hiện tại */}
+        {profile?.userPackage && (
+          <div className="flex flex-wrap items-center gap-3 mb-4">
+            <span className="text-sm text-gray-500 dark:text-gray-400">Gói hiện tại:</span>
+
+            <div
+              className={classNames(
+                "px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-2 shadow-sm",
+                profile.userPackage.isActive
+                  ? "bg-blue-100 text-blue-800 dark:bg-blue-800/30 dark:text-blue-200"
+                  : "bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-200"
+              )}
+            >
+              {profile.userPackage.name}
+              {profile.userPackage.isActive && profile.userPackage.endDate && (
+                <span className="text-xs bg-white/30 dark:bg-gray-700/50 px-2 py-0.5 rounded">
+                  Hết hạn {formatDate(profile.userPackage.endDate)}
+                </span>
+              )}
+              {!profile.userPackage.isActive && <span>⛔ Hết hạn</span>}
+            </div>
+          </div>
+        )}
 
         {profile ? (
           <div className="flex flex-col gap-8">
@@ -446,6 +417,17 @@ export default function CandidateProfilePage() {
                       <span className="font-semibold">Tiêu đề:</span>{" "}
                       {profile.title}
                     </div>
+                    <div>
+                      <span className="font-semibold">Giới tính:</span>{" "}
+                      {profile.gender === "MALE"
+                        ? "Nam"
+                        : profile.gender === "FEMALE"
+                          ? "Nữ"
+                          : profile.gender === "OTHER"
+                            ? "Khác"
+                            : "-"}
+                    </div>
+
                   </div>
 
                   {profile.bio && (
@@ -504,19 +486,42 @@ export default function CandidateProfilePage() {
         title="Cập nhật thông tin"
       >
         <form onSubmit={handleUpdateProfile} className="space-y-4">
-          {["fullName", "phoneNumber", "address", "title"].map((f) => (
-            <div key={f}>
-              <label className="block text-sm font-medium capitalize">
-                {f}
-              </label>
-              <input
-                type="text"
-                className="w-full px-4 py-2 rounded border dark:bg-[#3a3a3a]"
-                value={form[f]}
-                onChange={(e) => setForm({ ...form, [f]: e.target.value })}
-              />
-            </div>
-          ))}
+          {["fullName", "phoneNumber", "address", "title"].map((f) => {
+            const labels = {
+              fullName: "Họ và tên",
+              phoneNumber: "Số điện thoại",
+              address: "Địa chỉ",
+              title: "Chức danh"
+            };
+
+            return (
+              <div key={f}>
+                <label className="block text-sm font-medium">
+                  {labels[f]}
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-4 py-2 rounded border dark:bg-[#3a3a3a]"
+                  value={form[f]}
+                  onChange={(e) => setForm({ ...form, [f]: e.target.value })}
+                />
+              </div>
+            );
+          })}
+          <div>
+            <label className="block text-sm font-medium">Giới tính</label>
+            <select
+              value={form.gender}
+              onChange={(e) => setForm({ ...form, gender: e.target.value })}
+              className="w-full px-4 py-2 rounded border dark:bg-[#3a3a3a]"
+            >
+              <option value="">Chọn giới tính</option>
+              <option value="MALE">Nam</option>
+              <option value="FEMALE">Nữ</option>
+              <option value="OTHER">Khác</option>
+            </select>
+          </div>
+
 
           <div className="space-y-2">
             <label className="block text-sm font-medium">

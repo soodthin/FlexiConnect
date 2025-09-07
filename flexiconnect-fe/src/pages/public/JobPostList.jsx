@@ -1,18 +1,38 @@
 import React, { useEffect, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { Cross2Icon } from "@radix-ui/react-icons";
-import { Heart } from "lucide-react";
 import RadixSelect from "@components/RadixSelect";
 import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 /* ----------------- UI PRIMITIVES ----------------- */
 const Card = ({ className = "", children, ...props }) => (
   <div
-    className={`rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-neutral-900 shadow hover:shadow-lg hover:scale-[1.02] transition-all ${className}`}
+    className={`rounded-2xl border border-gray-200 dark:border-gray-700 
+                bg-white dark:bg-neutral-900 
+                shadow-sm hover:shadow-lg hover:-translate-y-1 
+                hover:bg-gray-50 dark:hover:bg-neutral-800 
+                transition-all duration-300 ${className}`}
     {...props}
   >
     {children}
+  </div>
+);
+
+const SkeletonCard = () => (
+  <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-neutral-900 shadow-sm p-5 animate-pulse">
+    <div className="flex items-center mb-5">
+      <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-neutral-700 mr-4" />
+      <div className="flex-1">
+        <div className="h-4 bg-gray-200 dark:bg-neutral-700 rounded w-2/3 mb-2" />
+        <div className="h-3 bg-gray-200 dark:bg-neutral-700 rounded w-1/2" />
+      </div>
+    </div>
+    <div className="flex gap-2">
+      <div className="h-5 w-16 bg-gray-200 dark:bg-neutral-700 rounded-full" />
+      <div className="h-5 w-20 bg-gray-200 dark:bg-neutral-700 rounded-full" />
+    </div>
   </div>
 );
 
@@ -28,10 +48,7 @@ const Button = ({ children, variant = "default", className = "", ...props }) => 
       "px-3 py-1 border rounded disabled:opacity-50 dark:border-gray-600",
   };
   return (
-    <button
-      className={`${base} ${variants[variant]} ${className}`}
-      {...props}
-    >
+    <button className={`${base} ${variants[variant]} ${className}`} {...props}>
       {children}
     </button>
   );
@@ -106,29 +123,34 @@ const Pagination = ({ currentPage, totalPages, onPrev, onNext }) => (
 export default function JobPostList() {
   const [jobPosts, setJobPosts] = useState([]);
   const [filteredPosts, setFilteredPosts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(""); // 🔹 Thêm state tìm kiếm
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedLocations, setSelectedLocations] = useState([]);
   const [selectedSalary, setSelectedSalary] = useState("Tất cả");
   const [selectedJobType, setSelectedJobType] = useState("Tất cả");
-  const [expandedJobIds, setExpandedJobIds] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
+  const [loading, setLoading] = useState(true);
+
   const navigate = useNavigate();
 
   useEffect(() => {
+    setLoading(true);
     fetch("http://localhost:8080/api/job-posts")
       .then((res) => res.json())
       .then((data) => {
         setJobPosts(data);
         setFilteredPosts(data);
+        setLoading(false);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
   }, []);
 
   useEffect(() => {
     let posts = jobPosts;
 
-    // 🔹 lọc theo searchTerm
     if (searchTerm.trim() !== "") {
       posts = posts.filter(
         (job) =>
@@ -170,13 +192,7 @@ export default function JobPostList() {
 
     setFilteredPosts(posts);
     setCurrentPage(1);
-  }, [
-    searchTerm,
-    selectedLocations,
-    selectedSalary,
-    selectedJobType,
-    jobPosts,
-  ]);
+  }, [searchTerm, selectedLocations, selectedSalary, selectedJobType, jobPosts]);
 
   const formatSalary = (min, max) => {
     if (!min && !max) return "Thoả thuận";
@@ -223,25 +239,16 @@ export default function JobPostList() {
     currentPage * itemsPerPage
   );
 
-  const toggleExpand = (id) => {
-    setExpandedJobIds((prev) =>
-      prev.includes(id)
-        ? prev.filter((jobId) => jobId !== id)
-        : [...prev, id]
-    );
-  };
-
   const goToJobDetail = (id) => {
     navigate(`/job-posts/${id}`);
   };
 
   return (
     <div className="p-2">
-      {/* 🔹 Simple Modern Search Box */}
+      {/* Search Box */}
       <div className="mb-8 flex">
         <div className="relative w-full max-w-xl">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-
           <input
             type="text"
             placeholder="Tìm việc, công ty, địa điểm..."
@@ -251,7 +258,7 @@ export default function JobPostList() {
                  shadow-sm 
                  text-sm md:text-base text-gray-700 dark:text-gray-200 
                  placeholder:text-gray-400 dark:placeholder:text-gray-500
-                 focus:outline-none focus:ring-2 focus:black dark:focus:ring-indigo-400
+                 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-indigo-400
                  transition-all duration-200
                  hover:border-gray-300 dark:hover:border-neutral-600"
             value={searchTerm}
@@ -259,9 +266,6 @@ export default function JobPostList() {
           />
         </div>
       </div>
-
-
-
 
       {/* Filters */}
       <div className="mb-6 flex flex-wrap gap-3 items-center">
@@ -285,83 +289,75 @@ export default function JobPostList() {
         />
       </div>
 
-      {/* Job Cards */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {paginatedPosts.map((job) => (
-          <Card
-            key={job.id}
-            className="p-5 flex flex-col cursor-pointer"
-            onClick={() => goToJobDetail(job.id)}
-          >
-            {/* Company logo & title */}
-            <div className="flex items-center mb-4">
-              <div className="w-12 h-12 rounded-full mr-3 flex items-center justify-center overflow-hidden bg-gray-100 dark:bg-neutral-800">
-                {job.avatar ? (
-                  <img
-                    src={job.avatar}
-                    alt="avatar"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="text-sm font-semibold text-gray-800 dark:text-white">
-                    {job.companyName?.[0]}
-                  </span>
-                )}
-              </div>
-              <div>
-                <h2 className="text-base font-semibold text-gray-800 dark:text-white">
-                  {job.title}
-                </h2>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {job.companyName}
-                </p>
-              </div>
-            </div>
+      {/* Job Cards with Transition */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={`${searchTerm}-${selectedLocations.join(",")}-${selectedSalary}-${selectedJobType}-${currentPage}`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+        >
+          {loading
+            ? Array.from({ length: itemsPerPage }).map((_, i) => (
+                <SkeletonCard key={i} />
+              ))
+            : paginatedPosts.map((job) => (
+                <Card
+                  key={job.id}
+                  className="p-5 flex flex-col cursor-pointer"
+                  onClick={() => goToJobDetail(job.id)}
+                >
+                  {/* Company logo & title */}
+                  <div className="flex items-center mb-5">
+                    <div className="w-12 h-12 rounded-full mr-4 flex items-center justify-center overflow-hidden bg-gray-100 dark:bg-neutral-800 shadow-sm">
+                      {job.avatar ? (
+                        <img
+                          src={job.avatar}
+                          alt="avatar"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-sm font-medium text-gray-800 dark:text-white">
+                          {job.companyName?.[0]}
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      <h2 className="text-base font-semibold text-gray-900 dark:text-white leading-tight">
+                        {job.title}
+                      </h2>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {job.companyName}
+                      </p>
+                    </div>
+                  </div>
 
-            {/* Tags */}
-            <div className="flex flex-wrap gap-2 text-xs mb-4">
-              <Badge color="green">
-                {formatSalary(job.salaryMin, job.salaryMax)}
-              </Badge>
-              {job.location && <Badge color="yellow">{job.location}</Badge>}
-              {job.jobType && <Badge color="blue">{job.jobType}</Badge>}
-            </div>
-
-            {/* Expandable description */}
-            {expandedJobIds.includes(job.id) && job.description && (
-              <div className="mt-2 text-sm text-gray-600 dark:text-gray-300 border-t pt-3">
-                {job.description}
-              </div>
-            )}
-
-            {/* Save & Expand buttons */}
-            <div className="mt-auto flex justify-between items-center">
-              <Button onClick={(e) => e.stopPropagation()}>
-                <Heart className="w-4 h-4" /> Lưu tin
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleExpand(job.id);
-                }}
-              >
-                {expandedJobIds.includes(job.id) ? "Ẩn bớt" : "Xem thêm"}
-              </Button>
-            </div>
-          </Card>
-        ))}
-      </div>
+                  {/* Tags */}
+                  <div className="flex flex-wrap gap-2 text-xs mb-5">
+                    <Badge color="green">
+                      {formatSalary(job.salaryMin, job.salaryMax)}
+                    </Badge>
+                    {job.location && <Badge color="yellow">{job.location}</Badge>}
+                    {job.jobType && <Badge color="blue">{job.jobType}</Badge>}
+                  </div>
+                </Card>
+              ))}
+        </motion.div>
+      </AnimatePresence>
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPrev={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-          onNext={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
-        />
-      )}
+    <div className="mt-8">
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPrev={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+        onNext={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+      />
+    </div>
+  )}
     </div>
   );
 }

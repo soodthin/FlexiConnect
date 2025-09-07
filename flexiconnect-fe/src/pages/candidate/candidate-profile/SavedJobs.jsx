@@ -200,28 +200,32 @@ const JobCard = ({ job, onViewDetails, onUnsave }) => {
     );
 };
 
-const EmptyState = () => (
-    <div className="col-span-full flex flex-col items-center justify-center py-20">
-        <div className="relative mb-6">
-            <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-full flex items-center justify-center">
-                <Bookmark size={40} className="text-blue-500 dark:text-blue-400" />
+const EmptyState = () => {
+    const navigate = useNavigate();
+    return (
+        <div className="col-span-full flex flex-col items-center justify-center py-20">
+            <div className="relative mb-6">
+                <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-full flex items-center justify-center">
+                    <Bookmark size={40} className="text-blue-500 dark:text-blue-400" />
+                </div>
+                <div className="absolute -top-2 -right-2 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm font-bold">0</span>
+                </div>
             </div>
-            <div className="absolute -top-2 -right-2 w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
-                <span className="text-white text-sm font-bold">0</span>
-            </div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                Chưa có job nào được lưu
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400 text-center max-w-md">
+                Khi bạn lưu các job yêu thích, chúng sẽ hiển thị ở đây để bạn dễ dàng theo dõi và ứng tuyển sau.
+            </p>
+            <Button className="mt-6" onClick={() => navigate("/candidate-dashboard")}>
+                <Search size={16} />
+                Khám phá việc làm
+            </Button>
+
         </div>
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-            Chưa có job nào được lưu
-        </h3>
-        <p className="text-gray-500 dark:text-gray-400 text-center max-w-md">
-            Khi bạn lưu các job yêu thích, chúng sẽ hiển thị ở đây để bạn dễ dàng theo dõi và ứng tuyển sau.
-        </p>
-        <Button className="mt-6" onClick={() => window.location.href = '/candidate-dashboard'}>
-            <Search size={16} />
-            Khám phá việc làm
-        </Button>
-    </div>
-);
+    );
+}
 
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
     const getVisiblePages = () => {
@@ -302,7 +306,6 @@ export default function SavedJobs() {
     const [searchTerm, setSearchTerm] = useState("");
     const [filterJobType, setFilterJobType] = useState("all");
     const [filterExpired, setFilterExpired] = useState("all"); // all, notExpired, expired
-
     const navigate = useNavigate();
 
     const loadSavedJobs = async () => {
@@ -357,7 +360,7 @@ export default function SavedJobs() {
 
         const matchesJobType = filterJobType === "all" || job.jobType === filterJobType;
 
-        const matchesExpired = filterExpired === "all" || 
+        const matchesExpired = filterExpired === "all" ||
             (filterExpired === "notExpired" && job.jobExpiredAt && new Date(job.jobExpiredAt) >= new Date()) ||
             (filterExpired === "expired" && job.jobExpiredAt && new Date(job.jobExpiredAt) < new Date());
 

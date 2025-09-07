@@ -2,6 +2,19 @@ import { useEffect, useState } from "react";
 import { authApis, endpoints } from "@configs/APIs";
 import { toast } from "sonner";
 import * as Tabs from "@radix-ui/react-tabs";
+function Button({ children, className = "", ...props }) {
+  return (
+    <button
+      {...props}
+      className={`px-4 py-2 rounded-full shadow font-semibold transition border
+        bg-[#f5efe6] dark:bg-[#232323] text-[#222222] dark:text-[#f5efe6]
+        border-[#d1d5db] dark:border-[#444]
+        hover:bg-[#f5f5dc] dark:hover:bg-[#353535] ${className}`}
+    >
+      {children}
+    </button>
+  );
+}
 
 function UserManagement() {
   const [users, setUsers] = useState([]);
@@ -10,7 +23,8 @@ function UserManagement() {
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
   const [totalPages, setTotalPages] = useState(0);
-
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(null);
   useEffect(() => {
     document.documentElement.classList.toggle(
       "dark",
@@ -49,18 +63,25 @@ function UserManagement() {
     }
   };
 
-  const deleteUser = async (userId) => {
-    if (!window.confirm("Bạn có chắc muốn xóa user này?")) return;
+  const handleDeleteClick = (userId) => {
+    setSelectedUserId(userId);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = async () => {
     try {
       const token = localStorage.getItem("token");
       await authApis().delete(
-        `${endpoints["admin-users-management"]}/${userId}`,
+        `${endpoints["admin-users-management"]}/${selectedUserId}`
       );
       loadUsers();
       toast.success("Xóa user thành công!");
     } catch (err) {
       console.error(err);
       toast.error("❌ Không thể xóa user!");
+    } finally {
+      setShowDeleteConfirm(false);
+      setSelectedUserId(null);
     }
   };
 
@@ -85,11 +106,10 @@ function UserManagement() {
               <td className="p-3">{u.fullName}</td>
               <td className="p-3">{u.roles?.join(", ")}</td>
               <td className="p-3">
-                <span className={`px-3 py-1 rounded-full font-medium ${
-                  u.status === "ACTIVE" ? "bg-green-500 text-white" :
+                <span className={`px-3 py-1 rounded-full font-medium ${u.status === "ACTIVE" ? "bg-green-500 text-white" :
                   u.status === "BANNED" ? "bg-red-500 text-white" :
-                  "bg-gray-400 text-white"
-                }`}>
+                    "bg-gray-400 text-white"
+                  }`}>
                   {u.status}
                 </span>
               </td>
@@ -108,14 +128,42 @@ function UserManagement() {
                 >
                   Khóa
                 </button>
+
                 <button
-                  onClick={() => deleteUser(u.id)}
+                  onClick={() => handleDeleteClick(u.id)}
                   className="px-3 py-1 bg-gray-500 text-white rounded-full shadow hover:scale-105 transform transition"
                 >
                   Xóa
                 </button>
+
+                {showDeleteConfirm && (
+                  <div className="fixed inset-0 flex items-center justify-center z-50">
+                    <div
+                      className="absolute inset-0 bg-black/50"
+                      onClick={() => setShowDeleteConfirm(false)}
+                    ></div>
+                    <div className="bg-white dark:bg-[#232323] rounded-xl shadow-lg p-6 w-80 relative z-10 text-center">
+                      <h3 className="text-lg font-semibold mb-4 dark:text-[#f5efe6]">
+                        Xác nhận xóa user
+                      </h3>
+                      <p className="mb-6 text-gray-700 dark:text-gray-300">
+                        Bạn có chắc chắn muốn xóa user này không?
+                      </p>
+                      <div className="flex justify-center gap-4">
+                        <Button onClick={() => setShowDeleteConfirm(false)}>Hủy</Button>
+                        <Button
+                          className="bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                          onClick={confirmDelete}
+                        >
+                          Xóa
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </td>
             </tr>
+
           )) : (
             <tr>
               <td colSpan={6} className="text-center p-6 text-gray-500 dark:text-gray-400 italic">
@@ -130,7 +178,7 @@ function UserManagement() {
 
   return (
     <div className="p-6 min-h-screen bg-beige-light dark:bg-[#181818] text-gray-800 dark:text-gray-100">
-      <h2 className="text-2xl font-bold mb-6">👥 User Management</h2>
+      <h2 className="text-2xl font-bold mb-6">TRANG QUẢN LÝ NGƯỜI DÙNG</h2>
 
       {/* Tabs */}
       <Tabs.Root defaultValue={roleFilter} onValueChange={setRoleFilter}>
