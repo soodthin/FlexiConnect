@@ -21,4 +21,5 @@ public interface UserPackageRepository extends JpaRepository<UserPackage, Intege
 
     Optional<UserPackage> findTopByUserIdOrderByEndDateDesc(User user);
 
+
 }

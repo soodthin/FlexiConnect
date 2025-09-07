@@ -115,6 +115,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
         Application application = new Application();
         application.setCandidateId(candidate);
+        application.setCoverLetter(toString());
         application.setJobPostId(jobPost);
         application.setResumeFile(resumeFile);
         application.setAppliedAt(LocalDateTime.now());
@@ -256,7 +257,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                             .content("Hồ sơ của bạn cho vị trí " + application.getJobPostId().getTitle() + " tại " + employer.getCompanyName()
                                     + (request.getStatus() == ApplicationStatus.REJECTED ? " đã bị từ chối" : " đã được duyệt") + ".")
                             .type(Notification.NotificationType.APPLICATION_STATUS)
-                            .linkTo("/candidate/applied")
+                            .linkTo("/applied")
                             .build()
             );
         } catch (Exception e) {

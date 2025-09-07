@@ -43,7 +43,7 @@ export const endpoints = {
   "current-question": (id) => `interview/sessions/${id}/current-question`,
   "submit-answer": (id) => `interview/sessions/${id}/answers`,
   "complete-session": (id) => `interview/sessions/${id}/complete`,
-
+'current-package': "/users/candidate/current-package",
   /* Employer */
   'employer-profile': "/users/employer/profile",
   'employer-avatar': "/users/employer/profile/avatar",

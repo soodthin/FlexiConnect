@@ -118,8 +118,10 @@ public class User implements Serializable {
 
     private Set<Role> roleSet;
     @OneToMany(mappedBy = "userId")
+    @JsonIgnore
     private Set<PaymentTransaction> paymentTransactionSet;
     @OneToMany(mappedBy = "userId")
+    @JsonIgnore
     private Set<UserPackage> userPackageSet;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "userId")
     @JsonIgnore

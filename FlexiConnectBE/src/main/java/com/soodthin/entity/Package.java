@@ -4,6 +4,7 @@
  */
 package com.soodthin.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -64,8 +65,10 @@ public class Package implements Serializable {
     @Column(name = "target_role")
     private String targetRole;
     @OneToMany(mappedBy = "packageId")
+    @JsonIgnore
     private Set<PaymentTransaction> paymentTransactionSet;
     @OneToMany(mappedBy = "packageId")
+    @JsonIgnore
     private Set<UserPackage> userPackageSet;
 
     public Package() {

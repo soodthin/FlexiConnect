@@ -16,15 +16,11 @@ import com.soodthin.entity.User;
 import com.soodthin.repositories.ApplicationRepository;
 import com.soodthin.repositories.InterviewSessionRepository;
 import com.soodthin.repositories.InterviewTurnRepository;
-import com.soodthin.repositories.JobPostRepository;
 import com.soodthin.services.CandidateService;
 import com.soodthin.services.InterviewService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,26 +37,20 @@ public class InterviewServiceImpl implements InterviewService {
     private final InterviewSessionRepository sessionRepository;
     private final InterviewTurnRepository turnRepository;
     private final CandidateService candidateService;
-    private final RestTemplate restTemplate;
     private final ApplicationRepository applicationRepository;
-    private final String n8nWebhookUrl;
-    private final String n8nQuestionWebhookUrl;
+    private final N8nServiceImpl n8nService;
 
     public InterviewServiceImpl(
             InterviewSessionRepository sessionRepository,
             InterviewTurnRepository turnRepository,
             CandidateService candidateService,
-            RestTemplate restTemplate,
             ApplicationRepository applicationRepository,
-            @Value("${ai.n8n.analysis-url}") String n8nWebhookUrl,
-            @Value("${ai.n8n.generate-url}") String n8nQuestionWebhookUrl) {
+            N8nServiceImpl n8nService) {
         this.sessionRepository = sessionRepository;
         this.turnRepository = turnRepository;
         this.candidateService = candidateService;
-        this.restTemplate = restTemplate;
         this.applicationRepository = applicationRepository;
-        this.n8nWebhookUrl = n8nWebhookUrl;
-        this.n8nQuestionWebhookUrl = n8nQuestionWebhookUrl;
+        this.n8nService = n8nService;
     }
 
     @Override
@@ -111,7 +101,7 @@ public class InterviewServiceImpl implements InterviewService {
                 "Job interview context" // You can enhance this with actual job description
         );
 
-        N8nAnalysisResponse analysisResponse = callN8nForAnalysis(analysisRequest);
+        N8nAnalysisResponse analysisResponse = n8nService.n8nForAnalysis(analysisRequest);
 
         // Create and save interview turn
         InterviewTurn turn = new InterviewTurn();
@@ -180,7 +170,7 @@ public class InterviewServiceImpl implements InterviewService {
                 getJobContextForSession(sessionId)
         );
 
-        N8nAnalysisResponse analysisResponse = callN8nForAnalysis(analysisRequest);
+        N8nAnalysisResponse analysisResponse = n8nService.n8nForAnalysis(analysisRequest);
 
         // Save turn
         InterviewTurn turn = new InterviewTurn();
@@ -278,29 +268,6 @@ public class InterviewServiceImpl implements InterviewService {
         return SessionResponse.fromEntity(session);
     }
 
-    private N8nAnalysisResponse callN8nForAnalysis(N8nAnalysisRequest request) throws Exception {
-        try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
-            HttpEntity<N8nAnalysisRequest> entity = new HttpEntity<>(request, headers);
-            ResponseEntity<N8nAnalysisResponse> response = restTemplate.postForEntity(
-                    n8nWebhookUrl,
-                    entity,
-                    N8nAnalysisResponse.class
-            );
-
-            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-                return response.getBody();
-            } else {
-                throw new RuntimeException("Failed to get analysis from n8n");
-            }
-        } catch (Exception e) {
-            log.error("Error calling n8n webhook: {}", e.getMessage());
-            throw new RuntimeException("AI analysis service unavailable", e);
-        }
-    }
-
     private String buildFeedbackText(N8nAnalysisResponse response) {
         StringBuilder feedback = new StringBuilder();
         feedback.append("Feedback: ").append(response.getFeedback()).append("\n\n");
@@ -343,7 +310,7 @@ public class InterviewServiceImpl implements InterviewService {
         System.out.println("Job Description: " + questionRequest.getJobDescription());
 
         // Gọi n8n để tạo câu hỏi
-        N8nQuestionResponse questionResponse = callN8nForQuestionGeneration(questionRequest);
+        N8nQuestionResponse questionResponse = n8nService.n8nForQuestionGeneration(questionRequest);
 
         // Trả về response
         return new GenerateQuestionResponse(
@@ -383,8 +350,8 @@ public class InterviewServiceImpl implements InterviewService {
         }
 
         GenerateQuestionRequest request = new GenerateQuestionRequest(
-                jobPost.getTitle(), 
-                jobDescription, 
+                jobPost.getTitle(),
+                jobDescription,
                 difficulty,
                 category,
                 sessionId
@@ -461,30 +428,6 @@ public class InterviewServiceImpl implements InterviewService {
         }
         // Trả về mô tả công việc để AI sử dụng
         return jobPost.getDescription();
-    }
-
-    private N8nQuestionResponse callN8nForQuestionGeneration(N8nQuestionRequest request) throws Exception {
-        try {
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
-            HttpEntity<N8nQuestionRequest> entity = new HttpEntity<>(request, headers);
-            ResponseEntity<N8nQuestionResponse> response = restTemplate.postForEntity(
-                    n8nQuestionWebhookUrl,
-                    entity,
-                    N8nQuestionResponse.class
-            );
-
-            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-                return response.getBody();
-            } else {
-                throw new RuntimeException("Failed to generate question from n8n");
-            }
-        } catch (Exception e) {
-            log.error("Error calling n8n question webhook: {}", e.getMessage());
-            throw new RuntimeException("AI question generation service unavailable", e);
-        }
     }
 
 }

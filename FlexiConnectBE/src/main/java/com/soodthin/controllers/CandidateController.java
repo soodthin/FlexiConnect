@@ -9,23 +9,20 @@ import com.soodthin.dto.request.CandidateProfileRequest;
 import com.soodthin.dto.request.AI.CvSuggestionRequest;
 import com.soodthin.dto.request.AI.CvSuggestionSubmitRequest;
 import com.soodthin.dto.request.FollowEmployerRequest;
-import com.soodthin.dto.request.SavedJobRequest;
-
 import com.soodthin.dto.response.CandidateApplicationResponse;
 import com.soodthin.dto.response.CandidateProfileResponse;
-import com.soodthin.dto.response.SavedJobResponse;
 import com.soodthin.entity.CvSuggestion;
-import com.soodthin.entity.SavedJob;
 import com.soodthin.entity.User;
+import com.soodthin.entity.UserPackage;
+import com.soodthin.repositories.UserPackageRepository;
 import com.soodthin.repositories.UserRepository;
 import com.soodthin.services.ApplicationService;
 import com.soodthin.services.CandidateService;
 import com.soodthin.services.CvSuggestionService;
 import com.soodthin.services.FollowEmployerService;
-import com.soodthin.services.NotificationUserService;
-import com.soodthin.services.SavedJobService;
+
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -60,9 +57,7 @@ public class CandidateController {
     @Autowired
     private FollowEmployerService followEmployerService;
     @Autowired
-    private SavedJobService savedJobService;
-    @Autowired
-    private NotificationUserService notificationUserService;
+    private UserPackageRepository userPackageRepository;
 
     private User getCurrentUser(Authentication authentication) {
         String email = authentication.getName();
@@ -167,6 +162,13 @@ public class CandidateController {
         followEmployerService.toggleNotify(candidateId, request.getEmployerId(), request.getNotifyJob());
     }
 
-    
+    @GetMapping("/current-package")
+    public ResponseEntity<UserPackage> getCurrentPackage(Authentication authentication) {
+        User user = getCurrentUser(authentication);
 
+        Optional<UserPackage> optional = userPackageRepository
+                .findTopByUserIdAndIsActiveTrueOrderByPackageIdDesc(user);
+
+        return ResponseEntity.ok(optional.orElse(null));
+    }
 }

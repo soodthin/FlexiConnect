@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 import com.soodthin.repositories.CvSuggestionRepository;
 import com.soodthin.repositories.SkillRepository;
 import com.soodthin.repositories.WorkExperienceRepository;
-import com.soodthin.services.AiIntegrationService;
 import com.soodthin.services.CvSuggestionService;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDate;
@@ -42,7 +41,7 @@ public class CvSuggestionServiceImpl implements CvSuggestionService {
     @Autowired
     private CvSuggestionRepository suggestionRepo;
     @Autowired
-    private AiIntegrationService aiService;
+    private N8nServiceImpl n8nService;
     @Autowired
     private WorkExperienceRepository workExpRepo;
     @Autowired
@@ -55,7 +54,7 @@ public class CvSuggestionServiceImpl implements CvSuggestionService {
         Candidate candidate = candidateRepo.findById(candidateId)
                 .orElseThrow(() -> new EntityNotFoundException("Candidate not found"));
 
-        CvSuggestionResponse aiResult = aiService.getSuggestionFromAI(request.getOriginalInput());
+        CvSuggestionResponse aiResult = n8nService.getSuggestionFromAI(request.getOriginalInput());
 
         String suggestion = aiResult.getSuggestion();
         String sectionStr = aiResult.getSection();
