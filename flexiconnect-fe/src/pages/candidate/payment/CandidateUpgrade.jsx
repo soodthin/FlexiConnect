@@ -35,11 +35,10 @@ export default function CandidateUpgrade() {
       const url = `${endpoints["momo"]}/create?amount=${amount}&packageId=${packageId}`;
       const res = await authApis().post(
         url,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
+        {} 
       );
 
-      const payUrl = res.data?.payUrl?.payUrl || res.data?.payUrl; 
+      const payUrl = res.data?.payUrl?.payUrl || res.data?.payUrl;
       if (payUrl && typeof payUrl === "string") {
         window.location.href = payUrl;
       } else {
@@ -70,8 +69,7 @@ export default function CandidateUpgrade() {
               Chức năng AI cơ bản dành cho người mới:
             </p>
             <ul className="list-disc list-inside text-gray-600 dark:text-gray-300 mb-4 space-y-1">
-              <li>Đánh giá CV tự động bằng AI</li>
-              <li>Gợi ý chỉnh sửa CV để tăng cơ hội phỏng vấn</li>
+              <li>Gợi ý chỉnh sửa hồ sơ tăng cơ hội ghép nối với ứng viên  </li>
             </ul>
             <div className="text-3xl font-extrabold text-blue-600 dark:text-blue-400 mb-4">
               55.000₫
@@ -85,29 +83,34 @@ export default function CandidateUpgrade() {
             {userPackage?.name === "Basic"
               ? "Đang sử dụng"
               : userPackage?.name === "Premium"
-              ? "Không thể nâng cấp"
-              : loading
-              ? "Đang tạo giao dịch..."
-              : "Nâng cấp ngay"}
+                ? "Không thể nâng cấp"
+                : loading
+                  ? "Đang tạo giao dịch..."
+                  : "Nâng cấp ngay"}
           </button>
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            Phương thức thanh toán: MoMo
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+            <strong>Phương thức thanh toán:</strong>
+            <img
+              src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png"
+              alt="MoMo"
+              className="w-6 h-6"
+            />
           </p>
+
         </div>
 
         {/* Card Premium */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 flex flex-col justify-between hover:shadow-2xl transition duration-300">
           <div>
-            <h3 className="text-2xl font-bold mb-2 text-gray-800 dark:text-gray-100">
+            <h3 className="text-2xl font-bold mb-2 text-purple-700 dark:text-yellow-500">
               Premium
             </h3>
             <p className="text-gray-600 dark:text-gray-300 mb-4">
               Chức năng AI nâng cao dành cho người tìm việc chuyên nghiệp:
             </p>
             <ul className="list-disc list-inside text-gray-600 dark:text-gray-300 mb-4 space-y-1">
-              <li>Tất cả tính năng của Basic</li>
+              <li>Gợi ý chỉnh sửa hồ sơ tăng cơ hội ghép nối với ứng viên  </li>
               <li>Mock interview / Phỏng vấn thử với AI</li>
-              <li>Hỗ trợ tạo Cover Letter bằng AI</li>
             </ul>
             <div className="text-3xl font-extrabold text-purple-600 dark:text-purple-400 mb-4">
               115.000₫
@@ -121,11 +124,16 @@ export default function CandidateUpgrade() {
             {userPackage?.name === "Premium"
               ? "Đang sử dụng"
               : loading
-              ? "Đang tạo giao dịch..."
-              : "Nâng cấp ngay"}
+                ? "Đang tạo giao dịch..."
+                : "Nâng cấp ngay"}
           </button>
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            Phương thức thanh toán: MoMo
+          <p className="mt-3 text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+            <strong>Phương thức thanh toán:</strong>
+            <img
+              src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png"
+              alt="MoMo"
+              className="w-6 h-6"
+            />
           </p>
         </div>
       </div>

@@ -220,11 +220,12 @@ export default function Header() {
 
   const toggleDarkMode = () => setIsDark((prev) => !prev);
 
-  const logout = () => {
-    cookie.remove("token");
-    dispatch({ type: "logout" });
-    navigate("/");
-  };
+ const logout = () => {
+  localStorage.removeItem("user");
+  dispatch({ type: "logout" });
+  navigate("/login");
+};
+
 
   return (
     <header className="flex justify-between items-center p-6 bg-[#f7f6f3] dark:bg-[#181818] font-inter text-[#222222] dark:text-[#f5efe6]">

@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useReducer } from 'react';
 import { Toaster } from 'sonner';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
-
+import { useEffect } from "react";
 import { MyUserContext, MyDispatcherContext } from '@contexts/MyContexts';
 
 import MainLayout from '@layouts/MainLayout';
@@ -49,6 +49,12 @@ const userReducer = (current, action) => {
 function App() {
   const [user, dispatch] = useReducer(userReducer, null);
 
+  useEffect(() => {
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      dispatch({ type: "login", payload: JSON.parse(savedUser) });
+    }
+  }, []);
   return (
     <MyUserContext.Provider value={user}>
       <MyDispatcherContext.Provider value={dispatch}>
@@ -112,12 +118,12 @@ function App() {
                     </PrivateRoute>
                   }
                 />
-                <Route 
-                path="/saved-jobs" element={
-                  <PrivateRoute allowedRoles={["CANDIDATE"]}>
-                    <SavedJobs />
-                  </PrivateRoute>
-                } />
+                <Route
+                  path="/saved-jobs" element={
+                    <PrivateRoute allowedRoles={["CANDIDATE"]}>
+                      <SavedJobs />
+                    </PrivateRoute>
+                  } />
                 <Route
                   path="/applied"
                   element={

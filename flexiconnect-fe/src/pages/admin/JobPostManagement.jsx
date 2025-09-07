@@ -32,7 +32,6 @@ function JobPostManagement() {
           page,
           size,
         },
-        headers: { Authorization: `Bearer ${token}` },
       });
 
       setJobPosts(Array.isArray(res.data.content) ? res.data.content : []);

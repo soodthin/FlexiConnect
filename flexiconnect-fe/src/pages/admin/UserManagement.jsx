@@ -23,7 +23,6 @@ function UserManagement() {
       const token = localStorage.getItem("token");
       const res = await authApis().get(endpoints["admin-users-management"], {
         params: { role: roleFilter === "ALL" ? "" : roleFilter, search, page, size },
-        headers: { Authorization: `Bearer ${token}` },
       });
       setUsers(res.data.content || []);
       setTotalPages(res.data.totalPages || 0);
@@ -41,7 +40,6 @@ function UserManagement() {
       await authApis().put(
         `${endpoints["admin-users-management"]}/${userId}/status`,
         { status },
-        { headers: { Authorization: `Bearer ${token}` } }
       );
       loadUsers();
       toast.success(`Cập nhật trạng thái: ${status}`);
@@ -57,7 +55,6 @@ function UserManagement() {
       const token = localStorage.getItem("token");
       await authApis().delete(
         `${endpoints["admin-users-management"]}/${userId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
       );
       loadUsers();
       toast.success("Xóa user thành công!");

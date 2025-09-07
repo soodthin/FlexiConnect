@@ -6,6 +6,7 @@ package com.soodthin.services;
 
 import com.soodthin.dto.EmployerRegisterDTO;
 import com.soodthin.dto.CandidateRegisterDTO;
+import com.soodthin.dto.response.UserLoginResponse;
 import com.soodthin.entity.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,10 @@ public interface UserService extends UserDetailsService {
     User registerCandidate(CandidateRegisterDTO userRegisterDTO);
 
     User registerEmployer(EmployerRegisterDTO employerDTO, MultipartFile[] images);
+
+    UserLoginResponse login(String email, String password);
+
+    UserLoginResponse getCurrentUser(String token);
 
     User getUserByEmail(String email);
 

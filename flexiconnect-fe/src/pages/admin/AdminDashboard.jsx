@@ -33,7 +33,6 @@ const AdminDashboard = () => {
           return;
         }
         const res = await authApis().get(endpoints["admin-dashboard"], {
-          headers: { Authorization: `Bearer ${token}` },
         });
         setStats(res.data);
       } catch (err) {

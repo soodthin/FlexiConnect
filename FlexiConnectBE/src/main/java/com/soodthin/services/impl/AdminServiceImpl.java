@@ -39,13 +39,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.Map;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
@@ -268,9 +266,8 @@ public class AdminServiceImpl implements AdminService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        UserStatus oldStatus = user.getStatus(); // Lưu trạng thái cũ
+        UserStatus oldStatus = user.getStatus(); 
 
-        // Chuyển String sang enum UserStatus an toàn
         UserStatus newStatus;
         try {
             newStatus = UserStatus.valueOf(request.getStatus().toUpperCase());
@@ -309,15 +306,19 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void deleteUser(Integer userId) {
-        log.info(String.format("Deleting user - userId: {}", userId));
+public void deleteUser(Integer userId) {
+    log.info("Deleting user - userId: {}", userId);
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
-        userRepository.delete(user);
-        log.info(String.format("User deleted successfully - userId: {}", userId));
-    }
+    // chỉ cập nhật trạng thái thay vì xóa hẳn
+    user.setStatus(UserStatus.DELETED); 
+    userRepository.save(user);
+
+    log.info("User marked as DELETED - userId: {}", userId);
+}
+
 
     @Override
     public Page<JobPostAdminResponse> getJobPosts(String status, String search, int page, int size) {

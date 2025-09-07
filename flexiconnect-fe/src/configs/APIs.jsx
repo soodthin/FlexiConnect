@@ -67,14 +67,14 @@ export const publicApi = axios.create({
 });
 
 export const authApis = () => {
-  const token = cookie.load('token');
+  const savedUser = localStorage.getItem("user");
+  const token = savedUser ? JSON.parse(savedUser).token : null;
   return axios.create({
     baseURL: BASE_URL,
-    headers: {
-      ...(token && { Authorization: `Bearer ${token}` })
-    }
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
 };
+
 
 
 export default axios.create({

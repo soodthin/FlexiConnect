@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { authApis, endpoints } from "@configs/APIs";
 import { toast } from "sonner";
 import { UserRound, Briefcase, MapPin, Clock, DollarSign } from "lucide-react";
-
 const Card = ({ children, className = "" }) => (
   <div className={`p-6 rounded-xl shadow-sm border bg-white dark:bg-[#242424] hover:shadow-md transition ${className}`}>
     {children}
@@ -32,13 +31,10 @@ const Avatar = ({ src, alt, fallback }) => (
 
 const Applied = () => {
   const [applications, setApplications] = useState([]);
-
   useEffect(() => {
     const loadApplications = async () => {
       try {
-        const token = localStorage.getItem("token");
         const res = await authApis().get(endpoints["candidate-applied"], {
-          headers: { Authorization: `Bearer ${token}` },
         });
         setApplications(res.data || []);
       } catch (err) {

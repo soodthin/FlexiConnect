@@ -1,12 +1,11 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Apis, { endpoints } from "@configs/APIs";
-import cookie from "react-cookies";
 import { toast } from "sonner";
 
 import { unstable_PasswordToggleField as PasswordToggleField } from "radix-ui";
 import { EyeClosedIcon, EyeOpenIcon } from "@radix-ui/react-icons";
-import { MyDispatcherContext } from "../../contexts/MyContexts";
+import { MyDispatcherContext } from "@contexts/MyContexts";
 
 const Card = ({ children, className = "" }) => (
   <div
@@ -58,31 +57,58 @@ export default function Login() {
   const login = async (e) => {
     e.preventDefault();
     try {
+      // gọi API login
       const res = await Apis.post(endpoints["login"], {
         email: user.email,
         password: user.password,
       });
 
       const { token, role } = res.data;
-      cookie.save("token", token);
-      localStorage.setItem("token", token);
 
-      const userInfoRes = await Apis.get(endpoints["current-user"], {
-        headers: { Authorization: `Bearer ${token}` },
+      // gọi API current-user để lấy thông tin user
+      const currentUserRes = await Apis.get(endpoints["current-user"], {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-      dispatch({ type: "login", payload: userInfoRes.data });
+
+      // user data
+      const userData = {
+        ...currentUserRes.data,
+        token,
+        role,
+      };
+
+      // dispatch vào context
+      dispatch({ type: "login", payload: userData });
+
+      // lưu localStorage
+      localStorage.setItem("user", JSON.stringify(userData));
 
       toast.success("Đăng nhập thành công!");
+
+      // điều hướng theo role
       setTimeout(() => {
         if (role === "CANDIDATE") navigate("/candidate-dashboard");
         else if (role === "EMPLOYER") navigate("/employer-dashboard");
+        else if (role === "ADMIN") navigate("/admin-dashboard");
         else navigate("/");
       }, 800);
     } catch (err) {
-      console.error(err);
-      toast.error("Đăng nhập thất bại! Vui lòng kiểm tra lại email hoặc mật khẩu.");
+      if (err.response) {
+        if (err.response.status === 401) toast.error(err.response.data);
+        else if (err.response.status === 403) toast.error("Sai email hoặc mật khẩu!");
+        else toast.error(err.response.data || "Có lỗi xảy ra, vui lòng thử lại sau!");
+      } else {
+        toast.error("Không thể kết nối đến server!");
+      }
     }
   };
+
+
+
+
+
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-beige-50 dark:from-[#1e1e1e] dark:via-[#2a2a2a] dark:to-[#181818]">

@@ -207,7 +207,6 @@ export default function ApplicationsManagement() {
     try {
       setLoading(true);
       const res = await authApis().get(endpoints["employer-applications"], {
-        headers: { Authorization: `Bearer ${token}` }
       });
       console.log(res.data);
       setApplications(Array.isArray(res.data) ? res.data : []);

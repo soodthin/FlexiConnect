@@ -72,7 +72,6 @@ export default function CandidateDashboard() {
         const token = localStorage.getItem("token");
         if (!token) return;
         const res = await authApis().get(endpoints["current-user"], {
-          headers: { Authorization: `Bearer ${token}` },
         });
         setUser(res.data);
       } catch (err) {

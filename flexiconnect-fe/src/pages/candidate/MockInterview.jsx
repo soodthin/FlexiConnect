@@ -301,196 +301,186 @@ const MockInterview = ({ userPackage, onUpgradeClick }) => {
 
     // Memoized values
     const token = useMemo(() => localStorage.getItem('token'), []);
-    const authHeader = useMemo(() => ({ Authorization: `Bearer ${token}` }), [token]);
     const hasAIAccess = useMemo(() => checkAIAccess(currentPackage), [currentPackage]);
 
     useEffect(() => {
-        const fetchPackage = async () => {
-            try {
-                setIsLoadingPackage(true);
-                const res = await authApis().get(endpoints['current-package'], { headers: authHeader });
-                setCurrentPackage(res.data);
-            } catch (err) {
-                console.error('Load current package error:', err);
-            } finally {
-                setIsLoadingPackage(false);
-            }
-        };
+    const fetchPackage = async () => {
+        try {
+            setIsLoadingPackage(true);
+            const res = await authApis().get(endpoints['current-package']); // ✅ xóa { headers: authHeader }
+            setCurrentPackage(res.data);
+        } catch (err) {
+            console.error('Load current package error:', err);
+        } finally {
+            setIsLoadingPackage(false);
+        }
+    };
 
+    if (localStorage.getItem('user')) fetchPackage(); // kiểm tra token có trong user
+}, []);
 
-        if (token) fetchPackage();
-    }, [token, authHeader]);
-
-    const handleAIFeatureClick = (callback) => {
-        if (hasAIAccess) {
-            callback();
+// Handle AI feature click
+const handleAIFeatureClick = (callback) => {
+    if (hasAIAccess) {
+        callback();
+    } else {
+        if (onUpgradeClick) {
+            onUpgradeClick();
         } else {
-            if (onUpgradeClick) {
-                onUpgradeClick();
-            } else {
-                setIsUpgradeDialogOpen(true);
-            }
+            setIsUpgradeDialogOpen(true);
         }
-    };
+    }
+};
 
-    const handleUpgradeRedirect = () => {
-        console.log("🚀 Navigating to upgrade page...");
-        setIsUpgradeDialogOpen(false);
-        window.location.href = "/candidate-upgrade";
-    };
+const handleUpgradeRedirect = () => {
+    console.log("🚀 Navigating to upgrade page...");
+    setIsUpgradeDialogOpen(false);
+    window.location.href = "/candidate-upgrade";
+};
 
-    // Load applications
-    useEffect(() => {
-        const loadApplications = async () => {
-            try {
-                if (!token) return;
-                setIsLoadingApps(true);
-                const res = await authApis().get(endpoints['candidate-applied'], {
-                    headers: authHeader,
-                });
-                const apps = Array.isArray(res.data) ? res.data : [];
-                setApplications(apps);
-                if (apps.length > 0 && !selectedApplicationId) {
-                    setSelectedApplicationId(apps[0].id);
-                }
-            } catch (err) {
-                console.error(err);
-                toast.error('Không thể tải danh sách ứng tuyển!');
-            } finally {
-                setIsLoadingApps(false);
-            }
-        };
-        loadApplications();
-    }, [token, authHeader, selectedApplicationId]);
-
-    // API functions
-    const createSession = async (applicationId) => {
-        if (!applicationId) {
-            setError('Vui lòng chọn đơn ứng tuyển!');
-            return;
-        }
-        if (!token) {
-            setError('Bạn chưa đăng nhập!');
-            return;
-        }
+// Load applications
+useEffect(() => {
+    const loadApplications = async () => {
         try {
-            setIsCreatingSession(true);
-            setError('');
+            if (!token) return;
 
-            const response = await authApis().post(
-                endpoints['create-session'],
-                { applicationId },
-                { headers: authHeader }
-            );
+            setIsLoadingApps(true);
 
-            const session = normalizeSession(response.data);
-            setCurrentSession(session);
-            setSessionStatus('IN_PROGRESS');
-            setTurns([]);
-            setSessionStats(null);
-
-            if (session?.id) {
-                await fetchCurrentQuestion(session.id);
-            }
-        } catch (err) {
-            console.error('Create session error:', err);
-            setError(
-                'Không thể bắt đầu phiên phỏng vấn: ' +
-                (err?.response?.data?.message || err?.message || 'Lỗi không xác định')
-            );
-        } finally {
-            setIsCreatingSession(false);
-        }
-    };
-
-    const fetchCurrentQuestion = async (sessionId) => {
-        try {
-            setIsLoadingQ(true);
-            const res = await authApis().get(endpoints['current-question'](sessionId), {
-                headers: authHeader,
+            const res = await authApis().get(endpoints['candidate-applied'], {
             });
-            setNextQuestion(normalizeQuestion(res?.data));
-        } catch (err) {
-            console.error(err);
-            setError(
-                'Không lấy được câu hỏi hiện tại: ' +
-                (err?.response?.data?.message || err?.message || 'Lỗi không xác định')
-            );
-        } finally {
-            setIsLoadingQ(false);
-        }
-    };
 
-    const submitAnswer = async () => {
-        if (!currentSession?.id) {
-            setError('Chưa có phiên phỏng vấn hợp lệ.');
-            return;
-        }
-        if (!currentAnswer.trim()) {
-            setError('Vui lòng nhập câu trả lời.');
-            return;
-        }
+            const apps = Array.isArray(res.data) ? res.data : [];
+            setApplications(apps);
 
-        try {
-            setIsSubmitting(true);
-            setError('');
-
-            const response = await authApis().post(
-                endpoints['submit-answer'](currentSession.id),
-                {
-                    question: nextQuestion?.question,
-                    answer: currentAnswer.trim(),
-                    difficulty: nextQuestion?.difficulty,
-                    category: nextQuestion?.category,
-                },
-                { headers: authHeader }
-            );
-
-            const result = response.data;
-            console.log('New turn:', result.currentTurn);
-
-            if (result?.currentTurn) setTurns((prev) => [...prev, result.currentTurn]);
-            setNextQuestion(result?.nextQuestion || null);
-            setSessionStats(result?.sessionStats || null);
-            setCurrentAnswer('');
-
-            if (!result?.nextQuestion?.question) {
-                await fetchCurrentQuestion(currentSession.id);
+            if (apps.length > 0 && !selectedApplicationId) {
+                setSelectedApplicationId(apps[0].id);
             }
         } catch (err) {
             console.error(err);
-            setError(
-                'Gửi câu trả lời thất bại: ' +
-                (err?.response?.data?.message || err?.message || 'Lỗi không xác định')
-            );
+            toast.error('Không thể tải danh sách ứng tuyển!');
         } finally {
-            setIsSubmitting(false);
+            setIsLoadingApps(false);
         }
     };
 
-    const completeSession = async () => {
-        if (!currentSession?.id) return;
-        try {
-            setIsCompletingSession(true);
-            const response = await authApis().put(
-                endpoints['complete-session'](currentSession.id),
-                {},
-                { headers: authHeader }
-            );
-            const completedSession = normalizeSession(response.data);
-            setCurrentSession(completedSession);
-            setSessionStatus('COMPLETED');
-            setNextQuestion(null);
-        } catch (err) {
-            console.error(err);
-            setError(
-                'Kết thúc phiên thất bại: ' +
-                (err?.response?.data?.message || err?.message || 'Lỗi không xác định')
-            );
-        } finally {
-            setIsCompletingSession(false);
+    loadApplications();
+}, [token, selectedApplicationId]);
+
+
+// API functions
+const createSession = async (applicationId) => {
+    if (!applicationId) {
+        setError('Vui lòng chọn đơn ứng tuyển!');
+        return;
+    }
+    try {
+        setIsCreatingSession(true);
+        setError('');
+
+        const response = await authApis().post(
+            endpoints['create-session'],
+            { applicationId } 
+        );
+
+        const session = normalizeSession(response.data);
+        setCurrentSession(session);
+        setSessionStatus('IN_PROGRESS');
+        setTurns([]);
+        setSessionStats(null);
+
+        if (session?.id) {
+            await fetchCurrentQuestion(session.id);
         }
-    };
+    } catch (err) {
+        console.error('Create session error:', err);
+        setError(
+            'Không thể bắt đầu phiên phỏng vấn: ' +
+            (err?.response?.data?.message || err?.message || 'Lỗi không xác định')
+        );
+    } finally {
+        setIsCreatingSession(false);
+    }
+};
+
+const fetchCurrentQuestion = async (sessionId) => {
+    try {
+        setIsLoadingQ(true);
+        const res = await authApis().get(endpoints['current-question'](sessionId));
+        setNextQuestion(normalizeQuestion(res?.data));
+    } catch (err) {
+        console.error(err);
+        setError(
+            'Không lấy được câu hỏi hiện tại: ' +
+            (err?.response?.data?.message || err?.message || 'Lỗi không xác định')
+        );
+    } finally {
+        setIsLoadingQ(false);
+    }
+};
+
+const submitAnswer = async () => {
+    if (!currentSession?.id) return setError('Chưa có phiên phỏng vấn hợp lệ.');
+    if (!currentAnswer.trim()) return setError('Vui lòng nhập câu trả lời.');
+
+    try {
+        setIsSubmitting(true);
+        setError('');
+
+        const response = await authApis().post(
+            endpoints['submit-answer'](currentSession.id),
+            {
+                question: nextQuestion?.question,
+                answer: currentAnswer.trim(),
+                difficulty: nextQuestion?.difficulty,
+                category: nextQuestion?.category,
+            }
+        );
+
+        const result = response.data;
+        if (result?.currentTurn) setTurns((prev) => [...prev, result.currentTurn]);
+        setNextQuestion(result?.nextQuestion || null);
+        setSessionStats(result?.sessionStats || null);
+        setCurrentAnswer('');
+
+        if (!result?.nextQuestion?.question) {
+            await fetchCurrentQuestion(currentSession.id);
+        }
+    } catch (err) {
+        console.error(err);
+        setError(
+            'Gửi câu trả lời thất bại: ' +
+            (err?.response?.data?.message || err?.message || 'Lỗi không xác định')
+        );
+    } finally {
+        setIsSubmitting(false);
+    }
+};
+
+const completeSession = async () => {
+    if (!currentSession?.id) return;
+    try {
+        setIsCompletingSession(true);
+
+        const response = await authApis().put(
+            endpoints['complete-session'](currentSession.id),
+            {} 
+        );
+
+        const completedSession = normalizeSession(response.data);
+        setCurrentSession(completedSession);
+        setSessionStatus('COMPLETED');
+        setNextQuestion(null);
+    } catch (err) {
+        console.error(err);
+        setError(
+            'Kết thúc phiên thất bại: ' +
+            (err?.response?.data?.message || err?.message || 'Lỗi không xác định')
+        );
+    } finally {
+        setIsCompletingSession(false);
+    }
+};
+
 
     const resetSession = () => {
         setCurrentSession(null);
@@ -928,13 +918,7 @@ const MockInterview = ({ userPackage, onUpgradeClick }) => {
                                             <RefreshCw className="w-4 h-4" />
                                             Luyện Tập Mới
                                         </Button>
-                                        <Button
-                                            onClick={() => window.location.reload()}
-                                            className="bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 text-neutral-900 dark:text-white"
-                                        >
-                                            <BarChart3 className="w-4 h-4" />
-                                            Xem Chi Tiết
-                                        </Button>
+                                       
                                     </div>
                                 </Card>
 
@@ -963,11 +947,11 @@ const MockInterview = ({ userPackage, onUpgradeClick }) => {
                                                         <h4 className="font-bold text-neutral-800 dark:text-neutral-200 text-lg">
                                                             Câu hỏi #{idx + 1}
                                                         </h4>
-                                                        {turn.score !== undefined && (
+                                                        {turn.aiScore !== undefined && (
                                                             <div className="flex items-center gap-2">
-                                                                <ScoreIcon score={turn.score} />
-                                                                <span className={`font-bold text-lg ${getScoreColor(turn.score)}`}>
-                                                                    {turn.score}/100
+                                                                <ScoreIcon aiScore={turn.score} />
+                                                                <span className={`font-bold text-lg ${getScoreColor(turn.aiScore)}`}>
+                                                                    {turn.aiScore}/100
                                                                 </span>
                                                             </div>
                                                         )}
@@ -997,8 +981,9 @@ const MockInterview = ({ userPackage, onUpgradeClick }) => {
                                                         </div>
                                                     )}
 
+                                                    {/* Feedback AI cơ bản */}
                                                     {turn.aiFeedback?.length > 0 && (
-                                                        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+                                                        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4 mb-3">
                                                             <h5 className="font-semibold text-blue-800 dark:text-blue-200 mb-2 flex items-center gap-2">
                                                                 <Star className="w-4 h-4" />
                                                                 Phản hồi từ AI
@@ -1009,11 +994,11 @@ const MockInterview = ({ userPackage, onUpgradeClick }) => {
                                                         </div>
                                                     )}
 
-
-
+                                                   
                                                 </motion.div>
                                             ))}
                                         </div>
+
                                     </Card>
                                 )}
                             </motion.div>

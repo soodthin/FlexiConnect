@@ -4,17 +4,21 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.soodthin.dto.EmployerRegisterDTO;
 import com.soodthin.dto.CandidateRegisterDTO;
+import com.soodthin.dto.response.UserLoginResponse;
 import com.soodthin.entity.Candidate;
 import com.soodthin.entity.Employer;
 import com.soodthin.entity.Role;
 import com.soodthin.entity.User;
 import com.soodthin.entity.User.UserStatus;
+import static com.soodthin.entity.User.UserStatus.BANNED;
+import static com.soodthin.entity.User.UserStatus.INACTIVE;
 import com.soodthin.repositories.CandidateRepository;
 import com.soodthin.repositories.EmployerRepository;
 import com.soodthin.repositories.RoleRepository;
 import com.soodthin.repositories.UserRepository;
 import com.soodthin.services.EmailService;
 import com.soodthin.services.UserService;
+import com.soodthin.utils.JwtUtils;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -22,6 +26,8 @@ import java.util.Map;
 import java.util.Set;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder; // Thêm import này
@@ -140,6 +146,62 @@ public class UserServiceImpl implements UserService {
         }
 
         return user;
+    }
+
+    @Override
+    public UserLoginResponse login(String email, String password) {
+        if (!authenticate(email, password)) {
+            throw new BadCredentialsException("Sai thông tin đăng nhập");
+        }
+
+        User user = getUserByEmail(email);
+
+        // check status trước khi cấp token
+        switch (user.getStatus()) {
+            case BANNED:
+                throw new DisabledException("Tài khoản đã bị chặn và không thể đăng nhập.");
+            case DELETED:
+                throw new DisabledException("Tài khoản đã bị xóa và không thể đăng nhập.");
+            default:
+                break;
+        }
+
+        String role = user.getRoleSet().iterator().next().getRoleName();
+        String token;
+        try {
+            token = JwtUtils.generateToken(user.getEmail(), role);
+        } catch (Exception e) {
+            throw new RuntimeException("Lỗi khi tạo JWT", e);
+        }
+
+        UserLoginResponse resp = new UserLoginResponse();
+        resp.setToken(token);
+        resp.setEmail(user.getEmail());
+        resp.setRole(role);
+        resp.setFullName(user.getFullName());
+        return resp;
+    }
+
+    @Override
+    public UserLoginResponse getCurrentUser(String token) {
+        String email;
+        try {
+            email = JwtUtils.validateTokenAndGetUsername(token);
+        } catch (Exception e) {
+            throw new BadCredentialsException("Token không hợp lệ!");
+        }
+
+        if (email == null) {
+            throw new BadCredentialsException("Token không hợp lệ!");
+        }
+
+        User user = getUserByEmail(email);
+
+        UserLoginResponse resp = new UserLoginResponse();
+        resp.setEmail(user.getEmail());
+        resp.setFullName(user.getFullName());
+        resp.setRole(user.getRoleSet().iterator().next().getRoleName());
+        return resp;
     }
 
     private String buildCompanyIntro(String introText, MultipartFile[] images) {

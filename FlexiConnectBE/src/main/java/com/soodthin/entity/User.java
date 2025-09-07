@@ -103,6 +103,7 @@ public class User implements Serializable {
         ACTIVE,
         INACTIVE,
         BANNED,
+        DELETED,    
     }
     private static final long serialVersionUID = 1L;
     @Id

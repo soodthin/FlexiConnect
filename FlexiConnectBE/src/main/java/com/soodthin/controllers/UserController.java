@@ -29,9 +29,8 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-    
 
-     @PostMapping("/register/candidate")
+    @PostMapping("/register/candidate")
     public ResponseEntity<?> registerCandidate(@RequestBody CandidateRegisterDTO userRegisterDTO) {
         try {
             User savedUser = userService.registerCandidate(userRegisterDTO);
@@ -58,54 +57,31 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserLoginRequest loginRequest) {
-        if (userService.authenticate(loginRequest.getEmail(), loginRequest.getPassword())) {
-            try {
-                User user = userService.getUserByEmail(loginRequest.getEmail());
-                String role = user.getRoleSet().iterator().next().getRoleName();
-                String token = JwtUtils.generateToken(user.getEmail(), role);
-
-                UserLoginResponse resp = new UserLoginResponse();
-                resp.setToken(token);
-                resp.setEmail(user.getEmail());
-                resp.setRole(role);
-                resp.setFullName(user.getFullName());
-
-                return ResponseEntity.ok(resp);
-            } catch (Exception e) {
-                return ResponseEntity.status(500).body("Lỗi khi tạo JWT");
-            }
+        try {
+            UserLoginResponse resp = userService.login(
+                    loginRequest.getEmail(),
+                    loginRequest.getPassword()
+            );
+            return ResponseEntity.ok(resp);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sai thông tin đăng nhập");
     }
 
     @GetMapping("/current-user")
     public ResponseEntity<?> currentUser(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Thiếu token!");
-        }
-
-        String token = authHeader.substring(7);
         try {
-            String email = JwtUtils.validateTokenAndGetUsername(token);
-            if (email == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token không hợp lệ!");
+            String authHeader = request.getHeader("Authorization");
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Thiếu token!");
             }
 
-            User user = userService.getUserByEmail(email);
-            if (user == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Không tìm thấy người dùng!");
-            }
-            
-            UserLoginResponse resp = new UserLoginResponse();
-            resp.setEmail(user.getEmail());
-            resp.setFullName(user.getFullName());
-            resp.setRole(user.getRoleSet().iterator().next().getRoleName());
+            String token = authHeader.substring(7); // cắt bỏ "Bearer "
+            UserLoginResponse resp = userService.getCurrentUser(token);
 
             return ResponseEntity.ok(resp);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Lỗi xác thực token!");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
 
