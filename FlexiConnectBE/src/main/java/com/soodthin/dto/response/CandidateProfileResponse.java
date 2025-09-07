@@ -22,7 +22,6 @@ public class CandidateProfileResponse {
 
     private String title;
     private String bio;
-    private String resumeFile;
     private UserPackageResponse userPackage;
 
     public UserPackageResponse getUserPackage() {
@@ -129,20 +128,6 @@ public class CandidateProfileResponse {
      */
     public void setBio(String bio) {
         this.bio = bio;
-    }
-
-    /**
-     * @return the resumeFile
-     */
-    public String getResumeFile() {
-        return resumeFile;
-    }
-
-    /**
-     * @param resumeFile the resumeFile to set
-     */
-    public void setResumeFile(String resumeFile) {
-        this.resumeFile = resumeFile;
     }
 
     /**

@@ -51,10 +51,6 @@ public class WorkExperience implements Serializable {
     @Size(max = 65535)
     @Column(name = "description")
     private String description;
-    @Lob
-    @Size(max = 65535)
-    @Column(name = "description_ai_suggestion")
-    private String descriptionAiSuggestion;
     @Column(name = "start_date")
     private LocalDate startDate;
     @Column(name = "end_date")
@@ -151,18 +147,5 @@ public class WorkExperience implements Serializable {
         return "com.soodthin.pojo.WorkExperience[ id=" + id + " ]";
     }
 
-    /**
-     * @return the descriptionAiSuggestion
-     */
-    public String getDescriptionAiSuggestion() {
-        return descriptionAiSuggestion;
-    }
-
-    /**
-     * @param descriptionAiSuggestion the descriptionAiSuggestion to set
-     */
-    public void setDescriptionAiSuggestion(String descriptionAiSuggestion) {
-        this.descriptionAiSuggestion = descriptionAiSuggestion;
-    }
-
+  
 }

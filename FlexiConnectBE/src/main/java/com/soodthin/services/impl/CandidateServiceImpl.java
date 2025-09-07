@@ -67,7 +67,6 @@ public class CandidateServiceImpl implements CandidateService {
 
         response.setTitle(candidate.getTitle());
         response.setBio(candidate.getBio());
-        response.setResumeFile(candidate.getResumeFile());
 
         UserPackage userPackage = userPackageRepository.findTopByUserIdAndIsActiveTrueOrderByPackageIdDesc(user)
                 .orElse(null);

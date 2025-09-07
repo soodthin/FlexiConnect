@@ -79,10 +79,6 @@ public class JobPost implements Serializable {
         CLOSED,
         HIDDEN,
     }
-    @Lob
-    @Size(max = 65535)
-    @Column(name = "job_vector")
-    private String jobVector;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -170,13 +166,6 @@ public class JobPost implements Serializable {
         this.viewCount = viewCount;
     }
 
-    public String getJobVector() {
-        return jobVector;
-    }
-
-    public void setJobVector(String jobVector) {
-        this.jobVector = jobVector;
-    }
 
     public Set<Skill> getSkillSet() {
         return skillSet;

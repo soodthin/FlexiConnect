@@ -36,7 +36,6 @@ CREATE TABLE candidate (
     user_id INT UNIQUE NOT NULL,
     title VARCHAR(150),
     bio TEXT,
-    resume_file VARCHAR(255),
     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );
 

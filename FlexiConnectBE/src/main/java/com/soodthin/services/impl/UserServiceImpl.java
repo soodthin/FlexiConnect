@@ -11,7 +11,6 @@ import com.soodthin.entity.Role;
 import com.soodthin.entity.User;
 import com.soodthin.entity.User.UserStatus;
 import static com.soodthin.entity.User.UserStatus.BANNED;
-import static com.soodthin.entity.User.UserStatus.INACTIVE;
 import com.soodthin.repositories.CandidateRepository;
 import com.soodthin.repositories.EmployerRepository;
 import com.soodthin.repositories.RoleRepository;

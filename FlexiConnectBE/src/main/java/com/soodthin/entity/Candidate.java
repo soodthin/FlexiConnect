@@ -32,8 +32,7 @@ import java.util.Set;
 @NamedQueries({
     @NamedQuery(name = "Candidate.findAll", query = "SELECT c FROM Candidate c"),
     @NamedQuery(name = "Candidate.findById", query = "SELECT c FROM Candidate c WHERE c.id = :id"),
-    @NamedQuery(name = "Candidate.findByTitle", query = "SELECT c FROM Candidate c WHERE c.title = :title"),
-    @NamedQuery(name = "Candidate.findByResumeFile", query = "SELECT c FROM Candidate c WHERE c.resumeFile = :resumeFile")})
+    @NamedQuery(name = "Candidate.findByTitle", query = "SELECT c FROM Candidate c WHERE c.title = :title")})
 public class Candidate implements Serializable {
 
     @Size(max = 150)
@@ -43,20 +42,12 @@ public class Candidate implements Serializable {
     @Size(max = 65535)
     @Column(name = "bio")
     private String bio;
-    @Size(max = 255)
-    @Column(name = "resume_file")
-    private String resumeFile;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "candidateId")
     @JsonIgnore
     private Set<EmployerEmailLog> employerEmailLogSet;
-    @Lob
-    @Size(max = 65535)
-    @Column(name = "bio_ai_suggestion")
-    private String bioAiSuggestion;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "candidateId")
     @JsonIgnore
     private Set<CvSuggestion> cvSuggestionsSet;
-
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -102,17 +93,7 @@ public class Candidate implements Serializable {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public String getResumeFile() {
-        return resumeFile;
-    }
-
-    public void setResumeFile(String resumeFile) {
-        this.resumeFile = resumeFile;
-    }
-
-   
+    }  
 
     public Set<FollowEmployer> getFollowEmployerSet() {
         return followEmployerSet;
@@ -203,13 +184,6 @@ public class Candidate implements Serializable {
         return "com.soodthin.pojo.Candidate[ id=" + id + " ]";
     }
 
-    public String getBioAiSuggestion() {
-        return bioAiSuggestion;
-    }
-
-    public void setBioAiSuggestion(String bioAiSuggestion) {
-        this.bioAiSuggestion = bioAiSuggestion;
-    }
 
     public Set<CvSuggestion> getCvSuggestionsSet() {
         return cvSuggestionsSet;
