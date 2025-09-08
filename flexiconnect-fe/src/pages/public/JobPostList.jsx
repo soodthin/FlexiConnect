@@ -5,8 +5,8 @@ import RadixSelect from "@components/RadixSelect";
 import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { authApis, endpoints } from "@/configs/APIs";
 
-/* ----------------- UI PRIMITIVES ----------------- */
 const Card = ({ className = "", children, ...props }) => (
   <div
     className={`rounded-2xl border border-gray-200 dark:border-gray-700 
