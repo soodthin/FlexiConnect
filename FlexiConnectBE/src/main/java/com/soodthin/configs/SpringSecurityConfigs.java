@@ -88,7 +88,10 @@ public class SpringSecurityConfigs {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:3000"));
+        config.setAllowedOrigins(List.of(
+                "http://localhost:3000",
+                "https://flexiconnectweb.onrender.com" 
+        ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         config.setExposedHeaders(List.of("Authorization"));
@@ -97,8 +100,8 @@ public class SpringSecurityConfigs {
         source.registerCorsConfiguration("/**", config);
         return source;
     }
-    
-     @Bean
+
+    @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }

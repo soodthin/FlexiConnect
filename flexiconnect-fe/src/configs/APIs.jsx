@@ -1,7 +1,6 @@
 import axios from "axios";
-import cookie from 'react-cookies'
 
-const BASE_URL = 'http://localhost:8080/api';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
 export const endpoints = {
   /* Public*/
@@ -9,6 +8,7 @@ export const endpoints = {
   'register-employer': '/auth/register/employer',
   'login': '/auth/login',
   'current-user': '/auth/current-user',
+  'job-posts': '/job-posts',
   'jobpost-id': (id) => `/job-posts/${id}`,
 
   /*Admnin*/

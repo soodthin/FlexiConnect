@@ -134,18 +134,20 @@ export default function JobPostList() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setLoading(true);
-    fetch("http://localhost:8080/api/job-posts")
-      .then((res) => res.json())
-      .then((data) => {
-        setJobPosts(data);
-        setFilteredPosts(data);
-        setLoading(false);
-      })
-      .catch((err) => {
+    const loadJobPosts = async () => {
+      try {
+        setLoading(true);
+        const res = await authApis().get(endpoints["job-posts"]);
+        setJobPosts(res.data);
+        setFilteredPosts(res.data);
+      } catch (err) {
         console.error(err);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    loadJobPosts();
   }, []);
 
   useEffect(() => {
@@ -301,63 +303,63 @@ export default function JobPostList() {
         >
           {loading
             ? Array.from({ length: itemsPerPage }).map((_, i) => (
-                <SkeletonCard key={i} />
-              ))
+              <SkeletonCard key={i} />
+            ))
             : paginatedPosts.map((job) => (
-                <Card
-                  key={job.id}
-                  className="p-5 flex flex-col cursor-pointer"
-                  onClick={() => goToJobDetail(job.id)}
-                >
-                  {/* Company logo & title */}
-                  <div className="flex items-center mb-5">
-                    <div className="w-12 h-12 rounded-full mr-4 flex items-center justify-center overflow-hidden bg-gray-100 dark:bg-neutral-800 shadow-sm">
-                      {job.avatar ? (
-                        <img
-                          src={job.avatar}
-                          alt="avatar"
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-sm font-medium text-gray-800 dark:text-white">
-                          {job.companyName?.[0]}
-                        </span>
-                      )}
-                    </div>
-                    <div>
-                      <h2 className="text-base font-semibold text-gray-900 dark:text-white leading-tight">
-                        {job.title}
-                      </h2>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {job.companyName}
-                      </p>
-                    </div>
+              <Card
+                key={job.id}
+                className="p-5 flex flex-col cursor-pointer"
+                onClick={() => goToJobDetail(job.id)}
+              >
+                {/* Company logo & title */}
+                <div className="flex items-center mb-5">
+                  <div className="w-12 h-12 rounded-full mr-4 flex items-center justify-center overflow-hidden bg-gray-100 dark:bg-neutral-800 shadow-sm">
+                    {job.avatar ? (
+                      <img
+                        src={job.avatar}
+                        alt="avatar"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-sm font-medium text-gray-800 dark:text-white">
+                        {job.companyName?.[0]}
+                      </span>
+                    )}
                   </div>
+                  <div>
+                    <h2 className="text-base font-semibold text-gray-900 dark:text-white leading-tight">
+                      {job.title}
+                    </h2>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {job.companyName}
+                    </p>
+                  </div>
+                </div>
 
-                  {/* Tags */}
-                  <div className="flex flex-wrap gap-2 text-xs mb-5">
-                    <Badge color="green">
-                      {formatSalary(job.salaryMin, job.salaryMax)}
-                    </Badge>
-                    {job.location && <Badge color="yellow">{job.location}</Badge>}
-                    {job.jobType && <Badge color="blue">{job.jobType}</Badge>}
-                  </div>
-                </Card>
-              ))}
+                {/* Tags */}
+                <div className="flex flex-wrap gap-2 text-xs mb-5">
+                  <Badge color="green">
+                    {formatSalary(job.salaryMin, job.salaryMax)}
+                  </Badge>
+                  {job.location && <Badge color="yellow">{job.location}</Badge>}
+                  {job.jobType && <Badge color="blue">{job.jobType}</Badge>}
+                </div>
+              </Card>
+            ))}
         </motion.div>
       </AnimatePresence>
 
       {/* Pagination */}
       {totalPages > 1 && (
-    <div className="mt-8">
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPrev={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-        onNext={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
-      />
-    </div>
-  )}
+        <div className="mt-8">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPrev={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+            onNext={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+          />
+        </div>
+      )}
     </div>
   );
 }

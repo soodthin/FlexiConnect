@@ -1,1 +1,6 @@
 /FlexiConnectBE/target/
+# Environment variables
+.env
+.env.local
+.env.production
+FlexiConnectBE/.env
