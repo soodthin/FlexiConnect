@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: flexiconnect-backend
+    env: java17
+    plan: free
+    region: frankfurt
+    branch: main
+    buildCommand: ./mvnw clean package -DskipTests
+    startCommand: java -jar target/*.jar
+    envVars:
+      - key: MYSQL_ADDON_HOST
+        sync: false
+      - key: MYSQL_ADDON_PORT
+        value: "3306"
+      - key: MYSQL_ADDON_DB
+        sync: false
+      - key: MYSQL_ADDON_USER
+        sync: false
+      - key: MYSQL_ADDON_PASSWORD
+        sync: false   
+      - key: N8N_WEBHOOK_URL
+        value: http://localhost:5678/webhook/cv-suggestion
+      - key: N8N_ANALYSIS_URL
+        value: http://localhost:5678/webhook/interview-analysis
+      - key: N8N_GENERATE_URL
+        value: http://localhost:5678/webhook/generate-question
