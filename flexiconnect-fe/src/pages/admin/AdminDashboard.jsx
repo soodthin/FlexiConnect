@@ -34,11 +34,6 @@ const AdminDashboard = () => {
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem("token");
-        if (!token) {
-          setError("Chưa đăng nhập hoặc thiếu token.");
-          setLoading(false);
-          return;
-        }
         const res = await authApis().get(endpoints["admin-dashboard"]);
         setStats(res.data);
       } catch (err) {

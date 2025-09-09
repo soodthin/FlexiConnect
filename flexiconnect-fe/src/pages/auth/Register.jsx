@@ -130,7 +130,7 @@ export default function Register() {
       setMsg("✅ Đăng ký thành công!");
       setTimeout(() => navigate("/login"), 1500);
     } catch (err) {
-      setMsg("❌ Đăng ký thất bại.");
+      setMsg("❌ Đăng ký không thành công!");
     }
   };
 

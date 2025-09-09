@@ -155,7 +155,25 @@ export default function JobDetail() {
       if (initialLoad) {
         setIsFollowed(data.isFollowed ?? false);
         setNotifyJob(data.notifyJob ?? false);
-        setIsSaved(data.isSaved ?? false);
+
+        if (myUser) {
+          try {
+            const checkRes = await authApis().post(endpoints["saved-job-check"], {
+              jobPostId: data.id
+            });
+            if (checkRes.data.success) {
+              setIsSaved(checkRes.data.isSaved);
+            } else {
+              setIsSaved(false);
+            }
+          } catch (err) {
+            console.error("Check saved job failed:", err);
+            setIsSaved(false);
+          }
+        } else {
+          setIsSaved(false);
+        }
+
         setInitialLoad(false);
       }
     } catch (err) {

@@ -27,11 +27,12 @@ const Card = ({ children, className = "", onClick }) => (
             "hover:-translate-y-1 transition-all duration-300 ease-out cursor-pointer",
             "before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-r before:from-blue-500/5 before:to-purple-500/5",
             "before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100",
+            "h-full flex flex-col", // Thêm flex và h-full
             className
         )}
         onClick={onClick}
     >
-        <div className="relative z-10 p-6">
+        <div className="relative z-10 p-6 flex-1 flex flex-col">
             {children}
         </div>
     </div>
@@ -107,94 +108,92 @@ const JobCard = ({ job, onViewDetails, onUnsave }) => {
     };
 
     return (
-        <Card className="h-full">
-            <div className="flex flex-col h-full">
-                {/* Header */}
-                <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors duration-300">
-                            {job.jobTitle}
-                        </h3>
-                        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300 mb-3">
-                            <Building2 size={16} />
-                            <span className="font-medium">{job.companyName || 'Công ty chưa cập nhật'}</span>
-                        </div>
+        <Card>
+            {/* Header */}
+            <div className="flex items-start justify-between mb-4">
+                <div className="flex-1 min-w-0"> {/* Thêm min-w-0 để tránh overflow */}
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors duration-300">
+                        {job.jobTitle}
+                    </h3>
+                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300 mb-3">
+                        <Building2 size={16} className="flex-shrink-0" />
+                        <span className="font-medium truncate">{job.companyName || 'Công ty chưa cập nhật'}</span>
                     </div>
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onUnsave(job.jobPostId);
-                        }}
-                        className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
-                    >
-                        <BookmarkX size={18} />
-                    </button>
+                </div>
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onUnsave(job.jobPostId);
+                    }}
+                    className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg flex-shrink-0"
+                >
+                    <BookmarkX size={18} />
+                </button>
+            </div>
+
+            {/* Job Details - Phần này sẽ mở rộng để fill không gian */}
+            <div className="space-y-3 flex-1">
+                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                    <MapPin size={16} className="text-blue-500 flex-shrink-0" />
+                    <span className="truncate">{job.jobLocation || 'Chưa cập nhật'}</span>
                 </div>
 
-                {/* Job Details */}
-                <div className="space-y-3 flex-1">
-                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                        <MapPin size={16} className="text-blue-500" />
-                        <span>{job.jobLocation || 'Chưa cập nhật'}</span>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                        <Briefcase size={16} className="text-green-500" />
-                        <span>{job.jobType || 'Full-time'}</span>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                        <DollarSign size={16} className="text-yellow-500" />
-                        <span>
-                            {job.salaryMin && job.salaryMax
-                                ? `${job.salaryMin} - ${job.salaryMax} triệu`
-                                : 'Thương lượng'
-                            }
-                        </span>
-                    </div>
-
-                    {/* Status and Dates */}
-                    <div className="flex items-center justify-between pt-2">
-                        <Badge variant={getStatusVariant(job.jobStatus)}>
-                            {getStatusText(job.jobStatus)}
-                        </Badge>
-
-                        <div className="text-xs text-gray-500 dark:text-gray-400 text-right">
-                            <div className="flex items-center gap-1 mb-1">
-                                <Calendar size={12} />
-                                <span>Hết hạn: {job.jobExpiredAt ? new Date(job.jobExpiredAt).toLocaleDateString('vi-VN') : 'Không có'}</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                                <Heart size={12} className="text-red-400" />
-                                <span>Lưu: {job.savedAt ? new Date(job.savedAt).toLocaleDateString('vi-VN') : '-'}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Job Description Preview */}
-                    {job.jobDescription && (
-                        <div className="pt-3 border-t border-gray-100 dark:border-gray-700">
-                            <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
-                                {job.jobDescription}
-                            </p>
-                        </div>
-                    )}
+                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                    <Briefcase size={16} className="text-green-500 flex-shrink-0" />
+                    <span className="truncate">{job.jobType || 'Full-time'}</span>
                 </div>
 
-                {/* Action Button */}
-                <div className="mt-6">
-                    <Button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onViewDetails(job.jobPostId);
-                        }}
-                        className="w-full"
-                        size="md"
-                    >
-                        <Eye size={16} />
-                        Xem chi tiết
-                    </Button>
+                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                    <DollarSign size={16} className="text-yellow-500 flex-shrink-0" />
+                    <span className="truncate">
+                        {job.salaryMin && job.salaryMax
+                            ? `${job.salaryMin} - ${job.salaryMax} triệu`
+                            : 'Thương lượng'
+                        }
+                    </span>
                 </div>
+
+                {/* Status and Dates */}
+                <div className="flex items-center justify-between pt-2">
+                    <Badge variant={getStatusVariant(job.jobStatus)}>
+                        {getStatusText(job.jobStatus)}
+                    </Badge>
+
+                    <div className="text-xs text-gray-500 dark:text-gray-400 text-right">
+                        <div className="flex items-center gap-1 mb-1">
+                            <Calendar size={12} />
+                            <span>Hết hạn: {job.jobExpiredAt ? new Date(job.jobExpiredAt).toLocaleDateString('vi-VN') : 'Không có'}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <Heart size={12} className="text-red-400" />
+                            <span>Lưu: {job.savedAt ? new Date(job.savedAt).toLocaleDateString('vi-VN') : '-'}</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Job Description Preview - Cố định chiều cao */}
+                {job.jobDescription && (
+                    <div className="pt-3 border-t border-gray-100 dark:border-gray-700">
+                        <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3 min-h-[4rem]">
+                            {job.jobDescription}
+                        </p>
+                    </div>
+                )}
+            </div>
+
+            {/* Action Button - Luôn ở cuối */}
+            <div className="mt-6">
+                <Button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onViewDetails(job.jobPostId);
+                    }}
+                    className="w-full"
+                    size="md"
+                >
+                    <Eye size={16} />
+                    Xem chi tiết
+                </Button>
             </div>
         </Card>
     );
@@ -222,7 +221,6 @@ const EmptyState = () => {
                 <Search size={16} />
                 Khám phá việc làm
             </Button>
-
         </div>
     );
 }

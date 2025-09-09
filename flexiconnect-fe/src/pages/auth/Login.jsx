@@ -71,7 +71,9 @@ export default function Login() {
         password: user.password,
       });
 
+
       const { token, role } = res.data;
+      console.log("Token login:", token);
       const currentUserRes = await Apis.get(endpoints["current-user"], {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -112,79 +114,79 @@ export default function Login() {
           </div>
 
           {/* AI Features */}
-<div className="grid gap-3">
-  {/* Feature 1 */}
-  <div className="relative p-5 rounded-2xl bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 
+          <div className="grid gap-3">
+            {/* Feature 1 */}
+            <div className="relative p-5 rounded-2xl bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 
                   border border-blue-400/20 dark:border-purple-400/20 
                   shadow-lg backdrop-blur-md group hover:shadow-blue-500/30 transition transform hover:-translate-y-1">
-    
-    {/* Premium badge */}
-    <div className="absolute -top-2 -right-2 bg-gradient-to-r from-yellow-400 to-orange-400 
+
+              {/* Premium badge */}
+              <div className="absolute -top-2 -right-2 bg-gradient-to-r from-blue-400 to-purple-400 
                     text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow">
-      PREMIUM
-    </div>
+                BASIC
+              </div>
 
-    <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-      <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></span>
-      Gợi ý viết hồ sơ với AI
-    </h3>
-    <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 group-hover:text-gray-800 dark:group-hover:text-gray-200 transition">
-      AI giúp tối ưu CV, làm nổi bật kỹ năng và kinh nghiệm quan trọng để chinh phục nhà tuyển dụng.
-    </p>
-  </div>
+              <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></span>
+                Gợi ý viết hồ sơ với AI
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 group-hover:text-gray-800 dark:group-hover:text-gray-200 transition">
+                AI giúp tối ưu CV, làm nổi bật kỹ năng và kinh nghiệm quan trọng để chinh phục nhà tuyển dụng.
+              </p>
+            </div>
 
-  {/* Feature 2 */}
-  <div className="relative p-5 rounded-2xl bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 
+            {/* Feature 2 */}
+            <div className="relative p-5 rounded-2xl bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 
                   border border-purple-400/20 dark:border-pink-400/20 
                   shadow-lg backdrop-blur-md group hover:shadow-purple-500/30 transition transform hover:-translate-y-1">
-    
-    {/* Premium badge */}
-    <div className="absolute -top-2 -right-2 bg-gradient-to-r from-yellow-400 to-orange-400 
-                    text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow">
-      PREMIUM
-    </div>
 
-    <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-      <span className="w-2.5 h-2.5 rounded-full bg-purple-500 animate-ping"></span>
-      Luyện tập phỏng vấn ảo với AI
-    </h3>
-    <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 group-hover:text-gray-800 dark:group-hover:text-gray-200 transition">
-      Trải nghiệm phỏng vấn mô phỏng với AI, luyện tập câu trả lời và tăng sự tự tin.
-    </p>
-  </div>
-</div>
+              {/* Premium badge */}
+              <div className="absolute -top-2 -right-2 bg-gradient-to-r from-yellow-400 to-orange-400 
+                    text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow">
+                PREMIUM
+              </div>
+
+              <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-purple-500 animate-ping"></span>
+                Luyện tập phỏng vấn ảo với AI
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 group-hover:text-gray-800 dark:group-hover:text-gray-200 transition">
+                Trải nghiệm phỏng vấn mô phỏng với AI, luyện tập câu trả lời và tăng sự tự tin.
+              </p>
+            </div>
+          </div>
 
 
 
 
           {/* Job list auto-scroll */}
-<div>
-  <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-3 flex items-center gap-2">
-    <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-    Việc làm mới nhất
-  </h3>
+          <div>
+            <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-3 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+              Việc làm mới nhất
+            </h3>
 
-  <div className="h-56 overflow-hidden relative">
-    <div className="animate-scroll space-y-3">
-      {[...jobs, ...jobs].map((job, i) => (
-        <div
-          key={i}
-          className="p-4 rounded-xl bg-gradient-to-r from-gray-50/70 to-white/60 
+            <div className="h-56 overflow-hidden relative">
+              <div className="animate-scroll space-y-3">
+                {[...jobs, ...jobs].map((job, i) => (
+                  <div
+                    key={i}
+                    className="p-4 rounded-xl bg-gradient-to-r from-gray-50/70 to-white/60 
                      dark:from-[#2a2a2a]/80 dark:to-[#232323]/70
                      border border-gray-200/40 dark:border-neutral-700/40
                      shadow-sm backdrop-blur-md hover:shadow-md hover:scale-[1.02] transition"
-        >
-          <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm truncate">
-            {job.title}
-          </h4>
-          <p className="text-gray-600 dark:text-gray-400 text-xs mt-1 truncate">
-            {job.company} • {job.salary}
-          </p>
-        </div>
-      ))}
-    </div>
-  </div>
-</div>
+                  >
+                    <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm truncate">
+                      {job.title}
+                    </h4>
+                    <p className="text-gray-600 dark:text-gray-400 text-xs mt-1 truncate">
+                      {job.company} • {job.salary}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
 
         </div>
       </div>
@@ -248,13 +250,16 @@ export default function Login() {
             {/* Register link */}
             <p className="text-sm text-center text-gray-600 dark:text-gray-400 mt-4">
               Chưa có tài khoản?{" "}
-              <a
+              <button
+                type="button"
                 onClick={() => navigate("/register")}
-                className="text-gray-900 dark:text-gray-100 font-semibold hover:underline"
+                className="text-gray-900 dark:text-gray-100 font-semibold hover:underline transition"
               >
                 Đăng ký ngay
-              </a>
+              </button>
             </p>
+
+
           </Card>
         </form>
       </div>

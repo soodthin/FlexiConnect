@@ -129,6 +129,8 @@ export default function ApplyDialog({ jobId, isOpen, setIsOpen, hasApplied }) {
             const formData = new FormData();
             formData.append("resumeFile", file);
             formData.append("jobPostId", jobId);
+            formData.append("coverLetter", coverLetter || ""); 
+
 
             // Dùng authApis() như trước
             await authApis().post(endpoints["apply-job"], formData, {

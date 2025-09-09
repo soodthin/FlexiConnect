@@ -37,12 +37,15 @@ export const endpoints = {
   'saved-jobs-count': "/users/candidate/saved-jobs/count",
   "saved-jobs-list": "/users/candidate/saved-jobs/list",
   "unsaved-job": "/users/candidate/saved-jobs/unsave",
+  'saved-job-check': `/users/candidate/saved-jobs/check`,
+
   /*Mock Interview*/
   "create-session": "interview/sessions",
   "current-question": (id) => `interview/sessions/${id}/current-question`,
   "submit-answer": (id) => `interview/sessions/${id}/answers`,
   "complete-session": (id) => `interview/sessions/${id}/complete`,
-'current-package': "/users/candidate/current-package",
+  'current-package': "/users/candidate/current-package",
+
   /* Employer */
   'employer-profile': "/users/employer/profile",
   'employer-avatar': "/users/employer/profile/avatar",

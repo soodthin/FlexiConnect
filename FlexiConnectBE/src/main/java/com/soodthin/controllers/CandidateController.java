@@ -99,11 +99,12 @@ public class CandidateController {
     public ResponseEntity<CandidateApplicationResponse> applyToJob(
             @RequestParam("jobPostId") Integer jobPostId,
             @RequestParam("resumeFile") MultipartFile resumeFile,
+            @RequestParam("coverLetter") String coverLetter,
             Authentication authentication) {
 
         User user = getCurrentUser(authentication);
 
-        CandidateApplicationResponse response = applicationService.applyToJob(jobPostId, resumeFile, user);
+        CandidateApplicationResponse response = applicationService.applyToJob(jobPostId, resumeFile, coverLetter, user);
         return ResponseEntity.ok(response);
     }
 

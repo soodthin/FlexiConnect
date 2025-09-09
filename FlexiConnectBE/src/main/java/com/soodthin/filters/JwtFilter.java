@@ -40,7 +40,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (header == null || !header.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
-            return; // Rất quan trọng
+            return; 
         }
 
         String token = header.substring(7).trim();

@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface ApplicationService {
 
-    CandidateApplicationResponse applyToJob(Integer jobPostId, MultipartFile cvFile, User user);
+   CandidateApplicationResponse applyToJob(Integer jobPostId, MultipartFile cvFile,String coverLetter, User user);
 
     public EmployerApplicationResponse reviewApplication(Integer id, ApplicationReviewRequest request, User user);
 

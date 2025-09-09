@@ -191,7 +191,10 @@ export default function EmployerRegister() {
     if (field === "confirmPassword") {
       newErrors.confirmPassword = value !== employer.password ? "Mật khẩu không khớp." : null;
     }
-
+    if (field === "taxCode") {
+      const mstRegex = /^(\d{10})(-\d{3})?$/;
+      newErrors.taxCode = mstRegex.test(value) ? null : "Mã số thuế không hợp lệ.";
+    }
     setErrors(newErrors);
   };
 
@@ -225,7 +228,7 @@ export default function EmployerRegister() {
       setMsg("❌ Vui lòng nhập đầy đủ các trường.");
       return;
     }
-    if (errors.email || errors.password || errors.confirmPassword) {
+    if (errors.email || errors.password || errors.confirmPassword||errors.taxCode) {
       setMsg("❌ Vui lòng sửa lỗi trước khi tiếp tục.");
       return;
     }
@@ -329,6 +332,7 @@ export default function EmployerRegister() {
                 value={employer.taxCode || ""}
                 onChange={(e) => setState(e.target.value, "taxCode")}
                 placeholder="Nhập mã số thuế..."
+                error={errors.taxCode}
               />
 
               <PasswordField

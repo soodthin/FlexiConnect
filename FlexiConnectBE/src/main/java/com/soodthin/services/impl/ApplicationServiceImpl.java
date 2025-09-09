@@ -30,7 +30,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -50,8 +49,6 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Autowired
     private Cloudinary cloudinary;
     @Autowired
-    private ModelMapper modelMapper;
-    @Autowired
     private EmployerRepository employerRepository;
     @Autowired
     private EmailService emailService;
@@ -59,7 +56,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     private NotificationService notificationService;
 
     @Override
-    public CandidateApplicationResponse applyToJob(Integer jobPostId, MultipartFile cvFile, User user) {
+    public CandidateApplicationResponse applyToJob(Integer jobPostId, MultipartFile cvFile,String coverLetter, User user) {
         System.out.println("Tên file: " + cvFile.getOriginalFilename());
         System.out.println("Kích thước: " + cvFile.getSize() + " bytes");
         System.out.println("Loại: " + cvFile.getContentType());
@@ -95,11 +92,9 @@ public class ApplicationServiceImpl implements ApplicationService {
             String publicId = uploadResult.get("public_id").toString();
 
             // 2. TẠO URL DOWNLOAD VỚI ĐỊNH DẠNG MONG MUỐN
-            // Chỉ sử dụng "attachment" mà không kèm theo tên file
             resumeFile = cloudinary.url()
                     .resourceType("raw")
                     .publicId(publicId)
-                    // SỬA Ở ĐÂY: Bỏ "+ originalFilename"
                     .transformation(new Transformation<>().flags("attachment"))
                     .secure(true)
                     .generate();
@@ -113,7 +108,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
         Application application = new Application();
         application.setCandidateId(candidate);
-        application.setCoverLetter(application.getCoverLetter());
+        application.setCoverLetter(coverLetter);
         application.setJobPostId(jobPost);
         application.setResumeFile(resumeFile);
         application.setAppliedAt(LocalDateTime.now());
