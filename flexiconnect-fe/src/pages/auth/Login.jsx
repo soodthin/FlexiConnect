@@ -70,10 +70,7 @@ export default function Login() {
         email: user.email,
         password: user.password,
       });
-
-
       const { token, role } = res.data;
-      console.log("Token login:", token);
       const currentUserRes = await Apis.get(endpoints["current-user"], {
         headers: { Authorization: `Bearer ${token}` },
       });

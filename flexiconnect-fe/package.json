@@ -9,6 +9,7 @@
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.1.0",
     "axios": "^1.11.0",
+    "chart.js": "^4.5.0",
     "classnames": "^2.5.1",
     "dayjs": "^1.11.18",
     "framer-motion": "^12.23.12",

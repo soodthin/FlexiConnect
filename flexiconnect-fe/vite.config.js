@@ -36,7 +36,7 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: true,   // thêm dòng này
+    sourcemap: true, 
 
   }
 });
