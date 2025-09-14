@@ -28,7 +28,6 @@ public class MomoConfig {
     @Value("${DEV_SECRET_KEY:}")
     private String devSecretKey;
     
-    // Thêm các URL IPN và Redirect cho môi trường DEV
     @Value("${DEV_IPN_URL:}")
     private String devIpnUrl;
     
@@ -47,7 +46,6 @@ public class MomoConfig {
     @Value("${PROD_SECRET_KEY:}")
     private String prodSecretKey;
     
-    // Thêm các URL IPN và Redirect cho môi trường PROD
     @Value("${PROD_IPN_URL:}")
     private String prodIpnUrl;
     

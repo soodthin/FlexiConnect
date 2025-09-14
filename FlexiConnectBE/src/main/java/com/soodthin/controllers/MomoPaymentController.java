@@ -44,8 +44,8 @@ public class MomoPaymentController {
                     .orElseThrow(() -> new RuntimeException("Package not found"));
 
             // URL frontend để MoMo redirect sau khi thanh toán
-            String returnUrlSuccess = "http://localhost:3000/payment-success";
-            String returnUrlFail = "http://localhost:3000/payment-failed";
+            String returnUrlSuccess = "https://flexiconnectweb.onrender.com/payment-success";
+            String returnUrlFail = "https://flexiconnectweb.onrender.com/payment-failed";
 
             // Gọi service tạo payment, truyền returnUrl/failUrl
             MomoPaymentResponse payUrl = paymentTransactionService.createPremiumPayment(
