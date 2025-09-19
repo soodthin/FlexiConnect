@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import { MyUserContext, MyDispatcherContext } from "@contexts/MyContexts";
 import { AnimatePresence, motion } from "framer-motion";
+import 'leaflet/dist/leaflet.css';
 
 import MainLayout from "@layouts/MainLayout";
 import Dashboard from "@layouts/Dashboard";

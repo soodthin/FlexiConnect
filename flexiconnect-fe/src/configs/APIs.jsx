@@ -28,8 +28,8 @@ export const endpoints = {
   'workexperience': "/candidate/workexperience",
   'apply-job': "/users/candidate/apply",
   "cv-suggestion": "/users/candidate/cv-suggestion",
-
   'candidate-applied': "/users/candidate/applied",
+  "withdraw-application": (applicationId) => `users/candidate/applications/${applicationId}/withdraw`,
   'follow-employer': "/users/candidate/follow-employer/follow",
   'unfollow-employer': "/users/candidate/follow-employer/unfollow",
   'notify-employer': "/users/candidate/follow-employer/notify",
@@ -71,9 +71,18 @@ export const publicApi = axios.create({
 export const authApis = () => {
   const savedUser = localStorage.getItem("user");
   const token = savedUser ? JSON.parse(savedUser).token : null;
+  
+  const headers = {
+    'Content-Type': 'application/json'
+  };
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
   return axios.create({
     baseURL: BASE_URL,
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    headers: headers,
   });
 };
 

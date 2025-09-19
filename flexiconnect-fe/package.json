@@ -14,6 +14,7 @@
     "dayjs": "^1.11.18",
     "framer-motion": "^12.23.12",
     "html-react-parser": "^5.2.6",
+    "leaflet": "^1.9.4",
     "lucide-react": "^0.535.0",
     "radix-ui": "^1.4.2",
     "react": "^19.1.0",
@@ -22,6 +23,7 @@
     "react-cookies": "^0.1.1",
     "react-dom": "^19.1.0",
     "react-icons": "^5.5.0",
+    "react-leaflet": "^5.0.0",
     "react-router-dom": "^7.6.3",
     "sonner": "^2.0.6",
     "web-vitals": "^2.1.0"

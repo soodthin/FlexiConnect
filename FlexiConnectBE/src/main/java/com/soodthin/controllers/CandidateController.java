@@ -30,6 +30,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -105,6 +106,15 @@ public class CandidateController {
         User user = getCurrentUser(authentication);
 
         CandidateApplicationResponse response = applicationService.applyToJob(jobPostId, resumeFile, coverLetter, user);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/applications/{id}/withdraw")
+    public ResponseEntity<CandidateApplicationResponse> withdrawApplication(
+            @PathVariable("id") Integer id,
+            Authentication authentication) {
+        User user = getCurrentUser(authentication);
+        CandidateApplicationResponse response = applicationService.withdrawApplication(id, user);
         return ResponseEntity.ok(response);
     }
 

@@ -56,7 +56,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     private NotificationService notificationService;
 
     @Override
-    public CandidateApplicationResponse applyToJob(Integer jobPostId, MultipartFile cvFile,String coverLetter, User user) {
+    public CandidateApplicationResponse applyToJob(Integer jobPostId, MultipartFile cvFile, String coverLetter, User user) {
         System.out.println("Tên file: " + cvFile.getOriginalFilename());
         System.out.println("Kích thước: " + cvFile.getSize() + " bytes");
         System.out.println("Loại: " + cvFile.getContentType());
@@ -319,4 +319,55 @@ public class ApplicationServiceImpl implements ApplicationService {
         return dto;
     }
 
+    @Override
+    public CandidateApplicationResponse withdrawApplication(Integer id, User user) {
+        Candidate candidate = candidateRepository.findByUserId(user)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bạn không phải là ứng viên."));
+
+        Application application = applicationRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy hồ sơ ứng tuyển."));
+
+        if (!application.getCandidateId().getId().equals(candidate.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Bạn không có quyền thực hiện hành động này.");
+        }
+
+        if (application.getStatus() == ApplicationStatus.REJECTED || application.getStatus() == ApplicationStatus.WITHDRAWN) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Hồ sơ đã ở trạng thái cuối cùng, không thể rút.");
+        }
+
+        application.setStatus(ApplicationStatus.WITHDRAWN);
+        applicationRepository.save(application);
+
+        // 6. Gửi thông báo cho nhà tuyển dụng
+        Employer employer = application.getJobPostId().getEmployerId();
+
+        try {
+            emailService.sendHtmlMessage(
+                    employer.getUserId().getEmail(),
+                    "Ứng viên đã rút hồ sơ",
+                    "<p>Kính gửi <b>" + employer.getCompanyName() + "</b>,</p>"
+                    + "<p>Ứng viên <b>" + candidate.getUserId().getFullName() + "</b> đã rút hồ sơ ứng tuyển khỏi vị trí <b>" + application.getJobPostId().getTitle() + "</b>.</p>"
+                    + "<p>Hồ sơ này sẽ được đánh dấu là 'Đã rút' trong hệ thống của bạn.</p>"
+                    + "<p>Trân trọng!</p>"
+            );
+        } catch (Exception e) {
+            System.err.println("❌ Không thể gửi email thông báo rút hồ sơ: " + e.getMessage());
+        }
+
+        try {
+            notificationService.createNotification(
+                    NotificationRequest.builder()
+                            .userId(employer.getUserId().getId())
+                            .title("Ứng viên đã rút hồ sơ")
+                            .content(candidate.getUserId().getFullName() + " đã rút hồ sơ khỏi vị trí: " + application.getJobPostId().getTitle())
+                            .type(Notification.NotificationType.APPLICATION_STATUS)
+                            .linkTo("/employer-applications-management")
+                            .build()
+            );
+        } catch (Exception e) {
+            System.err.println("❌ Không thể gửi notification thông báo rút hồ sơ: " + e.getMessage());
+        }
+
+        return mapToResponseDTO(application);
+    }
 }

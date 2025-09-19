@@ -21,6 +21,8 @@ public class JobPostRequest {
     private LocalDateTime expiredAt;
     private String status;
     private int viewCount;
+    private Double latitude;
+    private Double longitude;
 
     /**
      * @return the title
@@ -147,5 +149,22 @@ public class JobPostRequest {
     public void setViewCount(int viewCount) {
         this.viewCount = viewCount;
     }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+    
 }
    

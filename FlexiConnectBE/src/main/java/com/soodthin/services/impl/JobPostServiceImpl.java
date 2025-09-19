@@ -2,6 +2,7 @@ package com.soodthin.services.impl;
 
 import com.soodthin.dto.request.JobPostRequest;
 import com.soodthin.dto.request.NotificationRequest;
+import com.soodthin.dto.response.CoordinatesResponse;
 import com.soodthin.dto.response.JobPostResponse;
 import com.soodthin.dto.response.NotificationUserResponse;
 import com.soodthin.entity.Candidate;
@@ -13,6 +14,7 @@ import com.soodthin.entity.User;
 import com.soodthin.repositories.EmployerRepository;
 import com.soodthin.repositories.FollowEmployerRepository;
 import com.soodthin.repositories.JobPostRepository;
+import com.soodthin.services.GeocodingService;
 import com.soodthin.services.JobPostService;
 import com.soodthin.services.NotificationService;
 import jakarta.transaction.Transactional;
@@ -44,6 +46,8 @@ public class JobPostServiceImpl implements JobPostService {
     private NotificationService notificationService;
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
+    @Autowired
+    private GeocodingService geocodingService;
 
     @Override
     public JobPost createJobPost(User user, JobPostRequest request) {
@@ -64,7 +68,9 @@ public class JobPostServiceImpl implements JobPostService {
                 throw new RuntimeException("Invalid job status: " + request.getStatus());
             }
         }
-
+        setCoordinatesFromLocation(jobPost, request);
+        System.out.println(">>> [DEBUG] Chuẩn bị lưu Job Post với Latitude: " + jobPost.getLatitude());
+        System.out.println(">>> [DEBUG] Chuẩn bị lưu Job Post với Longitude: " + jobPost.getLongitude());
         JobPost savedJobPost = jobPostRepository.save(jobPost);
 
         List<FollowEmployer> followers = followEmployerRepository
@@ -118,8 +124,13 @@ public class JobPostServiceImpl implements JobPostService {
             throw new RuntimeException("Access denied");
         }
 
+        // Giữ lại view count cũ trước khi map
         int currentViewCount = jobPost.getViewCount() == null ? 0 : jobPost.getViewCount();
+
+        // Map các trường thông thường từ request
         modelMapper.map(request, jobPost);
+
+        // Gán lại view count
         jobPost.setViewCount(currentViewCount);
 
         // Xử lý enum JobStatus
@@ -132,6 +143,7 @@ public class JobPostServiceImpl implements JobPostService {
                 throw new RuntimeException("Invalid job status: " + request.getStatus());
             }
         }
+        setCoordinatesFromLocation(jobPost, request);
 
         return jobPostRepository.save(jobPost);
     }
@@ -230,5 +242,20 @@ public class JobPostServiceImpl implements JobPostService {
             return text;
         }
         return text.substring(0, maxLength) + "...";
+    }
+
+    private void setCoordinatesFromLocation(JobPost jobPost, JobPostRequest request) {
+        if ((request.getLatitude() == null || request.getLongitude() == null)
+                && request.getLocation() != null && !request.getLocation().isBlank()) {
+
+            Optional<CoordinatesResponse> coords = geocodingService.getCoordinates(request.getLocation());
+            coords.ifPresent(coordinates -> {
+                jobPost.setLatitude(coordinates.getLatitude());
+                jobPost.setLongitude(coordinates.getLongitude());
+            });
+        } else {
+            jobPost.setLatitude(request.getLatitude());
+            jobPost.setLongitude(request.getLongitude());
+        }
     }
 }

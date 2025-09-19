@@ -17,12 +17,14 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface ApplicationService {
 
-   CandidateApplicationResponse applyToJob(Integer jobPostId, MultipartFile cvFile,String coverLetter, User user);
+    CandidateApplicationResponse applyToJob(Integer jobPostId, MultipartFile cvFile, String coverLetter, User user);
 
     public EmployerApplicationResponse reviewApplication(Integer id, ApplicationReviewRequest request, User user);
 
     public List<EmployerApplicationResponse> getAllApplicationsByEmployer(User user);
 
     List<CandidateApplicationResponse> getAppliedJobs(User user);
+
+    CandidateApplicationResponse withdrawApplication(Integer id, User user);
 
 }

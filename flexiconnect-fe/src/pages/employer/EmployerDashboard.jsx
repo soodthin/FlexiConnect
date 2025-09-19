@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { authApis, endpoints } from "@configs/APIs";
 import * as RadixDialog from "@radix-ui/react-dialog";
 import { X, Pencil, Trash2, PlusCircle } from "lucide-react";
+import locationData from "@assets/vietnam-provinces.json";
 
 function Card({ children, className = "" }) {
   return (
@@ -32,7 +33,13 @@ function Dialog({ open, onOpenChange, title, children }) {
     <RadixDialog.Root open={open} onOpenChange={onOpenChange}>
       <RadixDialog.Portal>
         <RadixDialog.Overlay className="fixed inset-0 bg-black/40 z-40" />
-        <RadixDialog.Content className="fixed left-1/2 top-1/2 max-h-[95vh] w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white dark:bg-neutral-800 p-8 shadow-xl border border-neutral-200 dark:border-neutral-700 z-50 focus:outline-none text-black dark:text-white">
+        <RadixDialog.Content
+          className="fixed left-1/2 top-1/2 max-h-[95vh] w-full max-w-lg -translate-x-1/2 -translate-y-1/2 
+             rounded-xl bg-white dark:bg-neutral-800 p-8 shadow-xl 
+             border border-neutral-200 dark:border-neutral-700 
+             z-50 focus:outline-none text-black dark:text-white 
+             overflow-y-auto">
+
           {title && (
             <RadixDialog.Title className="text-2xl font-bold mb-4">{title}</RadixDialog.Title>
           )}
@@ -77,15 +84,8 @@ function Select({ className = "", children, ...props }) {
   );
 }
 
-const PROVINCES = [
-  "An Giang","Bắc Ninh","Cà Mau","Cần Thơ","Cao Bằng","Đà Nẵng","Đắk Lắk","Điện Biên",
-  "Đồng Nai","Đồng Tháp","Gia Lai","Hà Nội","Hà Tĩnh","Hải Phòng","Huế","Hưng Yên",
-  "Khánh Hòa","Lai Châu","Lâm Đồng","Lạng Sơn","Lào Cai","Nghệ An","Ninh Bình","Phú Thọ",
-  "Quảng Ngãi","Quảng Ninh","Quảng Trị","Sơn La","Tây Ninh","Thái Nguyên","Thanh Hóa",
-  "TP.HCM","Tuyên Quang","Vĩnh Long"
-];
-
 const JOB_TYPES = [
+  { value: "FULLTIME", label: "Toàn thời gian" },
   { value: "PARTTIME", label: "Bán thời gian" },
   { value: "REMOTE", label: "Làm việc từ xa" },
   { value: "FREELANCE", label: "Freelance" },
@@ -117,6 +117,114 @@ export default function EmployerDashboard() {
   const [editingJob, setEditingJob] = useState(null);
   const [open, setOpen] = useState(false);
   const [reload, setReload] = useState(0);
+
+  // Location selection states
+  const [selectedProvince, setSelectedProvince] = useState("");
+  const [selectedCommune, setSelectedCommune] = useState("");
+  const [streetAddress, setStreetAddress] = useState("");
+  const [availableCommunes, setAvailableCommunes] = useState([]);
+
+  useEffect(() => {
+    if (selectedProvince) {
+      const communes = locationData.commune.filter(
+        (c) => c.idProvince === selectedProvince
+      );
+      setAvailableCommunes(communes);
+      setSelectedCommune("");
+    } else {
+      setAvailableCommunes([]);
+      setSelectedCommune("");
+    }
+  }, [selectedProvince]);
+
+  useEffect(() => {
+    const provinceName =
+      locationData.province.find((p) => p.idProvince === selectedProvince)?.name ||
+      "";
+    const communeName =
+      locationData.commune.find((c) => c.idCommune === selectedCommune)?.name ||
+      "";
+
+    const addressParts = [];
+    if (streetAddress.trim()) addressParts.push(streetAddress.trim());
+    if (communeName) addressParts.push(communeName);
+    if (provinceName) addressParts.push(provinceName);
+
+    const fullAddress = addressParts.join(", ");
+    setForm((prev) => ({ ...prev, location: fullAddress }));
+  }, [selectedProvince, selectedCommune, streetAddress]);
+
+  // Update available communes when province changes
+  useEffect(() => {
+    if (selectedProvince) {
+      const communes = locationData.commune.filter(c => c.idProvince === selectedProvince);
+      setAvailableCommunes(communes);
+      setSelectedCommune(""); // Reset commune selection
+    } else {
+      setAvailableCommunes([]);
+      setSelectedCommune("");
+    }
+  }, [selectedProvince]);
+
+  // Update form.location when address components change
+  useEffect(() => {
+    const provinceName = locationData.province.find(p => p.idProvince === selectedProvince)?.name || "";
+    const communeName = locationData.commune.find(c => c.idCommune === selectedCommune)?.name || "";
+
+    const addressParts = [];
+    if (streetAddress.trim()) addressParts.push(streetAddress.trim());
+    if (communeName) addressParts.push(communeName);
+    if (provinceName) addressParts.push(provinceName);
+
+    const fullAddress = addressParts.join(", ");
+    setForm(prev => ({ ...prev, location: fullAddress }));
+  }, [selectedProvince, selectedCommune, streetAddress]);
+
+  // Parse existing location when editing
+  const parseExistingLocation = (location) => {
+    if (!location) {
+      setSelectedProvince("");
+      setSelectedCommune("");
+      setStreetAddress("");
+      return;
+    }
+
+    // Try to extract province and commune from the location string
+    const provinces = locationData.province;
+    const communes = locationData.commune;
+
+    let foundProvince = null;
+    let foundCommune = null;
+    let remainingAddress = location;
+
+    // Find province in the location string
+    for (const province of provinces) {
+      if (location.includes(province.name)) {
+        foundProvince = province;
+        remainingAddress = remainingAddress.replace(province.name, "").trim();
+        break;
+      }
+    }
+
+    // Find commune in the location string
+    if (foundProvince) {
+      const provinceCommunnes = communes.filter(c => c.idProvince === foundProvince.idProvince);
+      for (const commune of provinceCommunnes) {
+        if (location.includes(commune.name)) {
+          foundCommune = commune;
+          remainingAddress = remainingAddress.replace(commune.name, "").trim();
+          break;
+        }
+      }
+    }
+
+    setSelectedProvince(foundProvince ? foundProvince.idProvince : "");
+    setSelectedCommune(foundCommune ? foundCommune.idCommune : "");
+
+    // Remove trailing commas and spaces
+    remainingAddress = remainingAddress.replace(/^,\s*|,\s*$/g, "");
+    setStreetAddress(remainingAddress);
+  };
 
   // Load profile
   useEffect(() => {
@@ -150,6 +258,9 @@ export default function EmployerDashboard() {
   const resetForm = () => {
     setForm(initialJob);
     setEditingJob(null);
+    setSelectedProvince("");
+    setSelectedCommune("");
+    setStreetAddress("");
     setOpen(false);
   };
 
@@ -194,6 +305,7 @@ export default function EmployerDashboard() {
       status: job.status || "OPEN",
     });
     setEditingJob(job);
+    parseExistingLocation(job.location);
     setOpen(true);
   };
 
@@ -224,21 +336,93 @@ export default function EmployerDashboard() {
         {profile?.isVerified && (
           <Dialog open={open} onOpenChange={setOpen} title={editingJob ? "Cập nhật tuyển dụng" : "Đăng tuyển dụng"}>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <Input placeholder="Tiêu đề" value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} required />
-              <Textarea placeholder="Mô tả" value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} required />
-              <Select value={form.location} onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))} required>
-                <option value="">Chọn tỉnh/thành phố</option>
-                {PROVINCES.map((p) => (
-                  <option key={p} value={p}>
-                    {p}
-                  </option>
-                ))}
-              </Select>
-              <div className="flex gap-3">
-                <Input type="number" min={0} placeholder="Lương tối thiểu (triệu)" value={form.salaryMin} onChange={(e) => setForm((f) => ({ ...f, salaryMin: e.target.value }))} step={0.1} className="w-1/2" />
-                <Input type="number" min={0} placeholder="Lương tối đa (triệu)" value={form.salaryMax} onChange={(e) => setForm((f) => ({ ...f, salaryMax: e.target.value }))} step={0.1} className="w-1/2" />
+              <Input
+                placeholder="Tiêu đề"
+                value={form.title}
+                onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+                required
+              />
+
+              <Textarea
+                placeholder="Mô tả"
+                value={form.description}
+                onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+                required
+              />
+
+              {/* Location selection section */}
+              <div className="space-y-3">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Địa chỉ làm việc
+                </label>
+
+                <Select
+                  value={selectedProvince}
+                  onChange={(e) => setSelectedProvince(e.target.value)}
+                  required
+                >
+                  <option value="">Chọn Tỉnh/Thành phố</option>
+                  {locationData.province.map((province) => (
+                    <option key={province.idProvince} value={province.idProvince}>
+                      {province.name}
+                    </option>
+                  ))}
+                </Select>
+
+                <Select
+                  value={selectedCommune}
+                  onChange={(e) => setSelectedCommune(e.target.value)}
+                  disabled={!selectedProvince}
+                  required
+                >
+                  <option value="">Chọn Phường/Xã</option>
+                  {availableCommunes.map((commune) => (
+                    <option key={commune.idCommune} value={commune.idCommune}>
+                      {commune.name}
+                    </option>
+                  ))}
+                </Select>
+
+                <Input
+                  placeholder="Số nhà, tên đường (vd: 72 Lê Thánh Tôn)"
+                  value={streetAddress}
+                  onChange={(e) => setStreetAddress(e.target.value)}
+                  required
+                />
+
+                {form.location && (
+                  <div className="text-sm text-gray-500 dark:text-gray-400 p-2 bg-gray-50 dark:bg-gray-800 rounded">
+                    <strong>Địa chỉ đầy đủ:</strong> {form.location}
+                  </div>
+                )}
               </div>
-              <Select value={form.jobType} onChange={(e) => setForm((f) => ({ ...f, jobType: e.target.value }))} required>
+
+              <div className="flex gap-3">
+                <Input
+                  type="number"
+                  min={0}
+                  placeholder="Lương tối thiểu (triệu)"
+                  value={form.salaryMin}
+                  onChange={(e) => setForm((f) => ({ ...f, salaryMin: e.target.value }))}
+                  step={0.1}
+                  className="w-1/2"
+                />
+                <Input
+                  type="number"
+                  min={0}
+                  placeholder="Lương tối đa (triệu)"
+                  value={form.salaryMax}
+                  onChange={(e) => setForm((f) => ({ ...f, salaryMax: e.target.value }))}
+                  step={0.1}
+                  className="w-1/2"
+                />
+              </div>
+
+              <Select
+                value={form.jobType}
+                onChange={(e) => setForm((f) => ({ ...f, jobType: e.target.value }))}
+                required
+              >
                 <option value="">Chọn loại công việc</option>
                 {JOB_TYPES.map((j) => (
                   <option key={j.value} value={j.value}>
@@ -246,14 +430,24 @@ export default function EmployerDashboard() {
                   </option>
                 ))}
               </Select>
-              <Input type="datetime-local" value={form.expiredAt} onChange={(e) => setForm((f) => ({ ...f, expiredAt: e.target.value }))} />
-              <Select value={form.status} onChange={(e) => setForm((f) => ({ ...f, status: e.target.value }))}>
+
+              <Input
+                type="datetime-local"
+                value={form.expiredAt}
+                onChange={(e) => setForm((f) => ({ ...f, expiredAt: e.target.value }))}
+              />
+
+              <Select
+                value={form.status}
+                onChange={(e) => setForm((f) => ({ ...f, status: e.target.value }))}
+              >
                 {Object.keys(STATUS_MAP).map((st) => (
                   <option key={st} value={st}>
                     {STATUS_MAP[st].label}
                   </option>
                 ))}
               </Select>
+
               <div className="flex gap-2">
                 <Button type="submit" className="flex-1">
                   {editingJob ? "Cập nhật" : "Đăng tuyển"}

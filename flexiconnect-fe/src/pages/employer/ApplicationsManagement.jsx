@@ -349,7 +349,7 @@ export default function ApplicationsManagement() {
               <Button variant="default" size="sm" onClick={() => setEmailDialog(null)}><X className="w-4 h-4" /></Button>
             </div>
             <div className="space-y-4">
-              {/* Email form code giữ nguyên, chỉ thêm dark:bg/dark:text/dark:border */}
+              {/* Email */}
             </div>
             <div className="flex gap-3 justify-end mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
               <Button variant="default" onClick={() => setEmailDialog(null)}>Hủy</Button>

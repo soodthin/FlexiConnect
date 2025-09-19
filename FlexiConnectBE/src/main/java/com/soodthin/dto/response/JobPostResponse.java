@@ -37,7 +37,9 @@ public class JobPostResponse {
     private String companyAddress;
     private String website;
     private int viewCount;
-
+    private Double latitude;
+    private Double longitude;
+    
     private Boolean isFollowed;
     private Boolean notifyJob;
 

@@ -122,7 +122,7 @@ export default function CandidateDashboard() {
                   className="px-4 py-2 text-base font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-200"
                   onClick={() => navigate("/candidate-upgrade")}
                 >
-                  Trải nghiệm Trợ lý AI
+                  Trải nghiệm chức năng AI
                 </Button>
               </div>
 

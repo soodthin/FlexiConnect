@@ -162,13 +162,11 @@ export default function JobPostList() {
       );
     }
 
-    if (
-      !(
-        selectedLocations.length === 0 ||
-        selectedLocations.includes("Tất cả")
-      )
-    ) {
-      posts = posts.filter((job) => selectedLocations.includes(job.location));
+   if (selectedLocations.length > 0 && !selectedLocations.includes("Tất cả")) {
+        posts = posts.filter(job => {
+            if (!job.location) return false;
+            return selectedLocations.some(city => job.location.endsWith(city));
+        });
     }
 
     if (selectedSalary !== "Tất cả") {
@@ -203,9 +201,19 @@ export default function JobPostList() {
     return `${min} - ${max} triệu`;
   };
 
-  const locations = [
+   const locations = [
     "Tất cả",
-    ...Array.from(new Set(jobPosts.map((job) => job.location).filter(Boolean))),
+    ...Array.from(
+      new Set(
+        jobPosts
+          .map((job) => {
+            if (!job.location) return null;
+            const parts = job.location.split(",");
+            return parts[parts.length - 1].trim(); 
+          })
+          .filter(Boolean)
+      )
+    ).sort(), 
   ];
 
   const salaryOptions = [

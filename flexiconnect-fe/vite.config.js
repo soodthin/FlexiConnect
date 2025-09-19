@@ -11,6 +11,7 @@ export default defineConfig({
       '@components': path.resolve(__dirname, 'src/components'),
       '@applicationForms': path.resolve(__dirname, 'src/components/application-forms'),
       '@forms': path.resolve(__dirname, 'src/components/forms'),
+      '@assets': path.resolve(__dirname, 'src/assets'),
 
       // Configs & Contexts
       '@configs': path.resolve(__dirname, 'src/configs'),
@@ -29,6 +30,8 @@ export default defineConfig({
       '@employerProfile': path.resolve(__dirname, 'src/pages/employer/employer-profile'),
       '@jobPosts': path.resolve(__dirname, 'src/pages/employer/job-posts'),
       '@public': path.resolve(__dirname, 'src/pages/public'),
+
+
     },
   },
   server: {

@@ -29,6 +29,7 @@ import { MyUserContext } from "@contexts/MyContexts";
 import ApplyDialog from "@applicationForms/ApplyDialog";
 import parse from "html-react-parser";
 import { toast } from "sonner";
+import JobMap from "@components/job-maps/JobMaps";
 
 const Card = ({ className = "", children, subtle = false }) => (
   <div className={`
@@ -430,6 +431,18 @@ export default function JobDetail() {
                   {job.description}
                 </div>
               </Card>
+
+              {job.location && (
+                <Card className="p-6">
+                  <div className="flex items-center gap-3 mb-6">
+                    <MapPin size={20} className="text-blue-600 dark:text-blue-400" />
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                      Vị trí công việc
+                    </h2>
+                  </div>
+                  <JobMap job={job} />
+                </Card>
+              )}
             </div>
 
             {/* Sidebar */}

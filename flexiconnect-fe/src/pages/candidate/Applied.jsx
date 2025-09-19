@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { authApis, endpoints } from "@configs/APIs";
 import { toast } from "sonner";
-import { UserRound, Briefcase, MapPin, Clock, DollarSign } from "lucide-react";
+import { UserRound, Briefcase, MapPin, Clock, DollarSign, AlertTriangle } from "lucide-react";
+import ConfirmationDialog from "@components/confirm/ConfirmationDialog";
 const Card = ({ children, className = "" }) => (
   <div className={`p-6 rounded-xl shadow-sm border bg-white dark:bg-[#242424] hover:shadow-md transition ${className}`}>
     {children}
@@ -28,18 +29,27 @@ const Avatar = ({ src, alt, fallback }) => (
   </div>
 );
 
+const CardFooter = ({ children, className = "" }) => (
+  <div className={`flex items-center justify-end mt-4 ${className}`}>{children}</div>
+);
 
 const Applied = () => {
   const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedAppId, setSelectedAppId] = useState(null);
+
+
   useEffect(() => {
     const loadApplications = async () => {
       try {
-        const res = await authApis().get(endpoints["candidate-applied"], {
-        });
+        const res = await authApis().get(endpoints["candidate-applied"]);
         setApplications(res.data || []);
       } catch (err) {
         console.error(err);
         toast.error("⚠️ Không thể tải danh sách ứng tuyển!");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -50,10 +60,12 @@ const Applied = () => {
     switch (status) {
       case "PENDING":
         return "bg-yellow-100 text-yellow-800 border border-yellow-300";
-      case "APPROVED":
+      case "ACCEPTED":
         return "bg-green-100 text-green-800 border border-green-300";
       case "REJECTED":
         return "bg-red-100 text-red-800 border border-red-300";
+      case "WITHDRAWN":
+        return "bg-gray-200 text-gray-600 border border-gray-300 dark:bg-gray-700 dark:text-gray-300";
       default:
         return "bg-gray-100 text-gray-800 border border-gray-300";
     }
@@ -72,6 +84,35 @@ const Applied = () => {
       .filter(Boolean);
   };
 
+  const openConfirmationDialog = (applicationId) => {
+    setSelectedAppId(applicationId);
+    setIsDialogOpen(true);
+  };
+  const confirmWithdraw = async () => {
+    if (!selectedAppId) return;
+
+    try {
+      await authApis().put(endpoints["withdraw-application"](selectedAppId));
+      setApplications(prevApps =>
+        prevApps.map(app =>
+          app.id === selectedAppId ? { ...app, status: 'WITHDRAWN' } : app
+        )
+      );
+      toast.success("Rút hồ sơ thành công!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Đã xảy ra lỗi, không thể rút hồ sơ. Vui lòng thử lại.");
+    } finally {
+      // Đóng dialog và reset state sau khi hoàn tất
+      setIsDialogOpen(false);
+      setSelectedAppId(null);
+    }
+  };
+
+
+  if (loading) {
+    return <div className="p-8">Đang tải dữ liệu...</div>;
+  }
   return (
     <div className="p-8 min-h-screen bg-gray-50 dark:bg-[#181818]">
       <h2 className="text-3xl font-bold mb-8 text-gray-800 dark:text-gray-100">
@@ -156,12 +197,30 @@ const Applied = () => {
                   )}
                 </div>
               </CardContent>
+              {(app.status === "PENDING" || app.status === "ACCEPTED") && (
+                <CardFooter>
+                  <button
+                      onClick={() => openConfirmationDialog(app.id)}
+                      className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors dark:bg-red-900/50 dark:text-red-400 dark:hover:bg-red-900"
+                    >
+                    <AlertTriangle size={14} />
+                    Rút hồ sơ
+                  </button>
+                </CardFooter>
+              )}
             </Card>
           ))}
         </div>
       ) : (
         <p className="text-gray-500 italic">Chưa có hồ sơ nào</p>
       )}
+      <ConfirmationDialog
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        onConfirm={confirmWithdraw}
+        title="Xác nhận rút hồ sơ"
+        message="Bạn có chắc chắn muốn rút hồ sơ này không? Hành động này không thể hoàn tác và nhà tuyển dụng sẽ được thông báo."
+      />
     </div>
   );
 };

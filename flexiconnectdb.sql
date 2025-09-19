@@ -63,6 +63,8 @@ CREATE TABLE job_post (
     salary_min DECIMAL(12,2),
     salary_max DECIMAL(12,2),
     job_type ENUM('FULLTIME', 'PARTTIME', 'REMOTE', 'FREELANCE', 'INTERNSHIP'),
+	latitude DECIMAL(10, 7) NULL,
+	longitude DECIMAL(10, 7) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     expired_at DATE,
     status ENUM('OPEN', 'CLOSED', 'HIDDEN') DEFAULT 'OPEN',
@@ -77,7 +79,7 @@ CREATE TABLE application (
     cover_letter TEXT,
 	resume_file VARCHAR(255),
     applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    status ENUM('PENDING', 'ACCEPTED', 'REJECTED') DEFAULT 'PENDING',
+    status ENUM('PENDING','VIEWED', 'ACCEPTED', 'REJECTED', 'WITHDRAWN') DEFAULT 'PENDING',
     rejection_reason TEXT,
     FOREIGN KEY (job_post_id) REFERENCES job_post(id) ON DELETE CASCADE,
     FOREIGN KEY (candidate_id) REFERENCES candidate(id) ON DELETE CASCADE

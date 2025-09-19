@@ -60,7 +60,7 @@ public class Application implements Serializable {
     private Set<EmployerEmailLog> employerEmailLogSet;
 
     public enum ApplicationStatus {
-        PENDING, VIEWED, ACCEPTED, REJECTED,
+        PENDING, VIEWED, ACCEPTED, REJECTED, WITHDRAWN,
     }
     private static final long serialVersionUID = 1L;
     @Id

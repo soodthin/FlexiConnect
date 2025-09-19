@@ -6,15 +6,11 @@ package com.soodthin.controllers;
 
 import com.soodthin.dto.EmployerDTO;
 import com.soodthin.dto.response.AdminDashboardResponse;
-import com.soodthin.dto.response.EmployerVerificationResponse;
 import com.soodthin.dto.response.UserManagementResponse;
 import com.soodthin.dto.request.UserStatusUpdateRequest;
-import com.soodthin.dto.request.EmployerVerificationRequest;
 import com.soodthin.dto.request.JobPostAdminRequest;
 import com.soodthin.dto.response.JobPostAdminResponse;
-import com.soodthin.entity.Employer;
 import com.soodthin.services.AdminService;
-import com.soodthin.services.JobPostService;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
