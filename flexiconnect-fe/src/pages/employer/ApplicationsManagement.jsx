@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState, useRef } from "react"; 
+import { useEffect, useMemo, useState, useRef } from "react";
 import { toast } from "sonner";
 import { authApis, endpoints } from "@configs/APIs";
 import {
-  Search, Filter, RotateCcw, Eye, Send, X, Clock, MapPin,
-  CheckCircle, XCircle, Mail, FileText, Award, Calendar, User,
+  Search, Filter, RotateCcw, Send, X, 
+  CheckCircle, XCircle, FileText, Award, Calendar, User,
   ChevronDown
 } from "lucide-react";
 import { createPortal } from "react-dom";
@@ -233,9 +233,10 @@ export default function ApplicationsManagement() {
 
   const getStatusBadge = (status) => {
     switch (status) {
-      case "PENDING": return <Badge variant="pending">🕒 Chờ duyệt</Badge>;
-      case "ACCEPTED": return <Badge variant="accepted">✅ Đã duyệt</Badge>;
-      case "REJECTED": return <Badge variant="rejected">❌ Từ chối</Badge>;
+      case "PENDING": return <Badge variant="pending">CHỜ DUYỆT</Badge>;
+      case "ACCEPTED": return <Badge variant="accepted">ĐÃ DUYỆT</Badge>;
+      case "REJECTED": return <Badge variant="rejected">TỪ CHỐI</Badge>;
+      case "WITHDRAWN": return <Badge variant="default">RÚT ĐƠN</Badge>;
       default: return <Badge>-</Badge>;
     }
   };
@@ -333,7 +334,11 @@ export default function ApplicationsManagement() {
                           <DropdownItem icon={<Award className="w-4 h-4" />} onClick={() => setEmailDialog({ appId: app.id, actionType: "OFFER_LETTER" })}>Mời nhận việc</DropdownItem>
                           <DropdownItem icon={<XCircle className="w-4 h-4" />} onClick={() => setEmailDialog({ appId: app.id, actionType: "INTERVIEW_CANCEL" })}>Hủy phỏng vấn</DropdownItem>
                         </DropdownMenu>
-                      ) : <span className="text-gray-400 dark:text-gray-300">Đã từ chối</span>}
+                      ) : app.status === "REJECTED" ? (
+                        <span className="text-gray-400 dark:text-gray-300">Đã từ chối</span>
+                      ) : app.status === "WITHDRAWN" ? (
+                        <span className="text-gray-400 dark:text-gray-300">Ứng viên đã rút đơn</span>
+                      ) : null}
                     </td>
                   </tr>
                 ))}
