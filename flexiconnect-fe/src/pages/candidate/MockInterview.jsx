@@ -308,7 +308,7 @@ const MockInterview = ({ userPackage, onUpgradeClick }) => {
         const fetchPackage = async () => {
             try {
                 setIsLoadingPackage(true);
-                const res = await authApis().get(endpoints['current-package']); // ✅ xóa { headers: authHeader }
+                const res = await authApis().get(endpoints['current-package']); 
                 setCurrentPackage(res.data);
             } catch (err) {
                 console.error('Load current package error:', err);
@@ -339,7 +339,6 @@ const MockInterview = ({ userPackage, onUpgradeClick }) => {
         navigate("/candidate-upgrade");
     };
 
-    // Load applications
     useEffect(() => {
         const loadApplications = async () => {
             try {

@@ -78,6 +78,7 @@ export default function Login() {
       const userData = { ...currentUserRes.data, token, role };
       dispatch({ type: "login", payload: userData });
       localStorage.setItem("user", JSON.stringify(userData));
+      localStorage.setItem("token", token);
 
       toast.success("Đăng nhập thành công!");
 

@@ -12,7 +12,6 @@ export default function CandidateDashboard() {
   const aiMenuRef = useRef();
   const navigate = useNavigate();
 
-  // 🔹 UI Primitives cải tiến
   const Card = ({ className = "", children }) => (
     <div
       className={`rounded-2xl shadow-md border border-gray-200 dark:border-[#333] 
@@ -66,20 +65,29 @@ export default function CandidateDashboard() {
   }, [isDark]);
 
   // Load current user
-  useEffect(() => {
-    const loadUser = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
-        const res = await authApis().get(endpoints["current-user"], {
-        });
-        setUser(res.data);
-      } catch (err) {
-        console.error("Failed to load user:", err);
+useEffect(() => {
+  const loadUser = async () => {
+    try {
+      const userString = localStorage.getItem("user");
+
+      const userData = userString ? JSON.parse(userString) : null;
+
+      const token = userData ? userData.token : null;
+
+      if (!token) {
+        console.log("Không tìm thấy token, dừng thực thi.");
+        return;
       }
-    };
-    loadUser();
-  }, [navigate]);
+      
+      const res = await authApis().get(endpoints["current-user"]); 
+      setUser(res.data);
+
+    } catch (err) {
+      console.error("Failed to load user:", err);
+    }
+  };
+  loadUser();
+}, [navigate]);
 
   // Close AI menu on outside click
   useEffect(() => {

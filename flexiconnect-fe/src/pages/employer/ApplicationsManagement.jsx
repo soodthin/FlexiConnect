@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState, useRef } from "react";
 import { toast } from "sonner";
 import { authApis, endpoints } from "@configs/APIs";
 import {
-  Search, Filter, RotateCcw, Send, X, 
-  CheckCircle, XCircle, FileText, Award, Calendar, User,
+  Search, Filter, RotateCcw, Eye, Send, X, Clock, MapPin,
+  CheckCircle, XCircle, Mail, FileText, Award, Calendar, User,
   ChevronDown
 } from "lucide-react";
 import { createPortal } from "react-dom";
@@ -347,18 +347,130 @@ export default function ApplicationsManagement() {
           </div>
         </Card>
 
-        {/* 📧 Email Dialog */}
+         {/* 📧 Email Dialog */}
         <Dialog open={!!emailDialog} onClose={() => setEmailDialog(null)}>
           <div className="p-6 w-[500px]">
             <div className="flex items-center justify-between mb-6">
-              <Button variant="default" size="sm" onClick={() => setEmailDialog(null)}><X className="w-4 h-4" /></Button>
+              <Button variant="default" size="sm" onClick={() => setEmailDialog(null)}>
+                <X className="w-4 h-4" />
+              </Button>
             </div>
             <div className="space-y-4">
-              {/* Email */}
+              {/* INTERVIEW_INVITE */}
+              {emailDialog?.actionType === "INTERVIEW_INVITE" && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <Clock className="w-4 h-4 inline mr-1" />Thời gian phỏng vấn
+                    </label>
+                    <input
+                      type="datetime-local"
+                      className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 ${errors.interviewTime ? "border-red-500" : "border-gray-200"}`}
+                      value={emailPayload.interviewTime}
+                      onChange={(e) => setEmailPayload({ ...emailPayload, interviewTime: e.target.value })}
+                    />
+                    {errors.interviewTime && <p className="text-red-500 text-sm mt-1">{errors.interviewTime}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <MapPin className="w-4 h-4 inline mr-1" />Link phỏng vấn online
+                    </label>
+                    <input
+                      type="text"
+                      className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 ${errors.location ? "border-red-500" : "border-gray-200"}`}
+                      value={emailPayload.location}
+                      onChange={(e) => setEmailPayload({ ...emailPayload, location: e.target.value })}
+                    />
+                    {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location}</p>}
+                  </div>
+                </>
+              )}
+
+              {/* INTERVIEW_RESULT */}
+              {emailDialog?.actionType === "INTERVIEW_RESULT" && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <CheckCircle className="w-4 h-4 inline mr-1" />Kết quả (Đậu / Rớt)
+                  </label>
+                  <select
+                    className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 ${errors.result ? "border-red-500" : "border-gray-200"}`}
+                    value={emailPayload.result}
+                    onChange={(e) => setEmailPayload({ ...emailPayload, result: e.target.value })}
+                  >
+                    <option value="">-- Chọn kết quả --</option>
+                    <option value="Đậu">Đậu</option>
+                    <option value="Rớt">Rớt</option>
+                  </select>
+                  {errors.result && <p className="text-red-500 text-sm mt-1">{errors.result}</p>}
+                </div>
+              )}
+
+              {/* REQUEST_DOCUMENTS */}
+              {emailDialog?.actionType === "REQUEST_DOCUMENTS" && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <FileText className="w-4 h-4 inline mr-1" />Danh sách giấy tờ cần bổ sung...
+                  </label>
+                  <textarea
+                    placeholder="Ví dụ: Bằng cấp, chứng chỉ, giấy khám sức khỏe..."
+                    className={`w-full px-3 py-2.5 border rounded-lg resize-none focus:ring-2 focus:ring-blue-500 ${errors.documents ? "border-red-500" : "border-gray-200"}`}
+                    rows={4}
+                    value={emailPayload.documents}
+                    onChange={(e) => setEmailPayload({ ...emailPayload, documents: e.target.value })}
+                  />
+                  {errors.documents && <p className="text-red-500 text-sm mt-1">{errors.documents}</p>}
+                </div>
+              )}
+
+              {/* OFFER_LETTER */}
+              {emailDialog?.actionType === "OFFER_LETTER" && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <CheckCircle className="w-4 h-4 inline mr-1" />Gửi thư mời nhận việc
+                  </label>
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Mức lương(triệu)</label>
+                    <input
+                      type="text"
+                      value={emailPayload.salary || ""}
+                      onChange={(e) => setEmailPayload({ ...emailPayload, salary: e.target.value })}
+                      placeholder="VD: 15 "
+                      className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 ${errors.salary ? "border-red-500" : "border-gray-200"}`}
+                    />
+                    {errors.salary && <p className="text-red-500 text-sm mt-1">{errors.salary}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Ngày bắt đầu làm việc</label>
+                    <input
+                      type="date"
+                      value={emailPayload.startDate || ""}
+                      onChange={(e) => setEmailPayload({ ...emailPayload, startDate: e.target.value })}
+                      className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 ${errors.startDate ? "border-red-500" : "border-gray-200"}`}
+                    />
+                    {errors.startDate && <p className="text-red-500 text-sm mt-1">{errors.startDate}</p>}
+                  </div>
+                </div>
+              )}
+
+              {/* INTERVIEW_CANCEL */}
+              {emailDialog?.actionType === "INTERVIEW_CANCEL" && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <FileText className="w-4 h-4 inline mr-1" />Gửi thư hủy phỏng vấn
+                  </label>
+                  {/* Giữ nguyên UI, chưa có nội dung cụ thể */}
+                </div>
+              )}
             </div>
-            <div className="flex gap-3 justify-end mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
+
+            <div className="flex gap-3 justify-end mt-6 pt-4 border-t border-gray-100">
               <Button variant="default" onClick={() => setEmailDialog(null)}>Hủy</Button>
-              <Button variant="primary" onClick={handleSend}><Send className="w-4 h-4 mr-2" />Gửi</Button>
+              <Button variant="primary" onClick={handleSend}>
+                <Send className="w-4 h-4 mr-2" />Gửi
+              </Button>
             </div>
           </div>
         </Dialog>
