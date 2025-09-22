@@ -89,7 +89,6 @@ useEffect(() => {
   loadUser();
 }, [navigate]);
 
-  // Close AI menu on outside click
   useEffect(() => {
     const handleClick = (e) => {
       if (aiMenuRef.current && !aiMenuRef.current.contains(e.target)) {

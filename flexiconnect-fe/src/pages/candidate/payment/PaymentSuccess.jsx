@@ -1,4 +1,3 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function PaymentSuccess() {
@@ -10,7 +9,7 @@ export default function PaymentSuccess() {
         🎉 Thanh toán thành công!
       </h1>
       <p className="text-lg text-green-700 dark:text-green-300 mb-6">
-        Cảm ơn bạn đã nâng cấp tài khoản. Bạn có thể bắt đầu sử dụng tính năng AI của gói Premium ngay bây giờ.
+        Cảm ơn bạn đã nâng cấp tài khoản. Bạn có thể bắt đầu sử dụng tính năng AI ngay bây giờ.
       </p>
       <button
         onClick={() => navigate("/candidate-profile ")}
