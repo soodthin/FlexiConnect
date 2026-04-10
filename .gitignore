@@ -26,3 +26,6 @@ Thumbs.db
 
 # Large local artifacts
 /FlexiConnectDemo.mp4
+
+# Local env backups
+/env_local/
