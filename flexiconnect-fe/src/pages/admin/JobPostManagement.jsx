@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { cn } from "@/utils/cn";
 import { authApis, endpoints } from "@configs/APIs";
 import { toast } from "sonner";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -64,9 +65,9 @@ function JobPostManagement() {
   };
 
   const renderTable = (list, showActions = false) => (
-    <div className="overflow-x-auto border rounded-lg mt-4 shadow-sm dark:border-neutral-700">
+    <div className="overflow-x-auto border rounded-lg mt-4 shadow-sm dark:border-dark-border-primary">
       <table className="w-full border-collapse text-sm">
-        <thead className="bg-gray-100 dark:bg-[#2b2b2b] text-gray-700 dark:text-gray-200">
+        <thead className="bg-neutral-100 dark:bg-dark-bg-tertiary text-neutral-700 dark:text-neutral-200">
           <tr>
             <th className="p-3 text-left">Tiêu đề</th>
             <th className="p-3 text-left">Địa điểm</th>
@@ -103,7 +104,7 @@ function JobPostManagement() {
             </tr>
           )) : (
             <tr>
-              <td colSpan={6} className="text-center p-6 text-gray-500 dark:text-gray-400 italic">
+              <td colSpan={6} className="text-center p-6 text-neutral-500 dark:text-neutral-400 italic">
                 Không có dữ liệu
               </td>
             </tr>
@@ -114,7 +115,7 @@ function JobPostManagement() {
   );
 
   return (
-    <div className="p-6 min-h-screen bg-gray-50 dark:bg-[#181818] text-gray-800 dark:text-gray-100">
+    <div className="p-6 min-h-screen bg-neutral-50 dark:bg-dark-bg-primary text-neutral-800 dark:text-neutral-100">
       <h2 className="text-2xl font-bold mb-6">TRANG QUẢN LÝ VIỆC LÀM</h2>
 
       {/* Search + size */}
@@ -124,12 +125,12 @@ function JobPostManagement() {
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(0); }}
           placeholder="🔍 Tìm kiếm..."
-          className="p-2 border rounded dark:bg-[#2d2d2d] dark:text-gray-100 dark:border-neutral-600 focus:ring-2 focus:ring-blue-500 transition"
+          className="p-2 border rounded dark:bg-dark-bg-elevated dark:text-neutral-100 dark:border-dark-border-subtle focus:ring-2 focus:ring-blue-500 transition"
         />
         <select
           value={size}
           onChange={(e) => { setSize(Number(e.target.value)); setPage(0); }}
-          className="p-2 border rounded dark:bg-[#2d2d2d] dark:text-gray-100 dark:border-neutral-600 focus:ring-2 focus:ring-blue-500 transition"
+          className="p-2 border rounded dark:bg-dark-bg-elevated dark:text-neutral-100 dark:border-dark-border-subtle focus:ring-2 focus:ring-blue-500 transition"
         >
           <option value={5}>5 / trang</option>
           <option value={10}>10 / trang</option>
@@ -143,7 +144,7 @@ function JobPostManagement() {
         value={activeTab}
         onValueChange={(v) => { setActiveTab(v); setPage(0); }}
       >
-        <Tabs.List className="flex space-x-4 border-b pb-2 mb-4 dark:border-neutral-700">
+        <Tabs.List className="flex space-x-4 border-b pb-2 mb-4 dark:border-dark-border-primary">
           {["OPEN","CLOSED","HIDDEN"].map(tab => (
             <Tabs.Trigger
               key={tab}
@@ -167,7 +168,7 @@ function JobPostManagement() {
         <button
           onClick={() => setPage(p => Math.max(p - 1, 0))}
           disabled={page === 0}
-          className="px-3 py-1 border rounded disabled:opacity-50 dark:border-neutral-600"
+          className="px-3 py-1 border rounded disabled:opacity-50 dark:border-dark-border-subtle"
         >
           ◀ Trang trước
         </button>
@@ -175,7 +176,7 @@ function JobPostManagement() {
         <button
           onClick={() => setPage(p => Math.min(p + 1, totalPages - 1))}
           disabled={page + 1 >= totalPages}
-          className="px-3 py-1 border rounded disabled:opacity-50 dark:border-neutral-600"
+          className="px-3 py-1 border rounded disabled:opacity-50 dark:border-dark-border-subtle"
         >
           Trang sau ▶
         </button>
@@ -185,12 +186,12 @@ function JobPostManagement() {
       <Dialog.Root open={openModal} onOpenChange={setOpenModal}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-md" />
-          <Dialog.Content className="fixed top-1/2 left-1/2 w-[90%] max-w-3xl -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-[#232323] rounded-2xl shadow-2xl p-6 space-y-4">
+          <Dialog.Content className="fixed top-1/2 left-1/2 w-[90%] max-w-3xl -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-dark-bg-secondary rounded-2xl shadow-2xl p-6 space-y-4">
             {selectedJob && (
               <>
-                <h3 className="text-xl font-bold text-gray-700 dark:text-white">{selectedJob.title}</h3>
-                <p className="text-gray-700 dark:text-gray-200">{selectedJob.description}</p>
-                <div className="flex justify-between mt-4 text-sm text-gray-500 dark:text-gray-400">
+                <h3 className="text-xl font-bold text-neutral-700 dark:text-white">{selectedJob.title}</h3>
+                <p className="text-neutral-700 dark:text-neutral-200">{selectedJob.description}</p>
+                <div className="flex justify-between mt-4 text-sm text-neutral-500 dark:text-neutral-400">
                   <span>{selectedJob.companyName}</span>
                   <span >{dayjs(selectedJob.createdAt).format("YYYY-MM-DD HH:mm")}</span>
                 </div>

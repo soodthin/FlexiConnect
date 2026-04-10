@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { cn } from "@/utils/cn";
 import { Bell } from "lucide-react";
 import { authApis, endpoints } from "@configs/APIs";
 import { toast } from "sonner";
@@ -6,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 const Card = ({ children, className }) => (
   <div
-    className={`bg-white dark:bg-[#232323] border border-gray-200 dark:border-[#444] rounded-2xl shadow ${className}`}
+    className={`bg-white dark:bg-dark-bg-secondary border border-neutral-200 dark:border-dark-border-primary rounded-2xl shadow ${className}`}
   >
     {children}
   </div>
@@ -144,9 +145,9 @@ export default function Notifications() {
       {/* nút chuông */}
       <button
         onClick={() => setShowDropdown((v) => !v)}
-        className="relative p-2 rounded-full bg-[#f5efe6] dark:bg-[#232323] border border-[#d1d5db] dark:border-[#444] shadow hover:scale-110 transition"
+        className="relative p-2 rounded-full bg-beige-200 dark:bg-dark-bg-secondary border border-neutral-300 dark:border-dark-border-primary shadow hover:scale-110 transition"
       >
-        <Bell className="w-5 h-5 text-gray-700 dark:text-[#f5efe6]" />
+        <Bell className="w-5 h-5 text-neutral-700 dark:text-beige-200" />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
             {unreadCount}
@@ -157,9 +158,9 @@ export default function Notifications() {
       {/* dropdown */}
       <Dropdown
         open={showDropdown}
-        className="bg-white dark:bg-[#232323] border border-gray-100 dark:border-[#444] rounded-2xl shadow-xl"
+        className="bg-white dark:bg-dark-bg-secondary border border-neutral-100 dark:border-dark-border-primary rounded-2xl shadow-xl"
       >
-        <div className="flex justify-between items-center px-4 py-2 border-b dark:border-[#444]">
+        <div className="flex justify-between items-center px-4 py-2 border-b dark:border-dark-border-primary">
           <span className="font-semibold text-sm">Thông báo</span>
           <Button
             onClick={markAllAsRead}
@@ -169,7 +170,7 @@ export default function Notifications() {
           </Button>
         </div>
         {notifications.length === 0 ? (
-          <div className="p-6 text-center text-gray-500 dark:text-gray-400 cursor-default">
+          <div className="p-6 text-center text-neutral-500 dark:text-neutral-400 cursor-default">
             Không có thông báo
           </div>
         ) : (
@@ -177,14 +178,14 @@ export default function Notifications() {
             {notifications.map((n) => (
               <li
                 key={n.id}
-                className={`p-4 flex justify-between items-start cursor-pointer hover:bg-[#f5efe6] dark:hover:bg-[#353535] ${!n.isRead ? "font-semibold" : ""
+                className={`p-4 flex justify-between items-start cursor-pointer hover:bg-beige-200 dark:hover:bg-dark-bg-elevated ${!n.isRead ? "font-semibold" : ""
                   }`}
                 onClick={() => setSelectedNotif(n)}
               >
                 <div>
                   <p className="text-sm">{n.title}</p>
-                  <p className="text-xs text-gray-500">{n.content}</p>
-                  <div className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-neutral-500">{n.content}</p>
+                  <div className="text-xs text-neutral-400 mt-1">
                     {n.createdAt
                       ? new Date(n.createdAt).toLocaleString("vi-VN")
                       : ""}
@@ -238,7 +239,7 @@ export default function Notifications() {
           </button>
         )}
 
-        <div className="text-xs text-gray-400 mt-3">
+        <div className="text-xs text-neutral-400 mt-3">
           {selectedNotif?.createdAt
             ? new Date(selectedNotif.createdAt).toLocaleString("vi-VN")
             : ""}

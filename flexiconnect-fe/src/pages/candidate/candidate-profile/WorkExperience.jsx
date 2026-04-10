@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { cn } from "@/utils/cn";
 import { useNavigate } from "react-router-dom";
 import { authApis, endpoints } from "@configs/APIs";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
@@ -8,7 +9,7 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Card = ({ children, className = "" }) => (
-  <div className={`bg-white dark:bg-[#232323] rounded-xl shadow p-5 border border-transparent dark:border-neutral-700/50 ${className}`}>
+  <div className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow p-5 border border-transparent dark:border-dark-border-primary/50 ${className}`}>
     {children}
   </div>
 );
@@ -38,7 +39,7 @@ const Dialog = {
   Overlay: (props) => <DialogPrimitive.Overlay className="fixed inset-0 bg-black/40 z-40" {...props} />,
   Content: ({ children, className = "", ...props }) => (
     <DialogPrimitive.Content
-      className={`fixed left-1/2 top-1/2 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white dark:bg-[#2d2d2d] text-black dark:text-white p-8 shadow-xl z-50 max-h-[90vh] overflow-y-auto ${className}`}
+      className={`fixed left-1/2 top-1/2 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white dark:bg-dark-bg-elevated text-black dark:text-white p-8 shadow-xl z-50 max-h-[90vh] overflow-y-auto ${className}`}
       {...props}
     >
       {children}
@@ -59,10 +60,10 @@ const UpgradeDialog = ({ open, onClose, onUpgrade }) => (
             <div className="mx-auto w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mb-4">
               <Crown className="w-8 h-8 text-white" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+            <h3 className="text-2xl font-bold text-neutral-800 dark:text-neutral-100 mb-2">
               Nâng cấp tài khoản AI
             </h3>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-neutral-600 dark:text-neutral-300">
               Bạn cần nâng cấp tài khoản để sử dụng tính năng AI
             </p>
           </div>
@@ -103,7 +104,7 @@ const UpgradeDialog = ({ open, onClose, onUpgrade }) => (
           <div className="flex gap-3">
             <Button
               onClick={onClose}
-              className="flex-1 bg-gray-200 dark:bg-[#444] text-black dark:text-white hover:bg-gray-300"
+              className="flex-1 bg-neutral-200 dark:bg-dark-bg-elevated text-black dark:text-white hover:bg-neutral-300 dark:hover:bg-neutral-700"
             >
               Để sau
             </Button>
@@ -117,8 +118,8 @@ const UpgradeDialog = ({ open, onClose, onUpgrade }) => (
           </div>
         </div>
         <Dialog.Close asChild>
-          <IconButton className="absolute right-4 top-4 hover:bg-gray-200 dark:hover:bg-[#444]">
-            <Cross2Icon />
+          <IconButton className="absolute right-4 top-4 hover:bg-neutral-200 dark:hover:bg-dark-bg-elevated" aria-label="Close dialog">
+            <Cross2Icon aria-hidden="true" />
           </IconButton>
         </Dialog.Close>
       </Dialog.Content>
@@ -142,7 +143,7 @@ const ExperienceCard = ({ exp, onEdit, onDelete, hasAIAccess }) => (
       <p className="text-xs text-neutral-500 dark:text-neutral-400">{formatDate(exp.startDate)} - {formatDate(exp.endDate)}</p>
     </div>
     {exp.description && (
-      <p className="text-sm mt-3 pt-3 border-t border-neutral-200 dark:border-neutral-700/50 whitespace-pre-wrap">
+      <p className="text-sm mt-3 pt-3 border-t border-neutral-200 dark:border-dark-border-primary/50 whitespace-pre-wrap">
         {exp.description}
       </p>
     )}
@@ -303,7 +304,7 @@ export default function WorkExperience({ userPackage, onUpgradeClick }) {
         <Dialog.Trigger asChild>
           <Button
             onClick={() => setOpen(true)}
-            className="flex items-center gap-2 bg-black dark:bg-white text-white dark:text-black shadow hover:bg-gray-800 dark:hover:bg-gray-200"
+            className="flex items-center gap-2 bg-black dark:bg-white text-white dark:text-black shadow hover:bg-neutral-800 dark:hover:bg-neutral-200"
           >
             <PlusCircledIcon /> Thêm kinh nghiệm
           </Button>
@@ -317,17 +318,17 @@ export default function WorkExperience({ userPackage, onUpgradeClick }) {
                 {checkAIAccess() && <Crown size={20} className="inline ml-2 text-yellow-500" />}
               </Dialog.Title>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <input ref={firstInputRef} placeholder="Công ty" className="w-full px-4 py-2 rounded-lg border dark:border-neutral-600 bg-white dark:bg-[#3a3a3a]" value={company} onChange={(e) => setCompany(e.target.value)} required />
-                <input placeholder="Vị trí" className="w-full px-4 py-2 rounded-lg border dark:border-neutral-600 bg-white dark:bg-[#3a3a3a]" value={position} onChange={(e) => setPosition(e.target.value)} required />
-                <input type="date" className="w-full px-4 py-2 rounded-lg border dark:border-neutral-600 bg-white dark:bg-[#3a3a3a]" value={startDate} onChange={(e) => setStartDate(e.target.value)} required />
-                <input type="date" className="w-full px-4 py-2 rounded-lg border dark:border-neutral-600 bg-white dark:bg-[#3a3a3a]" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+                <input ref={firstInputRef} placeholder="Công ty" className="w-full px-4 py-2 rounded-lg border dark:border-dark-border-subtle bg-white dark:bg-dark-bg-tertiary" value={company} onChange={(e) => setCompany(e.target.value)} required />
+                <input placeholder="Vị trí" className="w-full px-4 py-2 rounded-lg border dark:border-dark-border-subtle bg-white dark:bg-dark-bg-tertiary" value={position} onChange={(e) => setPosition(e.target.value)} required />
+                <input type="date" className="w-full px-4 py-2 rounded-lg border dark:border-dark-border-subtle bg-white dark:bg-dark-bg-tertiary" value={startDate} onChange={(e) => setStartDate(e.target.value)} required />
+                <input type="date" className="w-full px-4 py-2 rounded-lg border dark:border-dark-border-subtle bg-white dark:bg-dark-bg-tertiary" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
               </div>
               <div className="space-y-2">
                 <label className="block text-sm font-medium">Mô tả công việc</label>
                 <textarea
                   placeholder="Nhập các ý chính về công việc và thành tựu của bạn..."
                   rows={4}
-                  className="w-full px-4 py-2 rounded-lg border dark:border-neutral-600 bg-white dark:bg-[#3a3a3a]"
+                  className="w-full px-4 py-2 rounded-lg border dark:border-dark-border-subtle bg-white dark:bg-dark-bg-tertiary"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                 />
@@ -338,7 +339,7 @@ export default function WorkExperience({ userPackage, onUpgradeClick }) {
                   className={`w-full flex items-center justify-center gap-2 text-sm font-semibold rounded-lg shadow ${
                     checkAIAccess()
                       ? "bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white hover:opacity-90"
-                      : "bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                      : "bg-neutral-200 dark:bg-dark-bg-elevated text-neutral-500 dark:text-neutral-400 cursor-not-allowed"
                   } disabled:opacity-60`}
                 >
                   {isSuggesting ? (
@@ -353,7 +354,7 @@ export default function WorkExperience({ userPackage, onUpgradeClick }) {
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mt-3 bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/20 dark:to-[#2d2d2d] border border-blue-300 dark:border-blue-700 rounded-xl p-4 shadow-inner"
+                    className="mt-3 bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/20 dark:to-dark-bg-elevated border border-blue-300 dark:border-blue-700 rounded-xl p-4 shadow-inner"
                   >
                     <p className="text-sm text-blue-900 dark:text-blue-200 font-medium mb-2 flex items-center gap-2">
                       <MagicWandIcon className="text-blue-600 dark:text-blue-300" /> Gợi ý từ AI
@@ -375,7 +376,7 @@ export default function WorkExperience({ userPackage, onUpgradeClick }) {
                       <Button
                         type="button"
                         onClick={() => setDescriptionAiSuggestion("")}
-                        className="flex-1 bg-gray-200 dark:bg-[#444] text-black dark:text-white text-xs py-1 hover:bg-gray-300"
+                        className="flex-1 bg-neutral-200 dark:bg-dark-bg-elevated text-black dark:text-white text-xs py-1 hover:bg-neutral-300 dark:hover:bg-neutral-700"
                       >
                         Bỏ qua
                       </Button>
@@ -388,7 +389,7 @@ export default function WorkExperience({ userPackage, onUpgradeClick }) {
                   {editingExp ? "Cập nhật" : "Thêm mới"}
                 </Button>
                 <Dialog.Close asChild>
-                  <Button type="button" className="flex-1 bg-gray-200 dark:bg-[#444] py-2.5">
+                  <Button type="button" className="flex-1 bg-neutral-200 dark:bg-dark-bg-elevated py-2.5">
                     Huỷ
                   </Button>
                 </Dialog.Close>
@@ -431,7 +432,7 @@ export default function WorkExperience({ userPackage, onUpgradeClick }) {
                 <Button onClick={handleDeleteExperience} className="bg-red-600 text-white flex-1">
                   Xóa
                 </Button>
-                <Button onClick={() => setDeleteDialogOpen(false)} className="bg-gray-200 dark:bg-[#444] flex-1">
+                <Button onClick={() => setDeleteDialogOpen(false)} className="bg-neutral-200 dark:bg-dark-bg-elevated flex-1">
                   Hủy
                 </Button>
               </div>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { cn } from "@/utils/cn";
 import {
   X,
   Pencil,
@@ -11,7 +12,7 @@ import { authApis, endpoints } from "@configs/APIs";
 /* -------------------- UI Primitives -------------------- */
 function Card({ children, className = "" }) {
   return (
-    <div className={`rounded-xl shadow bg-white dark:bg-[#232323] ${className}`}>
+    <div className={`rounded-xl shadow bg-white dark:bg-dark-bg-secondary ${className}`}>
       {children}
     </div>
   );
@@ -41,7 +42,7 @@ function Dialog({ open, onOpenChange, title, children }) {
     <RadixDialog.Root open={open} onOpenChange={onOpenChange}>
       <RadixDialog.Portal>
         <RadixDialog.Overlay className="fixed inset-0 bg-black/40 z-40" />
-        <RadixDialog.Content className="fixed left-1/2 top-1/2 max-h-[95vh] w-full max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white dark:bg-[#1e1e1e] p-8 shadow-xl border border-neutral-200 dark:border-neutral-700 z-50 focus:outline-none overflow-y-auto">
+        <RadixDialog.Content className="fixed left-1/2 top-1/2 max-h-[95vh] w-full max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white dark:bg-neutral-850 p-8 shadow-xl border border-neutral-200 dark:border-dark-border-primary z-50 focus:outline-none overflow-y-auto">
           {title && (
             <RadixDialog.Title className="text-2xl font-bold mb-4 text-black dark:text-white">
               {title}
@@ -62,7 +63,7 @@ function Dialog({ open, onOpenChange, title, children }) {
 function Textarea({ className = "", ...props }) {
   return (
     <textarea
-      className={`w-full h-32 p-3 border rounded-md dark:bg-neutral-800 text-black dark:text-white border-gray-300 dark:border-gray-600 ${className}`}
+      className={`w-full h-32 p-3 border rounded-md dark:bg-neutral-800 text-black dark:text-white border-neutral-300 dark:border-dark-border-subtle ${className}`}
       {...props}
     />
   );
@@ -95,7 +96,7 @@ function ImageGrid({ images, onRemove, onZoom, onAdd }) {
           onChange={(e) => e.target.files[0] && onAdd(e.target.files[0])}
           className="hidden"
         />
-        <PlusCircle className="w-6 h-6 text-gray-500" />
+        <PlusCircle className="w-6 h-6 text-neutral-500" />
       </label>
     </div>
   );

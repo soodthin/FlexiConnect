@@ -1,10 +1,15 @@
-const InputField = ({ label, ...props }) => (
-  <div>
-    <label className="text-sm text-gray-600 font-semibold">{label}</label>
-    <input
-      className="w-full px-4 py-3 mt-1 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-500 bg-white"
-      {...props}
-    />
-  </div>
-);
-export default InputField;
+const PrimaryButton = ({ children, variant = 'primary', ...props }) => {
+  const variantClasses = {
+    primary: 'btn btn-primary w-full',
+    secondary: 'btn btn-secondary w-full',
+    danger: 'btn btn-danger w-full',
+  };
+
+  return (
+    <button className={variantClasses[variant]} {...props}>
+      {children}
+    </button>
+  );
+};
+
+export default PrimaryButton;

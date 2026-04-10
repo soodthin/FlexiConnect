@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { MyUserContext, MyDispatcherContext } from "@contexts/MyContexts";
 import Notifications from "@components/notifications/Notifications";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/Avatar";
 import {
   Sun,
   Moon,
@@ -11,16 +12,21 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { Bot } from "lucide-react";
+import { cn } from "@/utils/cn";
 
 // Button
 function Button({ children, className = "", ...props }) {
   return (
     <button
       {...props}
-      className={`px-4 py-2 rounded-full shadow font-semibold transition border 
-        bg-[#f5efe6] dark:bg-[#232323] text-[#222222] dark:text-[#f5efe6]
-        border-[#d1d5db] dark:border-[#444]
-        hover:bg-[#f5f5dc] dark:hover:bg-[#353535] ${className}`}
+      className={cn(
+        "px-4 py-2 rounded-pill shadow-soft font-semibold transition-all duration-200 border",
+        "bg-beige-200 dark:bg-dark-bg-secondary",
+        "text-softblack dark:text-dark-text-primary",
+        "border-neutral-200 dark:border-dark-border-primary",
+        "hover:bg-beige-300 dark:hover:bg-dark-bg-tertiary hover:shadow-soft-md",
+        className
+      )}
     >
       {children}
     </button>
@@ -32,9 +38,13 @@ function IconButton({ children, className = "", ...props }) {
   return (
     <button
       {...props}
-      className={`p-2 rounded-full shadow border transition
-        bg-[#f5efe6] dark:bg-[#232323] border-[#d1d5db] dark:border-[#444]
-        hover:scale-110 ${className}`}
+      className={cn(
+        "p-2 rounded-pill shadow-soft border transition-all duration-200",
+        "bg-beige-200 dark:bg-dark-bg-secondary",
+        "border-neutral-200 dark:border-dark-border-primary",
+        "hover:scale-110 hover:shadow-soft-md",
+        className
+      )}
     >
       {children}
     </button>
@@ -57,7 +67,13 @@ function Dropdown({ open, onClose, children, trigger }) {
     <div className="relative" ref={ref}>
       {trigger}
       {open && (
-        <div className="absolute right-0 mt-3 w-60 bg-white dark:bg-[#232323] border border-gray-100 dark:border-[#444] rounded-2xl shadow-xl z-30 overflow-hidden">
+        <div className={cn(
+          "absolute right-0 mt-3 w-60",
+          "bg-white dark:bg-dark-bg-secondary",
+          "border border-neutral-200 dark:border-dark-border-primary",
+          "rounded-card shadow-soft-lg z-30 overflow-hidden",
+          "animate-dropdown"
+        )}>
           {children}
         </div>
       )}
@@ -70,10 +86,12 @@ function DropdownItem({ onClick, children, danger }) {
   return (
     <li
       onClick={onClick}
-      className={`px-6 py-4 cursor-pointer transition ${danger
-        ? "text-red-600 hover:bg-red-50 dark:hover:bg-red-900"
-        : "hover:bg-[#f5efe6] dark:hover:bg-[#353535]"
-        }`}
+      className={cn(
+        "px-6 py-4 cursor-pointer transition-colors duration-150",
+        danger
+          ? "text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+          : "hover:bg-beige-100 dark:hover:bg-dark-bg-tertiary"
+      )}
     >
       {children}
     </li>
@@ -121,14 +139,15 @@ function AIAvatar({ role }) {
 
   return (
     <div className="flex items-center gap-3 font-mono text-lg">
-      <Bot className={`w-7 h-7 ${isDark ? "text-[#f5efe6]" : "text-black"}`} />
-      <span className={`${isDark ? "text-[#f5efe6]" : "text-[#222222]"}`}>
+      <Bot className={cn(
+        "w-7 h-7",
+        isDark ? "text-dark-text-primary" : "text-softblack"
+      )} />
+      <span className={cn(
+        isDark ? "text-dark-text-primary" : "text-softblack"
+      )}>
         {displayText}<span className="animate-blink">|</span>
       </span>
-      <style jsx>{`
-        .animate-blink { display: inline-block; width: 1ch; animation: blink 1s step-start infinite; }
-        @keyframes blink { 50% { opacity: 0; } }
-      `}</style>
     </div>
   );
 }
@@ -137,6 +156,11 @@ function UserMenu({ user, onLogout }) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+
+  const getInitials = (name) => {
+    if (!name) return "U";
+    return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+  };
 
   const roleMenus = {
     ADMIN: [
@@ -161,16 +185,21 @@ function UserMenu({ user, onLogout }) {
         onClose={() => setOpen(false)}
         trigger={
           <Button
-            className="flex items-center gap-2 bg-white dark:bg-[#232323] hover:bg-[#f5efe6] dark:hover:bg-[#353535]"
+            className="flex items-center gap-2 bg-white dark:bg-dark-bg-secondary hover:bg-beige-100 dark:hover:bg-dark-bg-tertiary"
             onClick={() => setOpen((v) => !v)}
           >
-            <User className="text-xl text-[#6b7280] dark:text-[#aaa]" />
+            <Avatar size="sm" className="ring-2 ring-border">
+              <AvatarImage src={user?.avatar} alt={user?.fullName} />
+              <AvatarFallback className="text-xs bg-beige-200 dark:bg-dark-bg-tertiary">
+                {getInitials(user?.fullName)}
+              </AvatarFallback>
+            </Avatar>
             <span className="font-medium">{user?.fullName?.split(" ")[0] || "Bạn"}</span>
-            <ChevronDown className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+            <ChevronDown className="w-4 h-4 text-neutral-500 dark:text-dark-text-tertiary" />
           </Button>
         }
       >
-        <ul className="text-base text-gray-700 dark:text-[#f5efe6]">
+        <ul className="text-base text-neutral-700 dark:text-dark-text-primary">
           {roleMenus[user.role]?.map((item) => (
             <DropdownItem key={item.to} onClick={() => navigate(item.to)}>
               {item.label}
@@ -184,30 +213,36 @@ function UserMenu({ user, onLogout }) {
 
       {/* Confirm logout dialog */}
       {showConfirm && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-          {/* Overlay mờ */}
+        <div className="fixed inset-0 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="logout-title">
           <div
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
+            className="dialog-overlay"
             onClick={() => setShowConfirm(false)}
+            aria-label="Close dialog"
           ></div>
 
-          {/* Dialog box */}
-          <div className="relative z-10 w-80 bg-white dark:bg-[#1f1f1f] rounded-2xl shadow-2xl p-6 flex flex-col items-center text-center animate-scaleUp">
-            {/* Icon logout */}
+          <div className={cn(
+            "relative z-50 w-80",
+            "bg-white dark:bg-dark-bg-secondary",
+            "rounded-dialog shadow-soft-xl p-6",
+            "flex flex-col items-center text-center",
+            "animate-scaleIn"
+          )}>
             <LogOut className="w-10 h-10 text-red-500 mb-3" />
-            <h3 className="text-lg font-semibold mb-2 dark:text-[#f5efe6]">Xác nhận đăng xuất</h3>
-            <p className="mb-6 text-gray-700 dark:text-gray-300 text-sm">
+            <h3 id="logout-title" className="text-lg font-semibold mb-2 text-softblack dark:text-dark-text-primary">
+              Xác nhận đăng xuất
+            </h3>
+            <p className="mb-6 text-neutral-700 dark:text-dark-text-secondary text-sm">
               Bạn có chắc chắn muốn đăng xuất khỏi tài khoản không?
             </p>
             <div className="flex justify-center gap-4 w-full">
               <Button
-                className="flex-1 bg-gray-200 dark:bg-[#2c2c2c] text-gray-800 dark:text-[#f5efe6] hover:bg-gray-300 dark:hover:bg-[#3a3a3a]"
+                className="flex-1 bg-neutral-200 dark:bg-dark-bg-elevated text-neutral-800 dark:text-dark-text-primary hover:bg-neutral-300 dark:hover:bg-neutral-700"
                 onClick={() => setShowConfirm(false)}
               >
                 Hủy
               </Button>
               <Button
-                className="flex-1 bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                className="flex-1 bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 shadow-soft hover:shadow-soft-md"
                 onClick={() => {
                   setShowConfirm(false);
                   onLogout();
@@ -217,16 +252,6 @@ function UserMenu({ user, onLogout }) {
               </Button>
             </div>
           </div>
-
-          <style jsx>{`
-      .animate-scaleUp {
-        animation: scaleUp 0.15s ease-out;
-      }
-      @keyframes scaleUp {
-        0% { transform: scale(0.9); opacity: 0; }
-        100% { transform: scale(1); opacity: 1; }
-      }
-    `}</style>
         </div>
       )}
 
@@ -258,10 +283,16 @@ export default function Header() {
 
 
   return (
-    <header className="flex justify-between items-center p-6 bg-[#f7f6f3] dark:bg-[#181818] font-inter text-[#222222] dark:text-[#f5efe6]">
+    <header className={cn(
+      "flex justify-between items-center p-6",
+      "bg-beige-100 dark:bg-dark-bg-primary",
+      "text-softblack dark:text-dark-text-primary",
+      "border-b border-transparent dark:border-dark-border-subtle",
+      "transition-colors duration-200"
+    )}>
       {/* Logo */}
       <div
-        className="flex items-center gap-3 mr-8 select-none cursor-pointer"
+        className="flex items-center gap-3 mr-8 select-none cursor-pointer group"
         onClick={() => {
           if (!user) return navigate("/");
           const roleRoutes = {
@@ -272,10 +303,19 @@ export default function Header() {
           navigate(roleRoutes[user.role] || "/");
         }}
       >
-        <span className="w-10 h-10 rounded-xl shadow bg-[#111111] flex items-center justify-center font-bold text-white text-2xl">
+        <span className={cn(
+          "w-10 h-10 rounded-xl shadow-soft",
+          "bg-offblack dark:bg-beige-200",
+          "flex items-center justify-center font-bold text-2xl",
+          "text-white dark:text-softblack",
+          "group-hover:scale-105 transition-transform duration-200"
+        )}>
           FL
         </span>
-        <span className="text-2xl font-bold tracking-tight text-[#111111] dark:text-[#f5efe6]">
+        <span className={cn(
+          "text-2xl font-bold tracking-tight",
+          "text-offblack dark:text-dark-text-primary"
+        )}>
           FlexiConnect
         </span>
       </div>
@@ -305,7 +345,11 @@ export default function Header() {
 
         {/* Dark mode toggle */}
         <IconButton onClick={toggleDarkMode}>
-          {isDark ? <Sun className="w-5 h-5 text-yellow-400" /> : <Moon className="w-5 h-5 text-gray-700" />}
+          {isDark ? (
+            <Sun className="w-5 h-5 text-amber-500" />
+          ) : (
+            <Moon className="w-5 h-5 text-neutral-700" />
+          )}
         </IconButton>
 
         {/* User menu */}

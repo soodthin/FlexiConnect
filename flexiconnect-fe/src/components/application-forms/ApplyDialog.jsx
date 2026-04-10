@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { cn } from "@/utils/cn";
 import * as Dialog from "@radix-ui/react-dialog";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -13,8 +14,8 @@ const Button = ({ children, variant = "default", className = "", ...props }) => 
         default:
             "bg-orange-500 text-white hover:bg-orange-600 disabled:bg-orange-300",
         outline:
-            "border border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-neutral-600 dark:text-gray-300 dark:hover:bg-neutral-700",
-        icon: "p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-neutral-700",
+            "border border-neutral-300 text-neutral-700 hover:bg-neutral-50 dark:border-dark-border-subtle dark:text-neutral-300 dark:hover:bg-neutral-700",
+        icon: "p-2 rounded-full text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-700",
     };
     return (
         <button className={`${base} ${variants[variant]} ${className}`} {...props}>
@@ -35,7 +36,7 @@ const IconButton = ({ icon: Icon, label, ...props }) => (
 
 const Textarea = ({ ...props }) => (
     <textarea
-        className="w-full border rounded-lg p-3 min-h-[120px] text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 dark:bg-neutral-700 dark:border-neutral-600 dark:text-white"
+        className="w-full border rounded-lg p-3 min-h-[120px] text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 dark:bg-neutral-700 dark:border-dark-border-subtle dark:text-white"
         {...props}
     />
 );
@@ -44,12 +45,12 @@ const InputFile = ({ ...props }) => (
     <input
         type="file"
         accept=".pdf"
-        className="block w-full text-sm text-gray-500 border rounded-lg cursor-pointer
+        className="block w-full text-sm text-neutral-500 border rounded-lg cursor-pointer
              file:mr-4 file:py-2 file:px-4
              file:rounded-l-lg file:border-0
              file:text-sm file:font-semibold
              file:bg-orange-50 file:text-orange-600
-             hover:file:bg-orange-100 dark:text-gray-400 dark:bg-neutral-700 dark:border-neutral-600 dark:file:bg-neutral-600 dark:file:text-orange-400"
+             hover:file:bg-orange-100 dark:text-neutral-400 dark:bg-neutral-700 dark:border-dark-border-subtle dark:file:bg-neutral-600 dark:file:text-orange-400"
         {...props}
     />
 );
@@ -168,7 +169,7 @@ export default function ApplyDialog({ jobId, isOpen, setIsOpen, hasApplied }) {
             >
                 {/* Header */}
                 <div className="flex justify-between items-center mb-4">
-                    <Dialog.Title className="text-xl font-bold text-gray-800 dark:text-white">
+                    <Dialog.Title className="text-xl font-bold text-neutral-800 dark:text-white">
                         Ứng tuyển công việc
                     </Dialog.Title>
                     <Dialog.Close asChild>
@@ -184,7 +185,7 @@ export default function ApplyDialog({ jobId, isOpen, setIsOpen, hasApplied }) {
                     <div>
                         <label
                             htmlFor="coverLetter"
-                            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                            className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
                         >
                             Thư giới thiệu (tùy chọn)
                         </label>
@@ -204,13 +205,13 @@ export default function ApplyDialog({ jobId, isOpen, setIsOpen, hasApplied }) {
                     <div>
                         <label
                             htmlFor="resumeFile"
-                            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                            className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1"
                         >
                             Tải lên CV (PDF)
                         </label>
                         <InputFile id="resumeFile" onChange={handleUpload} disabled={hasApplied} />
                         {file && (
-                            <div className="mt-2 flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                            <div className="mt-2 flex items-center gap-2 text-sm text-neutral-700 dark:text-neutral-300">
                                 <FileText className="w-4 h-4 flex-shrink-0" />
                                 <span className="truncate max-w-[200px]">{file.name}</span>
                                 <a

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { authApis, endpoints } from "@configs/APIs";
-import classNames from "classnames";
+import { cn } from "@/utils/cn";
 import {
     Bookmark,
     MapPin,
@@ -21,13 +21,13 @@ import {
 
 const Card = ({ children, className = "", onClick }) => (
     <div
-        className={classNames(
-            "group relative bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700",
+        className={cn(
+            "group relative bg-white dark:bg-dark-bg-secondary rounded-2xl shadow-sm border border-neutral-100 dark:border-dark-border-primary",
             "hover:shadow-xl hover:shadow-blue-500/10 dark:hover:shadow-blue-400/20",
             "hover:-translate-y-1 transition-all duration-300 ease-out cursor-pointer",
             "before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-r before:from-blue-500/5 before:to-purple-500/5",
             "before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100",
-            "h-full flex flex-col", // Thêm flex và h-full
+            "h-full flex flex-col",
             className
         )}
         onClick={onClick}
@@ -41,7 +41,7 @@ const Card = ({ children, className = "", onClick }) => (
 const Button = ({ children, className = "", variant = "primary", size = "md", ...props }) => {
     const variants = {
         primary: "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40",
-        secondary: "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600",
+        secondary: "bg-neutral-100 dark:bg-dark-bg-elevated text-neutral-700 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-dark-bg-tertiary",
         outline: "border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white dark:border-blue-400 dark:text-blue-400",
         danger: "bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/40"
     };
@@ -55,7 +55,7 @@ const Button = ({ children, className = "", variant = "primary", size = "md", ..
     return (
         <button
             {...props}
-            className={classNames(
+            className={cn(
                 "flex items-center justify-center gap-2 rounded-xl font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed",
                 "transform hover:scale-105 active:scale-95",
                 variants[variant],
@@ -70,15 +70,15 @@ const Button = ({ children, className = "", variant = "primary", size = "md", ..
 
 const Badge = ({ children, variant = "default", className = "" }) => {
     const variants = {
-        default: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200",
-        success: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-        warning: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-        danger: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
-        info: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+        default: "bg-neutral-100 text-neutral-800 dark:bg-dark-bg-elevated dark:text-neutral-200",
+        success: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200",
+        warning: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200",
+        danger: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200",
+        info: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200"
     };
 
     return (
-        <span className={classNames(
+        <span className={cn(
             "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
             variants[variant],
             className
@@ -125,9 +125,10 @@ const JobCard = ({ job, onViewDetails, onUnsave }) => {
                         e.stopPropagation();
                         onUnsave(job.jobPostId);
                     }}
-                    className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg flex-shrink-0"
+                    className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg flex-shrink-0"
+                    aria-label="Unsave job"
                 >
-                    <BookmarkX size={18} />
+                    <BookmarkX size={18} aria-hidden="true" />
                 </button>
             </div>
 
@@ -266,16 +267,17 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
 
             {getVisiblePages().map((page, index) => (
                 <button
-                    key={index}
+                    key={`page-${index}-${page}`}
                     onClick={() => page !== '...' && onPageChange(page - 1)}
                     disabled={page === '...'}
-                    className={classNames(
+                    aria-label={page === '...' ? 'More pages' : `Go to page ${page}`}
+                    className={cn(
                         "w-10 h-10 rounded-lg font-semibold transition-all duration-200",
                         page === currentPage + 1
                             ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg transform scale-110"
                             : page === '...'
-                                ? "cursor-default text-gray-400"
-                                : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 hover:scale-105"
+                                ? "cursor-default text-neutral-400"
+                                : "bg-neutral-100 dark:bg-dark-bg-elevated text-neutral-700 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-dark-bg-tertiary hover:scale-105"
                     )}
                 >
                     {page}

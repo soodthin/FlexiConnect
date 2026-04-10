@@ -1,11 +1,12 @@
 // RadixSelect.js
 import * as Select from '@radix-ui/react-select';
+import { cn } from "@/utils/cn";
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons';
 
 const RadixSelect = ({ value, onValueChange, options, placeholder }) => (
   <Select.Root value={value} onValueChange={onValueChange}>
     <Select.Trigger
-      className="inline-flex items-center justify-between rounded-full px-4 py-1 text-sm bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200 focus:outline-none"
+      className="inline-flex items-center justify-between rounded-full px-4 py-1 text-sm bg-neutral-100 text-neutral-700 border border-neutral-200 hover:bg-neutral-200 focus:outline-none"
       aria-label="Job type"
     >
       <Select.Value placeholder={placeholder} />
@@ -18,9 +19,9 @@ const RadixSelect = ({ value, onValueChange, options, placeholder }) => (
       <Select.Content
         side="bottom"
         sideOffset={8}
-        className="rounded-md bg-white shadow-lg border border-gray-200 z-50 w-[200px]"
+        className="rounded-md bg-white shadow-lg border border-neutral-200 z-50 w-[200px]"
       >
-        <Select.ScrollUpButton className="flex items-center justify-center text-gray-400 h-6">
+        <Select.ScrollUpButton className="flex items-center justify-center text-neutral-400 h-6">
           <ChevronUpIcon />
         </Select.ScrollUpButton>
 
@@ -29,7 +30,7 @@ const RadixSelect = ({ value, onValueChange, options, placeholder }) => (
             <Select.Item
               key={opt}
               value={opt}
-              className="flex items-center px-3 py-2 rounded-md text-sm text-gray-700 hover:bg-gray-100 cursor-pointer relative"
+              className="flex items-center px-3 py-2 rounded-md text-sm text-neutral-700 hover:bg-neutral-100 cursor-pointer relative"
             >
               <Select.ItemText>{opt}</Select.ItemText>
               <Select.ItemIndicator className="absolute right-3 text-blue-600">
@@ -39,7 +40,7 @@ const RadixSelect = ({ value, onValueChange, options, placeholder }) => (
           ))}
         </Select.Viewport>
 
-        <Select.ScrollDownButton className="flex items-center justify-center text-gray-400 h-6">
+        <Select.ScrollDownButton className="flex items-center justify-center text-neutral-400 h-6">
           <ChevronDownIcon />
         </Select.ScrollDownButton>
       </Select.Content>

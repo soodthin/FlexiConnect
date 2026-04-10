@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { cn } from "@/utils/cn";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Pencil, X } from "lucide-react";
 import { authApis, endpoints } from "@configs/APIs";
@@ -6,7 +7,7 @@ import { toast } from "sonner";
 
 /* ---------------------- 🧩 UI PRIMITIVES ---------------------- */
 const Card = ({ children, className = "" }) => (
-  <div className={`bg-white dark:bg-[#232323] rounded-xl shadow p-6 ${className}`}>
+  <div className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow p-6 ${className}`}>
     {children}
   </div>
 );
@@ -41,7 +42,7 @@ const Dialog = {
   ),
   Content: ({ children, className = "", ...props }) => (
     <DialogPrimitive.Content
-      className={`fixed left-1/2 top-1/2 max-h-[95vh] w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white dark:bg-[#1e1e1e] p-8 shadow-xl border border-neutral-200 dark:border-neutral-700 z-50 focus:outline-none ${className}`}
+      className={`fixed left-1/2 top-1/2 max-h-[95vh] w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white dark:bg-neutral-850 p-8 shadow-xl border border-neutral-200 dark:border-dark-border-primary z-50 focus:outline-none ${className}`}
       {...props}
     >
       {children}
@@ -136,7 +137,7 @@ export default function CompanyInfo({ profile, onUpdated }) {
                       }
                       value={form[field]}
                       onChange={handleChange}
-                      className="w-full rounded-lg border px-4 py-2 bg-white dark:bg-neutral-800 text-black dark:text-white border-gray-300 dark:border-gray-600"
+                      className="w-full rounded-lg border px-4 py-2 bg-white dark:bg-neutral-800 text-black dark:text-white border-neutral-300 dark:border-dark-border-subtle"
                       required={field === "companyName"}
                     />
                   )
@@ -169,7 +170,7 @@ export default function CompanyInfo({ profile, onUpdated }) {
         </Dialog.Root>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-300">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-neutral-700 dark:text-neutral-300">
         <div>
           <strong>Email:</strong> {profile.email || "Chưa cập nhật"}
         </div>

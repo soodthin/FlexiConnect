@@ -8,7 +8,7 @@ import { toast } from "sonner";
 
 const Card = ({ children, className = "" }) => (
   <div
-    className={`rounded-xl shadow p-6 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white border border-neutral-200 dark:border-neutral-700 ${className}`}
+    className={`rounded-xl shadow p-6 bg-white dark:bg-dark-bg-secondary text-neutral-900 dark:text-white border border-neutral-200 dark:border-dark-border-primary ${className}`}
   >
     {children}
   </div>
@@ -26,7 +26,7 @@ const Button = ({ children, className = "", ...props }) => (
 const Input = ({ className = "", ...props }) => (
   <input
     {...props}
-    className={`w-full rounded-lg border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white px-4 py-2 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-yellow-500 ${className}`}
+    className={`w-full rounded-lg border border-neutral-300 dark:border-dark-border-subtle bg-white dark:bg-dark-bg-tertiary text-neutral-900 dark:text-white px-4 py-2 focus:ring-2 focus:ring-neutral-900 dark:focus:ring-yellow-500 ${className}`}
   />
 );
 
@@ -42,7 +42,7 @@ const Select = ({ children, className = "", ...props }) => (
 const Dialog = ({ open, onOpenChange, title, description, children }) => (
   <RadixDialog.Root open={open} onOpenChange={onOpenChange}>
     <RadixDialog.Overlay className="fixed inset-0 bg-black/40 z-40" />
-    <RadixDialog.Content className="fixed left-1/2 top-1/2 max-h-[95vh] w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white p-8 shadow-xl border border-neutral-200 dark:border-neutral-700 z-50 focus:outline-none">
+    <RadixDialog.Content className="fixed left-1/2 top-1/2 max-h-[95vh] w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white dark:bg-dark-bg-secondary text-neutral-900 dark:text-white p-8 shadow-xl border border-neutral-200 dark:border-dark-border-primary z-50 focus:outline-none">
       <RadixDialog.Title className="text-2xl font-bold mb-2">{title}</RadixDialog.Title>
       {description && (
         <RadixDialog.Description className="mb-4 text-neutral-500 dark:text-neutral-400">
@@ -51,8 +51,8 @@ const Dialog = ({ open, onOpenChange, title, description, children }) => (
       )}
       {children}
       <RadixDialog.Close asChild>
-        <button className="absolute right-4 top-4 p-2 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-700">
-          <Cross2Icon />
+        <button className="absolute right-4 top-4 p-2 rounded-full hover:bg-neutral-200 dark:hover:bg-dark-bg-elevated" aria-label="Close dialog">
+          <Cross2Icon aria-hidden="true" />
         </button>
       </RadixDialog.Close>
     </RadixDialog.Content>
@@ -138,7 +138,7 @@ export default function CandidateSkillList() {
       <Card>
         <RadixDialog.Root open={open} onOpenChange={setOpen}>
   <DialogTrigger asChild>
-    <Button className="bg-neutral-900 dark:bg-beige text-white dark:text-black px-5 py-3 rounded-xl font-semibold shadow hover:bg-neutral-800 dark:hover:bg-gray-200 mb-4">
+    <Button className="bg-neutral-900 dark:bg-beige-200 text-white dark:text-black px-5 py-3 rounded-xl font-semibold shadow hover:bg-neutral-800 dark:hover:bg-beige-300 mb-4">
       <PlusCircledIcon className="w-5 h-5" /> Thêm kỹ năng
     </Button>
   </DialogTrigger>
@@ -154,7 +154,7 @@ export default function CandidateSkillList() {
       <div className="flex gap-2">
         <Button
           type="submit"
-          className="flex-1 bg-neutral-900 dark:bg-beige text-white dark:text-black py-2 rounded-lg font-semibold hover:bg-neutral-800 dark:hover:bg-gray-200"
+          className="flex-1 bg-neutral-900 dark:bg-beige-200 text-white dark:text-black py-2 rounded-lg font-semibold hover:bg-neutral-800 dark:hover:bg-beige-300"
         >
           {editingSkill ? "Cập nhật" : "Thêm mới"}
         </Button>
@@ -214,8 +214,8 @@ export default function CandidateSkillList() {
       </Card>
 
       {/* Right - Saved Jobs */}
-      <Card className="flex flex-col gap-4 items-center justify-center text-center p-6 rounded-2xl bg-white dark:bg-neutral-900 shadow-lg dark:shadow-gray-700 transition-colors relative">
-        <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">JOB ĐÃ LƯU</h3>
+      <Card className="flex flex-col gap-4 items-center justify-center text-center p-6 rounded-2xl bg-white dark:bg-dark-bg-secondary shadow-lg transition-colors relative">
+        <h3 className="text-xl font-bold text-neutral-800 dark:text-neutral-100">JOB ĐÃ LƯU</h3>
         <div className="relative">
           <Bookmark className="w-16 h-16 text-yellow-500 dark:text-yellow-400" />
           {savedJobCount > 0 && (

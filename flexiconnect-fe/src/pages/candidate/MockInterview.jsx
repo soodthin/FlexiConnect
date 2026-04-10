@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { cn } from "@/utils/cn";
 import {
     Play,
     Send,
@@ -53,7 +54,7 @@ const getScoreColor = (score) => {
 
 // Components
 const Card = ({ children, className = "" }) => (
-    <div className={`rounded-xl shadow p-6 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white border border-neutral-200 dark:border-neutral-700 ${className}`}>
+    <div className={`rounded-xl shadow p-6 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white border border-neutral-200 dark:border-dark-border-primary ${className}`}>
         {children}
     </div>
 );
@@ -85,7 +86,7 @@ const Dialog = {
     Overlay: (props) => <DialogPrimitive.Overlay className="fixed inset-0 bg-black/40 z-40" {...props} />,
     Content: ({ children, className = "", ...props }) => (
         <DialogPrimitive.Content
-            className={`fixed left-1/2 top-1/2 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white p-8 shadow-xl z-50 max-h-[90vh] overflow-y-auto border border-neutral-200 dark:border-neutral-700 ${className}`}
+            className={`fixed left-1/2 top-1/2 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white p-8 shadow-xl z-50 max-h-[90vh] overflow-y-auto border border-neutral-200 dark:border-dark-border-primary ${className}`}
             {...props}
         >
             {children}
@@ -114,7 +115,7 @@ const UpgradeDialog = ({ open, onClose, onUpgrade }) => (
                         </p>
                     </div>
 
-                    <div className="bg-neutral-50 dark:bg-neutral-800 rounded-xl p-6 border border-neutral-200 dark:border-neutral-700 mb-6">
+                    <div className="bg-neutral-50 dark:bg-neutral-800 rounded-xl p-6 border border-neutral-200 dark:border-dark-border-primary mb-6">
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-2">
                                 <h4 className="font-bold text-neutral-800 dark:text-neutral-200 text-lg">Premium</h4>
@@ -191,7 +192,7 @@ const ApplicationSelector = ({ applications, selectedId, onSelect, isLoading }) 
 
     if (isLoading) {
         return (
-            <div className="w-full p-4 border-2 border-dashed border-neutral-300 dark:border-neutral-600 rounded-xl bg-neutral-50 dark:bg-neutral-800">
+            <div className="w-full p-4 border-2 border-dashed border-neutral-300 dark:border-dark-border-subtle rounded-xl bg-neutral-50 dark:bg-neutral-800">
                 <LoadingSpinner text="Đang tải danh sách ứng tuyển..." />
             </div>
         );
@@ -199,7 +200,7 @@ const ApplicationSelector = ({ applications, selectedId, onSelect, isLoading }) 
 
     if (applications.length === 0) {
         return (
-            <div className="w-full p-4 border-2 border-dashed border-neutral-300 dark:border-neutral-600 rounded-xl bg-neutral-50 dark:bg-neutral-800">
+            <div className="w-full p-4 border-2 border-dashed border-neutral-300 dark:border-dark-border-subtle rounded-xl bg-neutral-50 dark:bg-neutral-800">
                 <div className="flex items-center text-neutral-500 dark:text-neutral-400">
                     <AlertCircle className="w-5 h-5 mr-2" />
                     Không có đơn ứng tuyển nào
@@ -212,7 +213,7 @@ const ApplicationSelector = ({ applications, selectedId, onSelect, isLoading }) 
         <div className="relative">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-full p-4 border-2 border-neutral-200 dark:border-neutral-600 rounded-xl bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-500 transition-all duration-200 flex items-center justify-between shadow-sm"
+                className="w-full p-4 border-2 border-neutral-200 dark:border-dark-border-subtle rounded-xl bg-white dark:bg-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-500 transition-all duration-200 flex items-center justify-between shadow-sm"
             >
                 <div className="flex items-center">
                     <div className="bg-neutral-100 dark:bg-neutral-700 p-2 rounded-lg mr-3">
@@ -235,7 +236,7 @@ const ApplicationSelector = ({ applications, selectedId, onSelect, isLoading }) 
             {isOpen && (
                 <>
                     <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-                    <div className="absolute top-full left-0 right-0 z-20 mt-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-600 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                    <div className="absolute top-full left-0 right-0 z-20 mt-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-dark-border-subtle rounded-xl shadow-lg max-h-60 overflow-y-auto">
                         {applications.map((app, index) => (
                             <button
                                 key={app.id}
@@ -243,7 +244,7 @@ const ApplicationSelector = ({ applications, selectedId, onSelect, isLoading }) 
                                     onSelect(app.id);
                                     setIsOpen(false);
                                 }}
-                                className={`w-full p-4 text-left hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors ${index !== applications.length - 1 ? 'border-b border-neutral-100 dark:border-neutral-700' : ''
+                                className={`w-full p-4 text-left hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors ${index !== applications.length - 1 ? 'border-b border-neutral-100 dark:border-dark-border-primary' : ''
                                     }`}
                             >
                                 <div className="font-semibold text-neutral-900 dark:text-neutral-100">{app.jobTitle || 'Vị trí không xác định'}</div>
@@ -708,7 +709,7 @@ const MockInterview = ({ userPackage, onUpgradeClick }) => {
                                                 </span>
                                             </div>
 
-                                            <div className="bg-neutral-50 dark:bg-neutral-800 rounded-xl p-6 border border-neutral-200 dark:border-neutral-700">
+                                            <div className="bg-neutral-50 dark:bg-neutral-800 rounded-xl p-6 border border-neutral-200 dark:border-dark-border-primary">
                                                 <p className="text-lg text-neutral-800 dark:text-neutral-100 leading-relaxed">
                                                     {nextQuestion.question}
                                                 </p>
@@ -759,7 +760,7 @@ const MockInterview = ({ userPackage, onUpgradeClick }) => {
                                                 value={currentAnswer}
                                                 onChange={(e) => setCurrentAnswer(e.target.value)}
                                                 placeholder="Nhập câu trả lời của bạn..."
-                                                className="w-full p-4 border border-neutral-300 dark:border-neutral-600 rounded-xl bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-500 dark:placeholder-neutral-400 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent resize-none transition-all duration-200"
+                                                className="w-full p-4 border border-neutral-300 dark:border-dark-border-subtle rounded-xl bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-500 dark:placeholder-neutral-400 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent resize-none transition-all duration-200"
                                                 rows={6}
                                                 disabled={isSubmitting}
                                             />
@@ -809,7 +810,7 @@ const MockInterview = ({ userPackage, onUpgradeClick }) => {
                                                     initial={{ opacity: 0, y: 20 }}
                                                     animate={{ opacity: 1, y: 0 }}
                                                     transition={{ delay: idx * 0.1 }}
-                                                    className="border border-neutral-200 dark:border-neutral-700 rounded-xl p-6 bg-neutral-50 dark:bg-neutral-800"
+                                                    className="border border-neutral-200 dark:border-dark-border-primary rounded-xl p-6 bg-neutral-50 dark:bg-neutral-800"
                                                 >
                                                     <div className="flex justify-between items-start mb-4">
                                                         <h4 className="font-bold text-neutral-800 dark:text-neutral-200 text-lg">
@@ -835,7 +836,7 @@ const MockInterview = ({ userPackage, onUpgradeClick }) => {
                                                                     {CATEGORY_MAP[turn.category] || turn.category}
                                                                 </span>
                                                             </div>
-                                                            <p className="text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-900 p-3 rounded-lg border border-neutral-200 dark:border-neutral-600">
+                                                            <p className="text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-900 p-3 rounded-lg border border-neutral-200 dark:border-dark-border-subtle">
                                                                 <strong>Câu hỏi:</strong> {turn.question}
                                                             </p>
                                                         </div>
@@ -843,7 +844,7 @@ const MockInterview = ({ userPackage, onUpgradeClick }) => {
 
                                                     {turn.answer && (
                                                         <div className="mb-4">
-                                                            <p className="text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-900 p-3 rounded-lg border border-neutral-200 dark:border-neutral-600">
+                                                            <p className="text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-900 p-3 rounded-lg border border-neutral-200 dark:border-dark-border-subtle">
                                                                 <strong>Câu trả lời:</strong> {turn.answer}
                                                             </p>
                                                         </div>
@@ -894,7 +895,7 @@ const MockInterview = ({ userPackage, onUpgradeClick }) => {
                                     </div>
 
                                     {sessionStats && (
-                                        <div className="bg-neutral-50 dark:bg-neutral-800 rounded-xl p-6 mb-6 border border-neutral-200 dark:border-neutral-700">
+                                        <div className="bg-neutral-50 dark:bg-neutral-800 rounded-xl p-6 mb-6 border border-neutral-200 dark:border-dark-border-primary">
                                             <h3 className="text-xl font-bold text-neutral-800 dark:text-neutral-100 mb-4">
                                                 Thống Kê Phiên
                                             </h3>
@@ -959,7 +960,7 @@ const MockInterview = ({ userPackage, onUpgradeClick }) => {
                                                     initial={{ opacity: 0, y: 20 }}
                                                     animate={{ opacity: 1, y: 0 }}
                                                     transition={{ delay: idx * 0.1 }}
-                                                    className="border border-neutral-200 dark:border-neutral-700 rounded-xl p-6 bg-neutral-50 dark:bg-neutral-800"
+                                                    className="border border-neutral-200 dark:border-dark-border-primary rounded-xl p-6 bg-neutral-50 dark:bg-neutral-800"
                                                 >
                                                     <div className="flex justify-between items-start mb-4">
                                                         <h4 className="font-bold text-neutral-800 dark:text-neutral-200 text-lg">
@@ -985,7 +986,7 @@ const MockInterview = ({ userPackage, onUpgradeClick }) => {
                                                                     {CATEGORY_MAP[turn.category] || turn.category}
                                                                 </span>
                                                             </div>
-                                                            <p className="text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-900 p-3 rounded-lg border border-neutral-200 dark:border-neutral-600">
+                                                            <p className="text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-900 p-3 rounded-lg border border-neutral-200 dark:border-dark-border-subtle">
                                                                 <strong>Câu hỏi:</strong> {turn.question}
                                                             </p>
                                                         </div>
@@ -993,7 +994,7 @@ const MockInterview = ({ userPackage, onUpgradeClick }) => {
 
                                                     {turn.answer && (
                                                         <div className="mb-4">
-                                                            <p className="text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-900 p-3 rounded-lg border border-neutral-200 dark:border-neutral-600">
+                                                            <p className="text-neutral-700 dark:text-neutral-300 bg-white dark:bg-neutral-900 p-3 rounded-lg border border-neutral-200 dark:border-dark-border-subtle">
                                                                 <strong>Câu trả lời:</strong> {turn.answer}
                                                             </p>
                                                         </div>

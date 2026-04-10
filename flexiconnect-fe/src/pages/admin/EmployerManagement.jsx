@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { cn } from "@/utils/cn";
 import { authApis, endpoints } from "@configs/APIs";
 import { toast } from "sonner";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -63,9 +64,9 @@ function EmployerManagement() {
   const rejected = employers.filter((e) => !e.isVerified && e.reasonReject);
 
   const renderTable = (list, showActions = false, showReason = false) => (
-    <div className="overflow-x-auto border rounded-lg mt-4 shadow-sm dark:border-neutral-700">
+    <div className="overflow-x-auto border rounded-lg mt-4 shadow-sm dark:border-dark-border-primary">
       <table className="w-full border-collapse text-sm">
-        <thead className="bg-gray-100 dark:bg-[#2b2b2b] text-gray-700 dark:text-gray-200">
+        <thead className="bg-neutral-100 dark:bg-dark-bg-tertiary text-neutral-700 dark:text-neutral-200">
           <tr>
             <th className="p-3 text-left">Tên công ty</th>
             <th className="p-3 text-left">Mã số thuế</th>
@@ -106,7 +107,7 @@ function EmployerManagement() {
             </tr>
           )) : (
             <tr>
-              <td colSpan={5 + (showReason ? 1 : 0) + (showActions ? 1 : 0)} className="text-center p-6 text-gray-500 dark:text-gray-400 italic">
+              <td colSpan={5 + (showReason ? 1 : 0) + (showActions ? 1 : 0)} className="text-center p-6 text-neutral-500 dark:text-neutral-400 italic">
                 No data available
               </td>
             </tr>
@@ -117,11 +118,11 @@ function EmployerManagement() {
   );
 
   return (
-    <div className="p-6 min-h-screen bg-beige-light dark:bg-[#181818] text-gray-800 dark:text-gray-100">
+    <div className="p-6 min-h-screen bg-beige-light dark:bg-dark-bg-primary text-neutral-800 dark:text-neutral-100">
       <h2 className="text-2xl font-bold mb-6">TRANG DUYỆT NHÀ TUYỂN DỤNG</h2>
 
       <Tabs.Root defaultValue="pending">
-        <Tabs.List className="flex space-x-4 border-b pb-2 mb-4 dark:border-neutral-700">
+        <Tabs.List className="flex space-x-4 border-b pb-2 mb-4 dark:border-dark-border-primary">
           <Tabs.Trigger value="pending" className="px-4 py-2 data-[state=active]:border-b-2 border-blue-500 font-medium">
             Chờ duyệt <span className="ml-1 text-blue-600 dark:text-blue-400">({pending.length})</span>
           </Tabs.Trigger>
@@ -142,23 +143,23 @@ function EmployerManagement() {
       <Dialog.Root open={open} onOpenChange={setOpen}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-md" />
-          <Dialog.Content className="fixed top-1/2 left-1/2 w-[480px] max-w-full -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-[#232323] rounded-2xl shadow-2xl p-6 space-y-4">
+          <Dialog.Content className="fixed top-1/2 left-1/2 w-[480px] max-w-full -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-dark-bg-secondary rounded-2xl shadow-2xl p-6 space-y-4">
             <Dialog.Title className="text-xl font-bold text-red-600 dark:text-red-400">
               🚫 Từ chối nhà tuyển dụng
             </Dialog.Title>
-            <p className="text-gray-700 dark:text-gray-300 text-sm">
+            <p className="text-neutral-700 dark:text-neutral-300 text-sm">
               Vui lòng nhập lý do từ chối để thông báo cho nhà tuyển dụng.
             </p>
             <textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-red-400 dark:bg-[#3a3a3a] dark:border-neutral-600 dark:text-gray-100 resize-none"
+              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-red-400 dark:bg-neutral-700 dark:border-dark-border-subtle dark:text-neutral-100 resize-none"
               rows={5}
               placeholder="Nhập lý do..."
             />
             <div className="flex justify-end gap-3 mt-4">
               <Dialog.Close asChild>
-                <button className="px-4 py-2 bg-gray-200 dark:bg-[#444] rounded-full hover:bg-gray-300 dark:hover:bg-[#555] transition">
+                <button className="px-4 py-2 bg-neutral-200 dark:bg-[#444] rounded-full hover:bg-neutral-300 dark:hover:bg-[#555] transition">
                   Hủy
                 </button>
               </Dialog.Close>

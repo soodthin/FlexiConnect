@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { cn } from "@/utils/cn";
 import { authApis, endpoints } from "@configs/APIs";
 
 export default function CandidateUpgrade() {
@@ -53,22 +54,22 @@ export default function CandidateUpgrade() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center py-16 px-4">
-      <h2 className="text-4xl font-extrabold mb-8 text-gray-800 dark:text-gray-100 text-center">
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 flex flex-col items-center py-16 px-4">
+      <h2 className="text-4xl font-extrabold mb-8 text-neutral-800 dark:text-neutral-100 text-center">
         Nâng cấp tài khoản AI
       </h2>
 
       <div className="grid gap-8 md:grid-cols-2 w-full max-w-4xl">
         {/* Card Basic */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 flex flex-col justify-between hover:shadow-2xl transition duration-300">
+        <div className="bg-white dark:bg-neutral-800 rounded-2xl shadow-lg p-8 flex flex-col justify-between hover:shadow-2xl transition duration-300">
           <div>
-            <h3 className="text-2xl font-bold mb-2 text-gray-800 dark:text-gray-100">
+            <h3 className="text-2xl font-bold mb-2 text-neutral-800 dark:text-neutral-100">
               Basic
             </h3>
-            <p className="text-gray-600 dark:text-gray-300 mb-4">
+            <p className="text-neutral-600 dark:text-neutral-300 mb-4">
               Chức năng AI cơ bản dành cho người mới:
             </p>
-            <ul className="list-disc list-inside text-gray-600 dark:text-gray-300 mb-4 space-y-1">
+            <ul className="list-disc list-inside text-neutral-600 dark:text-neutral-300 mb-4 space-y-1">
               <li>Gợi ý chỉnh sửa hồ sơ tăng cơ hội ghép nối với ứng viên  </li>
             </ul>
             <div className="text-3xl font-extrabold text-blue-600 dark:text-blue-400 mb-4">
@@ -88,7 +89,7 @@ export default function CandidateUpgrade() {
                   ? "Đang tạo giao dịch..."
                   : "Nâng cấp ngay"}
           </button>
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+          <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400 flex items-center gap-2">
             <strong>Phương thức thanh toán:</strong>
             <img
               src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png"
@@ -100,15 +101,15 @@ export default function CandidateUpgrade() {
         </div>
 
         {/* Card Premium */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 flex flex-col justify-between hover:shadow-2xl transition duration-300">
+        <div className="bg-white dark:bg-neutral-800 rounded-2xl shadow-lg p-8 flex flex-col justify-between hover:shadow-2xl transition duration-300">
           <div>
             <h3 className="text-2xl font-bold mb-2 text-purple-700 dark:text-yellow-500">
               Premium
             </h3>
-            <p className="text-gray-600 dark:text-gray-300 mb-4">
+            <p className="text-neutral-600 dark:text-neutral-300 mb-4">
               Chức năng AI nâng cao dành cho người tìm việc chuyên nghiệp:
             </p>
-            <ul className="list-disc list-inside text-gray-600 dark:text-gray-300 mb-4 space-y-1">
+            <ul className="list-disc list-inside text-neutral-600 dark:text-neutral-300 mb-4 space-y-1">
               <li>Gợi ý chỉnh sửa hồ sơ tăng cơ hội ghép nối với ứng viên  </li>
               <li>Mock interview / Phỏng vấn thử với AI</li>
             </ul>
@@ -127,7 +128,7 @@ export default function CandidateUpgrade() {
                 ? "Đang tạo giao dịch..."
                 : "Nâng cấp ngay"}
           </button>
-          <p className="mt-3 text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+          <p className="mt-3 text-sm text-neutral-500 dark:text-neutral-400 flex items-center gap-2">
             <strong>Phương thức thanh toán:</strong>
             <img
               src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png"

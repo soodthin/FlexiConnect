@@ -3,44 +3,42 @@ import { useNavigate } from "react-router-dom";
 import { authApis, endpoints } from "@configs/APIs";
 import CompanyInfo from "@employerProfile/CompanyInfo";
 import CompanyIntro from "@employerProfile/CompanyIntro";
-import classNames from "classnames";
 import { toast } from "sonner";
-import { ArrowLeft, Camera } from "lucide-react";
+import {
+  ArrowLeft,
+  User,
+  Building2,
+  FileText,
+  Users,
+} from "lucide-react";
 
-const Card = ({ children, className = "" }) => (
-  <div className={`bg-white dark:bg-[#232323] rounded-xl shadow ${className}`}>
-    {children}
-  </div>
-);
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { ScrollArea } from "@/components/ui/ScrollArea";
+import {
+  ProfileCard,
+  ProfileCardHeader,
+  ProfileCardContent,
+  ProfileStat,
+} from "@/components/profile";
+import {
+  ProfileSection,
+  ProfileSectionHeader,
+  ProfileSectionTitle,
+  ProfileSectionContent,
+  ProfileNavItem,
+} from "@/components/profile";
 
-const Button = ({ children, className = "", ...props }) => (
-  <button
-    className={`px-4 py-2 rounded-lg font-semibold transition ${className}`}
-    {...props}
-  >
-    {children}
-  </button>
-);
-
-const IconButton = ({ children, className = "", ...props }) => (
-  <button
-    className={`p-2 rounded-lg flex items-center gap-1 transition ${className}`}
-    {...props}
-  >
-    {children}
-  </button>
-);
-
-/* ---------------------- 🧩 FEATURE COMPONENT ---------------------- */
+// Section navigation config
 const SECTIONS = [
-  { id: "profile", label: "Thông tin cá nhân", icon: "👤" },
-  { id: "company", label: "Thông tin công ty", icon: "🏢" },
-  { id: "intro", label: "Giới thiệu công ty", icon: "📝" },
+  { id: "profile", label: "Thông tin cá nhân", icon: User },
+  { id: "company", label: "Thông tin công ty", icon: Building2 },
+  { id: "intro", label: "Giới thiệu công ty", icon: FileText },
 ];
 
 export default function EmployerProfilePage() {
   const [profile, setProfile] = useState(null);
-  const [scrollTarget, setScrollTarget] = useState("");
   const [currentSection, setCurrentSection] = useState("profile");
   const [avatarTimestamp, setAvatarTimestamp] = useState(Date.now());
   const navigate = useNavigate();
@@ -71,20 +69,13 @@ export default function EmployerProfilePage() {
       });
       await loadProfile();
       setAvatarTimestamp(Date.now());
-      toast.success("✅ Ảnh đại diện đã được cập nhật!");
+      toast.success("Ảnh đại diện đã được cập nhật!");
     } catch {
-      toast.error("❌ Lỗi khi cập nhật ảnh đại diện.");
+      toast.error("Lỗi khi cập nhật ảnh đại diện.");
     }
   };
 
-  useEffect(() => {
-    if (scrollTarget) {
-      const el = sectionRefs.current[scrollTarget];
-      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-      setScrollTarget("");
-    }
-  }, [scrollTarget]);
-
+  // Scroll tracking
   useEffect(() => {
     const handleScroll = () => {
       const offsets = SECTIONS.map(({ id }) => {
@@ -100,135 +91,175 @@ export default function EmployerProfilePage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const scrollToSection = (id) => {
+    sectionRefs.current[id]?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
   return (
-    <div className="w-full min-h-screen flex bg-beige-light dark:bg-[#181818]">
-      {/* Sidebar Navigation */}
-      <aside className="hidden sm:flex flex-col gap-2 w-56 h-screen sticky top-0 left-0 bg-white dark:bg-[#232323] p-4 border-r border-neutral-300 dark:border-neutral-700">
-        <Button
-          onClick={() => navigate("/")}
-          className="flex items-center gap-2 bg-black text-beige dark:bg-beige dark:text-black shadow hover:bg-gray-800 dark:hover:bg-[#f5f5dc] text-xs"
-        >
-          <ArrowLeft size={14} /> Quay về
-        </Button>
-        {SECTIONS.map((sec) => (
-          <Button
-            key={sec.id}
-            onClick={() => setScrollTarget(sec.id)}
-            className={classNames(
-              "flex items-center gap-2 text-sm",
-              currentSection === sec.id
-                ? "bg-black dark:bg-beige text-beige dark:text-black shadow"
-                : "bg-gray-100 dark:bg-[#353535] text-gray-600 dark:text-beige hover:bg-beige-light hover:text-black dark:hover:bg-[#3a3a3a]"
-            )}
-          >
-            <span>{sec.icon}</span> {sec.label}
-          </Button>
-        ))}
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 overflow-y-auto px-4 sm:px-8 py-8">
-        
-
-        {profile ? (
-          <div className="flex flex-col gap-8">
-            {/* Header */}
-            <section
-              id="profile"
-              ref={(el) => (sectionRefs.current["profile"] = el)}
+    <div className="min-h-screen bg-background">
+      <div className="flex">
+        {/* Sidebar */}
+        <aside className="hidden lg:flex flex-col w-64 h-screen sticky top-0 border-r border-border bg-card">
+          <div className="p-4 border-b border-border">
+            <Button
+              variant="ghost"
+              className="w-full justify-start gap-2"
+              onClick={() => navigate("/")}
             >
-              <Card className="p-4 sm:p-6 flex flex-col sm:flex-row items-center gap-6">
-                <div className="relative w-24 h-24">
-                  <img
-                    src={
-                      profile.avatar
-                        ? `${profile.avatar}?t=${avatarTimestamp}`
-                        : "https://ui-avatars.com/api/?name=" +
-                          encodeURIComponent(profile.fullName || "Employer")
-                    }
-                    alt="avatar"
-                    className="w-full h-full rounded-full object-cover border-4 border-beige dark:border-beige"
-                  />
-                  <label className="absolute bottom-0 right-0 p-1 bg-white dark:bg-[#333] rounded-full shadow cursor-pointer text-sm">
-                    <Camera size={14} />
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleAvatarChange}
+              <ArrowLeft className="w-4 h-4" />
+              Quay về trang chủ
+            </Button>
+          </div>
+
+          <ScrollArea className="flex-1 p-4">
+            <nav className="space-y-2">
+              {SECTIONS.map((sec) => (
+                <ProfileNavItem
+                  key={sec.id}
+                  icon={sec.icon}
+                  label={sec.label}
+                  isActive={currentSection === sec.id}
+                  onClick={() => scrollToSection(sec.id)}
+                />
+              ))}
+            </nav>
+          </ScrollArea>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 min-w-0">
+          <div className="max-w-4xl mx-auto p-6 space-y-6">
+            {/* Mobile back button */}
+            <div className="lg:hidden">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/")}
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Quay về
+              </Button>
+            </div>
+
+            {profile ? (
+              <>
+                {/* Profile Header Card */}
+                <div ref={(el) => (sectionRefs.current["profile"] = el)}>
+                  <ProfileCard>
+                    <ProfileCardHeader
+                      avatar={profile.avatar}
+                      name={profile.fullName}
+                      title={profile.companyName}
+                      email={profile.email}
+                      phone={profile.phoneNumber}
+                      address={profile.address}
+                      isVerified={profile.isVerified}
+                      onAvatarChange={handleAvatarChange}
+                      avatarTimestamp={avatarTimestamp}
                     />
-                  </label>
+                    <ProfileCardContent>
+                      {/* Stats Grid */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <ProfileStat
+                          icon={Users}
+                          label="Followers"
+                          value={profile.follower || 0}
+                        />
+                        <ProfileStat
+                          icon={Building2}
+                          label="Trạng thái"
+                          value={
+                            <Badge variant={profile.isVerified ? "success" : "warning"}>
+                              {profile.isVerified ? "Đã xác minh" : "Chờ xác minh"}
+                            </Badge>
+                          }
+                        />
+                      </div>
+
+                      {/* Rejection reason if not verified */}
+                      {!profile.isVerified && profile.reasonReject && (
+                        <div className="mt-4 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700">
+                          <p className="text-sm font-medium text-red-700 dark:text-red-300 mb-1">
+                            Lý do từ chối:
+                          </p>
+                          <p className="text-sm text-red-600 dark:text-red-400">
+                            {profile.reasonReject}
+                          </p>
+                        </div>
+                      )}
+                    </ProfileCardContent>
+                  </ProfileCard>
                 </div>
 
-                <div className="flex-1 flex flex-col gap-2">
-                  <h2 className="text-2xl font-bold text-[#111] dark:text-beige flex items-center gap-3">
-                    {profile.fullName}
-                    {profile.isVerified ? (
-                      <span className="px-3 py-1 text-xs font-semibold text-green-800 bg-green-200 dark:bg-green-700 dark:text-green-100 rounded-full">
-                        Đã xác minh ✅
-                      </span>
-                    ) : (
-                      <span
-                        className="px-3 py-1 text-xs font-semibold text-red-800 bg-red-200 dark:bg-red-700 dark:text-red-100 rounded-full"
-                        title={profile.reasonReject || "Chưa được xác minh"}
-                      >
-                        Chưa xác minh ❌
-                      </span>
-                    )}
-                  </h2>
+                {/* Company Info Section */}
+                <ProfileSection
+                  id="company"
+                  innerRef={(el) => (sectionRefs.current["company"] = el)}
+                >
+                  <ProfileSectionHeader>
+                    <ProfileSectionTitle icon={Building2}>
+                      Thông tin công ty
+                    </ProfileSectionTitle>
+                  </ProfileSectionHeader>
+                  <ProfileSectionContent>
+                    <CompanyInfo
+                      profile={profile}
+                      onUpdated={(newProfile) => setProfile(newProfile)}
+                    />
+                  </ProfileSectionContent>
+                </ProfileSection>
 
-                  {/* Follower */}
-                  <div className="flex items-center gap-2 mt-1">
-                    <div className="flex items-center gap-1 px-3 py-1 bg-gray-100 dark:bg-[#353535] rounded-full shadow-sm hover:shadow-md transition cursor-pointer">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 text-blue-500"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 3v4h4M3 5h4v4H3V5zm0 8v4h4m-4-2h4m8-8v4h4M15 5h4v4h-4V5zm0 8v4h4m-4-2h4"
-                        />
-                      </svg>
-                      <span className="font-semibold">
-                        {profile.follower || 0}
-                      </span>
-                      <span>followers</span>
+                {/* Company Intro Section */}
+                <ProfileSection
+                  id="intro"
+                  innerRef={(el) => (sectionRefs.current["intro"] = el)}
+                >
+                  <ProfileSectionHeader>
+                    <ProfileSectionTitle icon={FileText}>
+                      Giới thiệu công ty
+                    </ProfileSectionTitle>
+                  </ProfileSectionHeader>
+                  <ProfileSectionContent>
+                    <CompanyIntro profile={profile} />
+                  </ProfileSectionContent>
+                </ProfileSection>
+              </>
+            ) : (
+              // Loading skeleton
+              <div className="space-y-6">
+                <div className="rounded-2xl bg-card border border-border p-6">
+                  <div className="flex items-start gap-6">
+                    <Skeleton className="w-24 h-24 rounded-full" />
+                    <div className="flex-1 space-y-3">
+                      <Skeleton className="h-8 w-48" />
+                      <Skeleton className="h-4 w-32" />
+                      <div className="grid grid-cols-2 gap-2">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-full" />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </Card>
-            </section>
-
-            {/* Company info */}
-            <section
-              id="company"
-              ref={(el) => (sectionRefs.current["company"] = el)}
-            >
-              <CompanyInfo
-                profile={profile}
-                onUpdated={(newProfile) => setProfile(newProfile)}
-              />
-            </section>
-
-            {/* Company Intro */}
-            <section
-              id="intro"
-              ref={(el) => (sectionRefs.current["intro"] = el)}
-            >
-              <CompanyIntro profile={profile} />
-            </section>
+                {[1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="rounded-xl bg-card border border-border p-6"
+                  >
+                    <Skeleton className="h-6 w-32 mb-4" />
+                    <div className="space-y-3">
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-3/4" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="text-center text-gray-500 dark:text-gray-400 py-16">
-            Đang tải thông tin hồ sơ nhà tuyển dụng...
-          </div>
-        )}
-      </main>
+        </main>
+      </div>
     </div>
   );
 }

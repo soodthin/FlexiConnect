@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { cn } from "@/utils/cn";
 import { authApis, endpoints } from "@configs/APIs";
 import * as RadixDialog from "@radix-ui/react-dialog";
 import { X, Pencil, Trash2, PlusCircle } from "lucide-react";
@@ -6,7 +7,7 @@ import locationData from "@assets/vietnam-provinces.json";
 
 function Card({ children, className = "" }) {
   return (
-    <div className={`rounded-xl shadow bg-white dark:bg-neutral-900 border dark:border-neutral-700 ${className}`}>
+    <div className={`rounded-xl shadow bg-white dark:bg-dark-bg-secondary border dark:border-dark-border-primary ${className}`}>
       {children}
     </div>
   );
@@ -15,11 +16,11 @@ function Card({ children, className = "" }) {
 function Button({ children, variant = "default", className = "", ...props }) {
   const base = "px-4 py-2 rounded-lg font-semibold transition flex items-center gap-2";
   const variants = {
-    default: "bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-beige dark:text-black dark:hover:bg-[#f5f5dc]",
-    secondary: "bg-neutral-100 dark:bg-neutral-700 text-neutral-900 dark:text-white hover:bg-neutral-200 dark:hover:bg-neutral-600",
-    danger: "bg-red-500 text-white hover:bg-red-600",
-    ghost: "bg-neutral-100 dark:bg-neutral-700 border dark:border-neutral-600 hover:bg-yellow-200 dark:hover:bg-yellow-600 text-black dark:text-white",
-    icon: "p-2 rounded-lg bg-neutral-100 dark:bg-neutral-700 border dark:border-neutral-600 hover:bg-neutral-200 dark:hover:bg-neutral-600",
+    default: "bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-beige-200 dark:text-black dark:hover:bg-beige-300",
+    secondary: "bg-neutral-100 dark:bg-dark-bg-elevated text-neutral-900 dark:text-white hover:bg-neutral-200 dark:hover:bg-dark-bg-tertiary",
+    danger: "bg-red-500 text-white hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700",
+    ghost: "bg-neutral-100 dark:bg-dark-bg-elevated border dark:border-dark-border-subtle hover:bg-yellow-200 dark:hover:bg-yellow-700/30 text-black dark:text-white",
+    icon: "p-2 rounded-lg bg-neutral-100 dark:bg-dark-bg-elevated border dark:border-dark-border-subtle hover:bg-neutral-200 dark:hover:bg-dark-bg-tertiary",
   };
   return (
     <button className={`${base} ${variants[variant]} ${className}`} {...props}>
@@ -36,7 +37,7 @@ function Dialog({ open, onOpenChange, title, children }) {
         <RadixDialog.Content
           className="fixed left-1/2 top-1/2 max-h-[95vh] w-full max-w-lg -translate-x-1/2 -translate-y-1/2 
              rounded-xl bg-white dark:bg-neutral-800 p-8 shadow-xl 
-             border border-neutral-200 dark:border-neutral-700 
+             border border-neutral-200 dark:border-dark-border-primary 
              z-50 focus:outline-none text-black dark:text-white 
              overflow-y-auto">
 
@@ -58,7 +59,7 @@ function Dialog({ open, onOpenChange, title, children }) {
 function Input({ className = "", ...props }) {
   return (
     <input
-      className={`w-full rounded-lg border px-4 py-2 dark:bg-neutral-900 dark:border-neutral-600 dark:text-white ${className}`}
+      className={`w-full rounded-lg border px-4 py-2 dark:bg-dark-bg-tertiary dark:border-dark-border-subtle dark:text-white ${className}`}
       {...props}
     />
   );
@@ -67,7 +68,7 @@ function Input({ className = "", ...props }) {
 function Textarea({ className = "", ...props }) {
   return (
     <textarea
-      className={`w-full rounded-lg border px-4 py-2 dark:bg-neutral-900 dark:border-neutral-600 dark:text-white ${className}`}
+      className={`w-full rounded-lg border px-4 py-2 dark:bg-dark-bg-tertiary dark:border-dark-border-subtle dark:text-white ${className}`}
       {...props}
     />
   );
@@ -76,7 +77,7 @@ function Textarea({ className = "", ...props }) {
 function Select({ className = "", children, ...props }) {
   return (
     <select
-      className={`w-full rounded-lg border px-4 py-2 dark:bg-neutral-900 dark:border-neutral-600 dark:text-white ${className}`}
+      className={`w-full rounded-lg border px-4 py-2 dark:bg-dark-bg-tertiary dark:border-dark-border-subtle dark:text-white ${className}`}
       {...props}
     >
       {children}
@@ -95,7 +96,7 @@ const JOB_TYPES = [
 const STATUS_MAP = {
   OPEN: { label: "Đang mở", color: "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300" },
   CLOSED: { label: "Đã đóng", color: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300" },
-  HIDDEN: { label: "Ẩn", color: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300" }
+  HIDDEN: { label: "Ẩn", color: "bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300" }
 };
 
 const initialJob = {
@@ -352,7 +353,7 @@ export default function EmployerDashboard() {
 
               {/* Location selection section */}
               <div className="space-y-3">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
                   Địa chỉ làm việc
                 </label>
 
@@ -391,7 +392,7 @@ export default function EmployerDashboard() {
                 />
 
                 {form.location && (
-                  <div className="text-sm text-gray-500 dark:text-gray-400 p-2 bg-gray-50 dark:bg-gray-800 rounded">
+                  <div className="text-sm text-neutral-500 dark:text-neutral-400 p-2 bg-neutral-50 dark:bg-neutral-800 rounded">
                     <strong>Địa chỉ đầy đủ:</strong> {form.location}
                   </div>
                 )}
@@ -473,7 +474,7 @@ export default function EmployerDashboard() {
       {/* Danh sách job posts */}
       <div className="space-y-5 w-full">
         {jobPosts.length === 0 && (
-          <div className="text-center text-neutral-400 rounded-xl py-10 bg-neutral-50 dark:bg-neutral-800 border dark:border-neutral-700">
+          <div className="text-center text-neutral-400 rounded-xl py-10 bg-neutral-50 dark:bg-neutral-800 border dark:border-dark-border-primary">
             Chưa có bài tuyển dụng nào.
           </div>
         )}
@@ -482,7 +483,7 @@ export default function EmployerDashboard() {
             <div className="flex justify-between items-start">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
-                  <h4 className="text-lg font-semibold text-gray-800 dark:text-white">{job.title}</h4>
+                  <h4 className="text-lg font-semibold text-neutral-800 dark:text-white">{job.title}</h4>
                   <span className={`ml-2 text-xs px-2 py-0.5 rounded ${STATUS_MAP[job.status]?.color}`}>
                     {STATUS_MAP[job.status]?.label || job.status}
                   </span>
@@ -493,8 +494,8 @@ export default function EmployerDashboard() {
                 <span className="text-sm text-neutral-500 dark:text-neutral-400">
                   Lương: {job.salaryMin} - {job.salaryMax} triệu
                 </span>
-                <div className="mt-2 text-sm text-gray-800 dark:text-gray-200">{job.description}</div>
-                <div className="mt-1 text-xs text-gray-400">
+                <div className="mt-2 text-sm text-neutral-800 dark:text-neutral-200">{job.description}</div>
+                <div className="mt-1 text-xs text-neutral-400">
                   Hạn nộp: {job.expiredAt ? new Date(job.expiredAt).toLocaleString() : "Không có"}
                 </div>
               </div>

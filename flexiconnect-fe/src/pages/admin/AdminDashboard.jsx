@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { cn } from "@/utils/cn";
 import { authApis, endpoints } from "@configs/APIs";
 import { Line } from "react-chartjs-2";
 import {
@@ -46,7 +47,7 @@ const AdminDashboard = () => {
     fetchStats();
   }, []);
 
-  if (loading) return <p className="text-gray-500 dark:text-gray-300">Đang tải dữ liệu...</p>;
+  if (loading) return <p className="text-neutral-500 dark:text-neutral-300">Đang tải dữ liệu...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
 
   const groupByMonth = (data, key) => {
@@ -122,7 +123,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className={`p-6 min-h-screen ${isDark ? 'bg-[#181818] text-gray-100' : 'bg-gray-50 text-gray-800'} space-y-6`}>
+    <div className={`p-6 min-h-screen ${isDark ? 'bg-[#181818] text-neutral-100' : 'bg-neutral-50 text-neutral-800'} space-y-6`}>
       <h2 className="text-2xl font-bold">📊 Thống kê Admin</h2>
 
       {/* Filter năm */}
@@ -132,7 +133,7 @@ const AdminDashboard = () => {
           id="yearFilter"
           value={selectedYear}
           onChange={e => setSelectedYear(Number(e.target.value))}
-          className={`p-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 ${isDark ? 'dark:bg-[#2d2d2d] dark:border-neutral-600 dark:text-gray-200' : ''}`}
+          className={`p-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-400 ${isDark ? 'dark:bg-dark-bg-elevated dark:border-dark-border-subtle dark:text-neutral-200' : ''}`}
         >
           {[2023, 2024, 2025].map(year => (
             <option key={year} value={year}>{year}</option>
@@ -149,7 +150,7 @@ const AdminDashboard = () => {
           >
             <div className="text-2xl mb-1">{card.icon}</div>
             <p className="text-lg font-semibold">{stats[card.key]}</p>
-            <span className={`text-xs ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>{card.title}</span>
+            <span className={`text-xs ${isDark ? 'text-neutral-300' : 'text-neutral-500'}`}>{card.title}</span>
           </div>
         ))}
       </div>
@@ -157,14 +158,14 @@ const AdminDashboard = () => {
       {/* Biểu đồ */}
       <div className="space-y-6">
         <div className={`${isDark ? 'bg-[#232323]' : 'bg-white'} p-4 rounded-xl shadow hover:shadow-md transition`}>
-          <h3 className={`font-semibold mb-2 ${isDark ? 'text-gray-200' : 'text-gray-700'}`}>Người dùng đăng ký</h3>
+          <h3 className={`font-semibold mb-2 ${isDark ? 'text-neutral-200' : 'text-neutral-700'}`}>Người dùng đăng ký</h3>
           <div className="h-72">
             <Line data={userChartData} options={chartOptions} />
           </div>
         </div>
 
         <div className={`${isDark ? 'bg-[#232323]' : 'bg-white'} p-4 rounded-xl shadow hover:shadow-md transition`}>
-          <h3 className={`font-semibold mb-2 ${isDark ? 'text-gray-200' : 'text-gray-700'}`}>Bài đăng việc làm</h3>
+          <h3 className={`font-semibold mb-2 ${isDark ? 'text-neutral-200' : 'text-neutral-700'}`}>Bài đăng việc làm</h3>
           <div className="h-72">
             <Line data={jobChartData} options={chartOptions} />
           </div>

@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
+import { cn } from "@/utils/cn";
 import { authApis, endpoints } from "@configs/APIs";
 import { toast } from "sonner";
 import { UserRound, Briefcase, MapPin, Clock, DollarSign, AlertTriangle } from "lucide-react";
 import ConfirmationDialog from "@components/confirm/ConfirmationDialog";
 const Card = ({ children, className = "" }) => (
-  <div className={`p-6 rounded-xl shadow-sm border bg-white dark:bg-[#242424] hover:shadow-md transition ${className}`}>
+  <div className={`p-6 rounded-xl shadow-sm border bg-white dark:bg-dark-bg-secondary hover:shadow-md transition ${className}`}>
     {children}
   </div>
 );
@@ -14,17 +15,17 @@ const CardHeader = ({ children, className = "" }) => (
 );
 
 const CardContent = ({ children, className = "" }) => (
-  <div className={`text-sm text-gray-700 dark:text-gray-300 ${className}`}>{children}</div>
+  <div className={`text-sm text-neutral-700 dark:text-neutral-300 ${className}`}>{children}</div>
 );
 
 const Badge = ({ children, className = "" }) => (
   <span className={`px-3 py-1 text-xs font-medium rounded-full ${className}`}>{children}</span>
 );
 
-const Separator = () => <div className="bg-gray-200 dark:bg-gray-700 h-px w-full mb-4" />;
+const Separator = () => <div className="bg-neutral-200 dark:bg-neutral-700 h-px w-full mb-4" />;
 
 const Avatar = ({ src, alt, fallback }) => (
-  <div className="w-12 h-12 rounded-full overflow-hidden border shadow flex items-center justify-center bg-gray-200 dark:bg-gray-600 text-sm font-medium text-gray-700 dark:text-gray-200">
+  <div className="w-12 h-12 rounded-full overflow-hidden border shadow flex items-center justify-center bg-neutral-200 dark:bg-neutral-600 text-sm font-medium text-neutral-700 dark:text-neutral-200">
     {src ? <img src={src} alt={alt} className="w-full h-full object-cover" /> : fallback}
   </div>
 );
@@ -59,15 +60,15 @@ const Applied = () => {
   const statusStyle = (status) => {
     switch (status) {
       case "PENDING":
-        return "bg-yellow-100 text-yellow-800 border border-yellow-300";
+        return "bg-yellow-100 text-yellow-800 border border-yellow-300 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-700";
       case "ACCEPTED":
-        return "bg-green-100 text-green-800 border border-green-300";
+        return "bg-green-100 text-green-800 border border-green-300 dark:bg-green-900/30 dark:text-green-300 dark:border-green-700";
       case "REJECTED":
-        return "bg-red-100 text-red-800 border border-red-300";
+        return "bg-red-100 text-red-800 border border-red-300 dark:bg-red-900/30 dark:text-red-300 dark:border-red-700";
       case "WITHDRAWN":
-        return "bg-gray-200 text-gray-600 border border-gray-300 dark:bg-gray-700 dark:text-gray-300";
+        return "bg-neutral-200 text-neutral-600 border border-neutral-300 dark:bg-neutral-700 dark:text-neutral-300 dark:border-neutral-600";
       default:
-        return "bg-gray-100 text-gray-800 border border-gray-300";
+        return "bg-neutral-100 text-neutral-800 border border-neutral-300 dark:bg-neutral-700 dark:text-neutral-300 dark:border-neutral-600";
     }
   };
 
@@ -76,10 +77,10 @@ const Applied = () => {
 
     return description
       .split("\n")
-      .map((line) => {
+      .map((line, index) => {
         const [key, value] = line.split(":").map((s) => s.trim());
         if (!key || !value) return null;
-        return { key, value };
+        return { key, value, id: `${key}-${index}` };
       })
       .filter(Boolean);
   };
@@ -114,8 +115,8 @@ const Applied = () => {
     return <div className="p-8">Đang tải dữ liệu...</div>;
   }
   return (
-    <div className="p-8 min-h-screen bg-gray-50 dark:bg-[#181818]">
-      <h2 className="text-3xl font-bold mb-8 text-gray-800 dark:text-gray-100">
+    <div className="p-8 min-h-screen bg-neutral-50 dark:bg-dark-bg-primary">
+      <h2 className="text-3xl font-bold mb-8 text-neutral-800 dark:text-neutral-100">
         Hồ sơ đã ứng tuyển
       </h2>
 
@@ -135,7 +136,7 @@ const Applied = () => {
                     <h3 className="text-lg font-semibold text-blue-600">
                       {app.jobPostTitle || app.jobTitle}
                     </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                    <p className="text-sm text-neutral-600 dark:text-neutral-300">
                       {app.companyName}
                     </p>
                   </div>
@@ -150,15 +151,15 @@ const Applied = () => {
               <CardContent>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="flex items-center gap-2">
-                    <MapPin size={14} className="text-gray-500" />
+                    <MapPin size={14} className="text-neutral-500" />
                     <p className="font-medium">{app.location || "—"}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Briefcase size={14} className="text-gray-500" />
+                    <Briefcase size={14} className="text-neutral-500" />
                     <p className="font-medium">{app.jobType || "—"}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <DollarSign size={14} className="text-gray-500" />
+                    <DollarSign size={14} className="text-neutral-500" />
                     <p className="font-medium">
                       {app.salaryMin && app.salaryMax
                         ? `${app.salaryMin} - ${app.salaryMax} triệu`
@@ -166,7 +167,7 @@ const Applied = () => {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Clock size={14} className="text-gray-500" />
+                    <Clock size={14} className="text-neutral-500" />
                     <p className="font-medium">
                       {new Date(app.appliedAt).toLocaleString("vi-VN")}
                     </p>
@@ -176,7 +177,7 @@ const Applied = () => {
                 {/* Extra info */}
                 <div className="mt-4 space-y-2">
                   {app.coverLetter && (
-                    <p className="italic text-gray-500">“{app.coverLetter}”</p>
+                    <p className="italic text-neutral-500">“{app.coverLetter}”</p>
                   )}
 
                   {app.rejectionReason && (
@@ -187,10 +188,10 @@ const Applied = () => {
 
                   {app.description && (
                     <div className="grid grid-cols-2 gap-3 text-sm">
-                      {parseDescription(app.description).map(({ key, value }, idx) => (
-                        <div key={idx}>
-                          <p className="text-gray-500">{key}</p>
-                          <p className="font-medium">{value}</p>
+                      {parseDescription(app.description).map(({ key, value, id }) => (
+                        <div key={id}>
+                          <p className="text-neutral-500 dark:text-neutral-400">{key}</p>
+                          <p className="font-medium dark:text-neutral-200">{value}</p>
                         </div>
                       ))}
                     </div>
@@ -212,7 +213,7 @@ const Applied = () => {
           ))}
         </div>
       ) : (
-        <p className="text-gray-500 italic">Chưa có hồ sơ nào</p>
+        <p className="text-neutral-500 italic">Chưa có hồ sơ nào</p>
       )}
       <ConfirmationDialog
         isOpen={isDialogOpen}

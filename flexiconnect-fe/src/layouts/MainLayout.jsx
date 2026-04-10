@@ -35,16 +35,24 @@ export default function MainLayout({ children }) {
     }
   }, []);
 
-  if (loading) return <div className="text-center mt-10">Đang tải...</div>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-beige-100 dark:bg-dark-bg-primary">
+        <div className="text-center">
+          <div className="w-12 h-12 mx-auto mb-4 spinner"></div>
+          <p className="text-neutral-600 dark:text-dark-text-secondary">Đang tải...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+      <main className="min-h-screen bg-white dark:bg-dark-bg-primary text-softblack dark:text-dark-text-primary transition-colors duration-200">
         {children}
       </main>
-            <Footer />
-
+      <Footer />
     </>
   );
 }

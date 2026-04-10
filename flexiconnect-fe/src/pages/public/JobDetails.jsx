@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
+import { cn } from "@/utils/cn";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Bookmark,
@@ -33,8 +34,8 @@ import JobMap from "@components/job-maps/JobMaps";
 
 const Card = ({ className = "", children, subtle = false }) => (
   <div className={`
-    bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700
-    ${subtle ? 'bg-gray-50 dark:bg-gray-800/50' : ''}
+    bg-white dark:bg-neutral-800 rounded-lg shadow-sm border border-neutral-200 dark:border-dark-border-primary
+    ${subtle ? 'bg-neutral-50 dark:bg-neutral-800/50' : ''}
     ${className}
   `}>
     {children}
@@ -43,12 +44,12 @@ const Card = ({ className = "", children, subtle = false }) => (
 
 const Button = ({ children, className = "", variant = "primary", size = "md", loading = false, ...props }) => {
   const variants = {
-    primary: "bg-gray-800 text-white hover:bg-gray-900 dark:bg-gray-200 dark:text-gray-900 dark:hover:bg-gray-300",
-    secondary: "bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-600",
-    outline: "border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700",
+    primary: "bg-neutral-800 text-white hover:bg-neutral-900 dark:bg-neutral-200 dark:text-neutral-900 dark:hover:bg-neutral-300",
+    secondary: "bg-neutral-100 dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 hover:bg-neutral-200 dark:hover:bg-neutral-600",
+    outline: "border border-neutral-300 dark:border-dark-border-subtle text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700",
     danger: "bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:text-white dark:hover:bg-red-600",
     success: "bg-green-600 text-white hover:bg-green-700 dark:bg-green-500 dark:text-white dark:hover:bg-green-600",
-    ghost: "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+    ghost: "text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-700"
   };
 
   const sizes = {
@@ -78,7 +79,7 @@ const Button = ({ children, className = "", variant = "primary", size = "md", lo
 
 const Badge = ({ children, variant = "default", className = "" }) => {
   const variants = {
-    default: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200",
+    default: "bg-neutral-100 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-200",
     success: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
     warning: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300",
     danger: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
@@ -96,12 +97,12 @@ const Badge = ({ children, variant = "default", className = "" }) => {
 };
 
 const StatCard = ({ icon: Icon, label, value, color = "gray" }) => (
-  <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+  <div className="bg-white dark:bg-neutral-800 rounded-lg p-3 border border-neutral-200 dark:border-dark-border-primary">
     <div className="flex items-center gap-2">
       <Icon size={16} className={`text-${color}-600 dark:text-${color}-400`} />
       <div>
-        <div className="text-xs text-gray-600 dark:text-gray-400">{label}</div>
-        <div className="text-sm font-semibold text-gray-900 dark:text-white">{value}</div>
+        <div className="text-xs text-neutral-600 dark:text-neutral-400">{label}</div>
+        <div className="text-sm font-semibold text-neutral-900 dark:text-white">{value}</div>
       </div>
     </div>
   </div>
@@ -259,16 +260,16 @@ export default function JobDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 p-6">
         <div className="max-w-6xl mx-auto">
           <div className="animate-pulse space-y-6">
-            <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-48"></div>
+            <div className="h-6 bg-neutral-300 dark:bg-neutral-700 rounded w-48"></div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-6">
-                <div className="h-80 bg-gray-300 dark:bg-gray-700 rounded-lg"></div>
-                <div className="h-60 bg-gray-300 dark:bg-gray-700 rounded-lg"></div>
+                <div className="h-80 bg-neutral-300 dark:bg-neutral-700 rounded-lg"></div>
+                <div className="h-60 bg-neutral-300 dark:bg-neutral-700 rounded-lg"></div>
               </div>
-              <div className="h-96 bg-gray-300 dark:bg-gray-700 rounded-lg"></div>
+              <div className="h-96 bg-neutral-300 dark:bg-neutral-700 rounded-lg"></div>
             </div>
           </div>
         </div>
@@ -288,9 +289,9 @@ export default function JobDetail() {
 
     <>
 
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
         {/* Header Navigation */}
-        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div className="bg-white dark:bg-neutral-800 border-b border-neutral-200 dark:border-dark-border-primary">
           <div className="max-w-6xl mx-auto px-6 py-4">
             <div className="flex items-center justify-between">
               <Button
@@ -326,7 +327,7 @@ export default function JobDetail() {
                   </Badge>
                 </div>
 
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                <h1 className="text-3xl font-bold text-neutral-900 dark:text-white mb-4">
                   {job.title}
                 </h1>
 
@@ -381,7 +382,7 @@ export default function JobDetail() {
               <Card className="p-6">
                 <div className="flex items-center gap-3 mb-6">
                   <Shield size={20} className="text-blue-600 dark:text-blue-400" />
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                  <h2 className="text-xl font-bold text-neutral-900 dark:text-white">
                     Mô tả công việc
                   </h2>
                 </div>
@@ -404,7 +405,7 @@ export default function JobDetail() {
                                 {domNode.children.map((imgNode, index) => {
                                   if (imgNode.name === "img") {
                                     return (
-                                      <div key={index} className="border border-gray-200 dark:border-gray-700 rounded overflow-hidden">
+                                      <div key={index} className="border border-neutral-200 dark:border-dark-border-primary rounded overflow-hidden">
                                         <img
                                           src={imgNode.attribs.src}
                                           alt={imgNode.attribs.alt || "company image"}
@@ -427,7 +428,7 @@ export default function JobDetail() {
 
 
 
-                <div className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
+                <div className="text-neutral-700 dark:text-neutral-300 leading-relaxed whitespace-pre-line">
                   {job.description}
                 </div>
               </Card>
@@ -436,7 +437,7 @@ export default function JobDetail() {
                 <Card className="p-6">
                   <div className="flex items-center gap-3 mb-6">
                     <MapPin size={20} className="text-blue-600 dark:text-blue-400" />
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                    <h2 className="text-xl font-bold text-neutral-900 dark:text-white">
                       Vị trí công việc
                     </h2>
                   </div>
@@ -451,7 +452,7 @@ export default function JobDetail() {
               <Card className="p-6 text-center">
                 {/* Company Logo */}
                 <div className="relative inline-block mb-4">
-                  <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+                  <div className="w-16 h-16 bg-neutral-100 dark:bg-neutral-700 rounded-lg flex items-center justify-center">
                     {job.avatar ? (
                       <img
                         src={job.avatar}
@@ -459,7 +460,7 @@ export default function JobDetail() {
                         className="w-14 h-14 object-contain rounded-lg"
                       />
                     ) : (
-                      <Building2 size={24} className="text-gray-600 dark:text-gray-400" />
+                      <Building2 size={24} className="text-neutral-600 dark:text-neutral-400" />
                     )}
                   </div>
                   <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
@@ -467,11 +468,11 @@ export default function JobDetail() {
                   </div>
                 </div>
 
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-2">
                   {job.companyName}
                 </h3>
 
-                <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                <p className="text-sm text-neutral-600 dark:text-neutral-300 mb-4">
                   Công ty công nghệ hàng đầu
                 </p>
 
@@ -479,7 +480,7 @@ export default function JobDetail() {
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   <div className="text-center p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                     <div className="text-lg font-bold text-blue-600">50+</div>
-                    <div className="text-xs text-gray-600 dark:text-gray-300">Nhân viên</div>
+                    <div className="text-xs text-neutral-600 dark:text-neutral-300">Nhân viên</div>
                   </div>
 
                 </div>
@@ -520,13 +521,13 @@ export default function JobDetail() {
                   Việc làm khác
                 </h3>
                 <div className="space-y-3">
-                  <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <div className="p-3 bg-neutral-50 dark:bg-neutral-700 rounded-lg">
                     <div className="font-semibold text-sm">Senior React Developer</div>
-                    <div className="text-xs text-gray-500">ABC Company • 20-25 triệu</div>
+                    <div className="text-xs text-neutral-500">ABC Company • 20-25 triệu</div>
                   </div>
-                  <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <div className="p-3 bg-neutral-50 dark:bg-neutral-700 rounded-lg">
                     <div className="font-semibold text-sm">Marketing</div>
-                    <div className="text-xs text-gray-500">Shopee • 18-22 triệu</div>
+                    <div className="text-xs text-neutral-500">Shopee • 18-22 triệu</div>
                   </div>
                 </div>
               </Card>

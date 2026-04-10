@@ -1,150 +1,311 @@
 import { useEffect, useState, useRef } from "react";
+import { cn } from "@/utils/cn";
 import { useNavigate } from "react-router-dom";
 import { authApis, endpoints } from "@configs/APIs";
 import EducationHistory from "@candidateProfile/EducationHistory";
 import Skill from "@candidateProfile/Skill";
 import WorkExperience from "@candidateProfile/WorkExperience";
-import classNames from "classnames";
 import { toast } from "sonner";
 import {
-  Pencil,
   Wand2,
-  X,
-  Camera,
   Crown,
   Zap,
+  ArrowLeft,
+  GraduationCap,
+  Briefcase,
+  Award,
+  FileText,
+  User,
+  Calendar,
+  Sparkles,
 } from "lucide-react";
 
-const Button = ({ className, children, ...props }) => (
-  <button
-    className={classNames(
-      "px-4 py-2 rounded-lg font-medium transition disabled:opacity-60",
-      className
-    )}
-    {...props}
-  >
-    {children}
-  </button>
-);
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { Input, Textarea, Select } from "@/components/ui/Input";
+import { Label } from "@/components/ui/Label";
+import { Separator } from "@/components/ui/Separator";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { ScrollArea } from "@/components/ui/ScrollArea";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogBody,
+} from "@/components/ui/Dialog";
+import {
+  ProfileCard,
+  ProfileCardHeader,
+  ProfileCardContent,
+} from "@/components/profile";
+import {
+  ProfileSection,
+  ProfileSectionHeader,
+  ProfileSectionTitle,
+  ProfileSectionContent,
+  ProfileNavItem,
+} from "@/components/profile";
 
-
-const Section = ({ id, innerRef, children }) => (
-  <section
-    id={id}
-    ref={innerRef}
-    className="bg-white dark:bg-[#232323] rounded-xl shadow p-6"
-  >
-    {children}
-  </section>
-);
-
-
-const Dialog = ({ open, onClose, title, children }) =>
-  open ? (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div
-        className="absolute inset-0 bg-black/40"
-        onClick={onClose}
-      />
-      <div className="relative bg-white dark:bg-[#2d2d2d] rounded-xl shadow-xl p-6 max-w-lg w-full z-10">
-        <h2 className="text-xl font-bold mb-4">{title}</h2>
-        {children}
-        <button
-          className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-[#444]"
-          onClick={onClose}
-        >
-          <X size={16} />
-        </button>
-      </div>
-    </div>
-  ) : null;
-
-
-const UpgradeDialog = ({ open, onClose, onUpgrade }) => (
-  <Dialog open={open} onClose={onClose} title="">
-    <div className="text-center">
-      <div className="mb-6">
-        <div className="mx-auto w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mb-4">
-          <Crown className="w-8 h-8 text-white" />
-        </div>
-        <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
-          Nâng cấp tài khoản AI
-        </h3>
-        <p className="text-gray-600 dark:text-gray-300">
-          Bạn cần nâng cấp tài khoản để sử dụng tính năng AI
-        </p>
-      </div>
-
-      <div className="grid gap-4 mb-6">
-        {/* Basic Package */}
-        <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl p-4 border border-blue-200 dark:border-blue-700">
-          <div className="flex items-center justify-between mb-2">
-            <h4 className="font-bold text-blue-800 dark:text-blue-300">Basic</h4>
-            <span className="text-lg font-bold text-blue-600 dark:text-blue-400">55.000₫</span>
-          </div>
-          <ul className="text-sm text-blue-700 dark:text-blue-300 text-left space-y-1">
-            <li>• Đánh giá CV tự động bằng AI</li>
-            <li>• Gợi ý chỉnh sửa CV</li>
-          </ul>
-        </div>
-
-        {/* Premium Package */}
-        <div className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-xl p-4 border border-purple-200 dark:border-purple-700">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <h4 className="font-bold text-purple-800 dark:text-purple-300">Premium</h4>
-              <span className="bg-purple-200 dark:bg-purple-700 text-purple-800 dark:text-purple-200 px-2 py-1 rounded-full text-xs font-semibold">
-                Phổ biến
-              </span>
-            </div>
-            <span className="text-lg font-bold text-purple-600 dark:text-purple-400">115.000₫</span>
-          </div>
-          <ul className="text-sm text-purple-700 dark:text-purple-300 text-left space-y-1">
-            <li>• Tất cả tính năng Basic</li>
-            <li>• Mock interview với AI</li>
-            <li>• Tạo Cover Letter bằng AI</li>
-          </ul>
-        </div>
-      </div>
-
-      <div className="flex gap-3">
-        <Button
-          onClick={onClose}
-          className="flex-1 bg-gray-200 dark:bg-[#444] text-black dark:text-white hover:bg-gray-300"
-        >
-          Để sau
-        </Button>
-        <Button
-          onClick={onUpgrade}
-          className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold hover:from-purple-600 hover:to-pink-600 flex items-center justify-center gap-2"
-        >
-          <Zap size={16} />
-          Nâng cấp ngay
-        </Button>
-      </div>
-    </div>
-  </Dialog>
-);
-
-// ----------------- Feature Component -----------------
+// Section navigation config
 const SECTIONS = [
-  { id: "profile", label: "Thông tin cá nhân" },
-  { id: "education", label: "Học vấn" },
-  { id: "experience", label: "Kinh nghiệm" },
-  { id: "skills", label: "Kỹ năng - Lưu Job" },
+  { id: "profile", label: "Thông tin cá nhân", icon: User },
+  { id: "education", label: "Học vấn", icon: GraduationCap },
+  { id: "experience", label: "Kinh nghiệm", icon: Briefcase },
+  { id: "skills", label: "Kỹ năng & Việc đã lưu", icon: Award },
 ];
 
-// Format date
+// Format date helper
 const formatDate = (dateStr) => {
   if (!dateStr) return "Hiện tại";
   const date = new Date(dateStr);
-  return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+  return `${String(date.getDate()).padStart(2, "0")}/${String(
+    date.getMonth() + 1
+  ).padStart(2, "0")}/${date.getFullYear()}`;
 };
 
+// Upgrade Dialog Component
+const UpgradeDialog = ({ open, onOpenChange, onUpgrade }) => (
+  <Dialog open={open} onOpenChange={onOpenChange}>
+    <DialogContent className="sm:max-w-md">
+      <DialogHeader>
+        <div className="mx-auto w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mb-4">
+          <Crown className="w-8 h-8 text-white" />
+        </div>
+        <DialogTitle className="text-center text-2xl">
+          Nâng cấp tài khoản AI
+        </DialogTitle>
+      </DialogHeader>
+      <DialogBody>
+        <p className="text-center text-muted-foreground mb-6">
+          Bạn cần nâng cấp tài khoản để sử dụng tính năng AI
+        </p>
+
+        <div className="space-y-4">
+          {/* Basic Package */}
+          <div className="rounded-xl p-4 border-2 border-info-200 dark:border-info-700 bg-info-50/50 dark:bg-info-900/20">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="font-bold text-info-700 dark:text-info-300">
+                Basic
+              </h4>
+              <span className="text-lg font-bold text-info-600 dark:text-info-400">
+                55.000₫
+              </span>
+            </div>
+            <ul className="text-sm text-info-600 dark:text-info-300 space-y-1">
+              <li className="flex items-center gap-2">
+                <Sparkles className="w-3 h-3" /> Đánh giá CV tự động bằng AI
+              </li>
+              <li className="flex items-center gap-2">
+                <Sparkles className="w-3 h-3" /> Gợi ý chỉnh sửa CV
+              </li>
+            </ul>
+          </div>
+
+          {/* Premium Package */}
+          <div className="rounded-xl p-4 border-2 border-purple-500 bg-purple-50/50 dark:bg-purple-900/20 relative">
+            <Badge
+              variant="default"
+              className="absolute -top-2 right-4 bg-purple-600"
+            >
+              Phổ biến
+            </Badge>
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="font-bold text-purple-700 dark:text-purple-300">
+                Premium
+              </h4>
+              <span className="text-lg font-bold text-purple-600 dark:text-purple-400">
+                115.000₫
+              </span>
+            </div>
+            <ul className="text-sm text-purple-600 dark:text-purple-300 space-y-1">
+              <li className="flex items-center gap-2">
+                <Sparkles className="w-3 h-3" /> Tất cả tính năng Basic
+              </li>
+              <li className="flex items-center gap-2">
+                <Sparkles className="w-3 h-3" /> Mock interview với AI
+              </li>
+              <li className="flex items-center gap-2">
+                <Sparkles className="w-3 h-3" /> Tạo Cover Letter bằng AI
+              </li>
+            </ul>
+          </div>
+        </div>
+      </DialogBody>
+      <DialogFooter className="flex-col sm:flex-row gap-2">
+        <Button
+          variant="secondary"
+          className="w-full sm:w-auto"
+          onClick={() => onOpenChange(false)}
+        >
+          Để sau
+        </Button>
+        <Button variant="ai" className="w-full sm:w-auto" onClick={onUpgrade}>
+          <Zap className="w-4 h-4" />
+          Nâng cấp ngay
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+);
+
+// Edit Profile Dialog
+const EditProfileDialog = ({
+  open,
+  onOpenChange,
+  form,
+  setForm,
+  onSubmit,
+  onGetSuggestion,
+  bioSuggestion,
+  setBioSuggestion,
+  isSuggesting,
+  checkAIAccess,
+  onAIFeatureClick,
+}) => (
+  <Dialog open={open} onOpenChange={onOpenChange}>
+    <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle>Cập nhật thông tin</DialogTitle>
+      </DialogHeader>
+      <form onSubmit={onSubmit}>
+        <DialogBody className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="fullName">Họ và tên</Label>
+              <Input
+                id="fullName"
+                value={form.fullName}
+                onChange={(e) => setForm({ ...form, fullName: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phoneNumber">Số điện thoại</Label>
+              <Input
+                id="phoneNumber"
+                value={form.phoneNumber}
+                onChange={(e) =>
+                  setForm({ ...form, phoneNumber: e.target.value })
+                }
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="address">Địa chỉ</Label>
+            <Input
+              id="address"
+              value={form.address}
+              onChange={(e) => setForm({ ...form, address: e.target.value })}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="title">Chức danh</Label>
+              <Input
+                id="title"
+                value={form.title}
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="gender">Giới tính</Label>
+              <Select
+                id="gender"
+                value={form.gender}
+                onChange={(e) => setForm({ ...form, gender: e.target.value })}
+                placeholder="Chọn giới tính"
+              >
+                <option value="MALE">Nam</option>
+                <option value="FEMALE">Nữ</option>
+                <option value="OTHER">Khác</option>
+              </Select>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="bio">Giới thiệu bản thân</Label>
+            <Textarea
+              id="bio"
+              rows={4}
+              value={form.bio}
+              onChange={(e) => setForm({ ...form, bio: e.target.value })}
+              placeholder="Nhập vài ý chính..."
+            />
+            <Button
+              type="button"
+              variant={checkAIAccess() ? "ai" : "secondary"}
+              className="w-full"
+              onClick={() => onAIFeatureClick(onGetSuggestion)}
+              disabled={isSuggesting}
+            >
+              {isSuggesting ? (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : checkAIAccess() ? (
+                <Wand2 className="w-4 h-4" />
+              ) : (
+                <Crown className="w-4 h-4" />
+              )}
+              {isSuggesting
+                ? "Đang xử lý..."
+                : checkAIAccess()
+                ? "Gợi ý từ AI"
+                : "Nâng cấp để dùng AI"}
+            </Button>
+
+            {bioSuggestion && (
+              <div className="mt-3 rounded-xl p-4 border border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20">
+                <p className="text-sm font-medium mb-2 flex items-center gap-2 text-blue-700 dark:text-blue-300">
+                  <Wand2 className="w-4 h-4" /> Gợi ý từ AI
+                </p>
+                <p className="text-sm italic whitespace-pre-wrap text-blue-600 dark:text-blue-400">
+                  {bioSuggestion}
+                </p>
+                <div className="mt-3 flex gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => {
+                      setForm({ ...form, bio: bioSuggestion });
+                      setBioSuggestion("");
+                    }}
+                  >
+                    Dùng gợi ý
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setBioSuggestion("")}
+                  >
+                    Bỏ qua
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </DialogBody>
+        <DialogFooter>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => onOpenChange(false)}
+          >
+            Huỷ
+          </Button>
+          <Button type="submit">Lưu thay đổi</Button>
+        </DialogFooter>
+      </form>
+    </DialogContent>
+  </Dialog>
+);
+
+// Main Component
 export default function CandidateProfilePage() {
   const [profile, setProfile] = useState(null);
   const [isVerified, setIsVerified] = useState(false);
-  const [scrollTarget, setScrollTarget] = useState("");
   const [currentSection, setCurrentSection] = useState("profile");
   const [avatarTimestamp, setAvatarTimestamp] = useState(Date.now());
   const [form, setForm] = useState({
@@ -173,8 +334,6 @@ export default function CandidateProfilePage() {
     try {
       const res = await authApis().get(endpoints["candidate-profile"]);
       setProfile(res.data);
-
-      // Kiểm tra AI access
       const pkg = res.data.userPackage;
       setIsVerified(pkg?.isActive === true);
     } catch (err) {
@@ -186,16 +345,7 @@ export default function CandidateProfilePage() {
     loadProfile();
   }, []);
 
-  useEffect(() => {
-    if (scrollTarget) {
-      sectionRefs.current[scrollTarget]?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-      setScrollTarget("");
-    }
-  }, [scrollTarget]);
-
+  // Scroll tracking
   useEffect(() => {
     const onScroll = () => {
       const offs = SECTIONS.map(({ id }) => {
@@ -212,6 +362,13 @@ export default function CandidateProfilePage() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const scrollToSection = (id) => {
+    sectionRefs.current[id]?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
   const checkAIAccess = () => isVerified;
 
   const handleAIFeatureClick = (callback) => {
@@ -221,7 +378,6 @@ export default function CandidateProfilePage() {
       setIsUpgradeDialogOpen(true);
     }
   };
-
 
   const handleAvatarChange = async (e) => {
     const file = e.target.files?.[0];
@@ -233,9 +389,9 @@ export default function CandidateProfilePage() {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setAvatarTimestamp(Date.now());
-      toast.success(" Ảnh đại diện đã được cập nhật!");
+      toast.success("Ảnh đại diện đã được cập nhật!");
     } catch {
-      toast.error(" Lỗi khi cập nhật ảnh đại diện.");
+      toast.error("Lỗi khi cập nhật ảnh đại diện.");
     }
   };
 
@@ -247,11 +403,11 @@ export default function CandidateProfilePage() {
         bio: bioSuggestion || form.bio,
         avatar: profile.avatar,
       });
-      toast.success(" Đã cập nhật!");
+      toast.success("Đã cập nhật thành công!");
       loadProfile();
       setIsDialogOpen(false);
     } catch {
-      toast.error(" Cập nhật thất bại!");
+      toast.error("Cập nhật thất bại!");
     }
   };
 
@@ -271,7 +427,7 @@ export default function CandidateProfilePage() {
 
   const handleGetSuggestion = async () => {
     if (!form.bio) {
-      toast.info(" Vui lòng nhập vài ý chính để AI gợi ý.");
+      toast.info("Vui lòng nhập vài ý chính để AI gợi ý.");
       return;
     }
     setIsSuggesting(true);
@@ -281,10 +437,10 @@ export default function CandidateProfilePage() {
       });
       if (res.data?.aiSuggestion) {
         setBioSuggestion(res.data.aiSuggestion);
-        toast.success(" AI đã tạo gợi ý!");
+        toast.success("AI đã tạo gợi ý!");
       }
     } catch {
-      toast.error(" AI gợi ý thất bại.");
+      toast.error("AI gợi ý thất bại.");
     } finally {
       setIsSuggesting(false);
     }
@@ -292,326 +448,246 @@ export default function CandidateProfilePage() {
 
   const handleUpgradeRedirect = () => {
     setIsUpgradeDialogOpen(false);
-
     navigate("/candidate-upgrade");
   };
 
+  const genderLabel = {
+    MALE: "Nam",
+    FEMALE: "Nữ",
+    OTHER: "Khác",
+  };
+
   return (
-    <div className="w-full min-h-screen flex bg-beige-light dark:bg-[#181818]">
-      {/* Sidebar */}
-      <aside className="hidden sm:flex flex-col gap-2 w-56 h-screen sticky top-0 p-4 bg-white dark:bg-[#232323] border-r dark:border-neutral-700">
-        <Button
-          onClick={() => navigate("/candidate-dashboard")}
-          className="bg-black text-beige dark:bg-beige dark:text-black text-xs shadow"
-        >
-          ← Quay về
-        </Button>
-        {SECTIONS.map((sec) => (
-          <Button
-            key={sec.id}
-            onClick={() => setScrollTarget(sec.id)}
-            className={classNames(
-              "flex items-center gap-2 text-sm justify-start",
-              currentSection === sec.id
-                ? "bg-black dark:bg-beige text-beige dark:text-black shadow"
-                : "bg-gray-100 dark:bg-[#353535] text-gray-600 dark:text-beige hover:bg-beige-light"
-            )}
-          >
-            <span>{sec.icon}</span> {sec.label}
-            {sec.id === "skills"}
-          </Button>
-        ))}
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 px-4 sm:px-8 py-8 text-gray-800 dark:text-gray-100">
-
-
-        {/* Hiển thị gói hiện tại */}
-        {profile?.userPackage && (
-          <div className="flex flex-wrap items-center gap-3 mb-4">
-            <span className="text-sm text-gray-500 dark:text-gray-400">Gói hiện tại:</span>
-
-            <div
-              className={classNames(
-                "px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-2 shadow-sm",
-                profile.userPackage.isActive
-                  ? "bg-blue-100 text-blue-800 dark:bg-blue-800/30 dark:text-blue-200"
-                  : "bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-200"
-              )}
+    <div className="min-h-screen bg-background">
+      <div className="flex">
+        {/* Sidebar */}
+        <aside className="hidden lg:flex flex-col w-64 h-screen sticky top-0 border-r border-border bg-card">
+          <div className="p-4 border-b border-border">
+            <Button
+              variant="ghost"
+              className="w-full justify-start gap-2"
+              onClick={() => navigate("/candidate-dashboard")}
             >
-              {profile.userPackage.name}
-              {profile.userPackage.isActive && profile.userPackage.endDate && (
-                <span className="text-xs bg-white/30 dark:bg-gray-700/50 px-2 py-0.5 rounded">
-                  Hết hạn {formatDate(profile.userPackage.endDate)}
-                </span>
-              )}
-              {!profile.userPackage.isActive && <span>⛔ Hết hạn</span>}
-            </div>
+              <ArrowLeft className="w-4 h-4" />
+              Quay về Dashboard
+            </Button>
           </div>
-        )}
 
-        {profile ? (
-          <div className="flex flex-col gap-8">
-            {/* Profile Section */}
-            <Section
-              id="profile"
-              innerRef={(el) => (sectionRefs.current["profile"] = el)}
-            >
-              <div className="flex flex-col sm:flex-row items-start gap-6">
-                {/* Avatar */}
-                <div className="relative w-24 h-24 shrink-0">
-                  <img
-                    src={
-                      profile.avatar
-                        ? `${profile.avatar}?t=${avatarTimestamp}`
-                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                          profile.fullName || "Candidate"
-                        )}`
-                    }
-                    alt="Avatar"
-                    className="rounded-full w-20 h-20 object-cover border-2 shadow"
-                  />
-                  <label className="absolute bottom-0 right-0 bg-white dark:bg-[#333] rounded-full p-1 cursor-pointer text-xs shadow">
-                    <Camera size={14} />
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleAvatarChange}
-                    />
-                  </label>
-                </div>
-
-                {/* Info */}
-                <div className="flex-1 space-y-2">
-                  <div className="flex justify-between items-start">
-                    <h2 className="text-2xl font-bold dark:text-beige">
-                      {profile.fullName}
-                      {checkAIAccess() && (
-                        <Crown size={16} className="inline ml-2 text-yellow-500" />
-                      )}
-                    </h2>
-                    <Button
-                      onClick={handleOpenEdit}
-                      className="text-xs text-blue-600 hover:underline flex items-center gap-1"
-                    >
-                      <Pencil size={14} /> Chỉnh sửa
-                    </Button>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-1 text-sm text-gray-700 dark:text-gray-300">
-                    <div>
-                      <span className="font-semibold">Email:</span>{" "}
-                      {profile.email}
-                    </div>
-                    <div>
-                      <span className="font-semibold">SĐT:</span>{" "}
-                      {profile.phoneNumber}
-                    </div>
-                    <div>
-                      <span className="font-semibold">Địa chỉ: </span>{" "}
-                      {profile.address}
-                    </div>
-                    <div>
-                      <span className="font-semibold">Tiêu đề:</span>{" "}
-                      {profile.title}
-                    </div>
-                    <div>
-                      <span className="font-semibold">Giới tính:</span>{" "}
-                      {profile.gender === "MALE"
-                        ? "Nam"
-                        : profile.gender === "FEMALE"
-                          ? "Nữ"
-                          : profile.gender === "OTHER"
-                            ? "Khác"
-                            : "-"}
-                    </div>
-
-                  </div>
-
-                  {profile.bio && (
-                    <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                      <span className="font-semibold">Giới thiệu:</span>{" "}
-                      {profile.bio}
-                    </div>
-                  )}
-
-                  {profile.resumeFile && (
-                    <a
-                      href={profile.resumeFile}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-block mt-3 px-4 py-2 bg-beige dark:bg-[#282828] text-[#111] dark:text-beige rounded-full text-xs font-semibold shadow hover:underline"
-                    >
-                      📄 Xem CV hiện tại
-                    </a>
-                  )}
-                </div>
-              </div>
-            </Section>
-
-            {/* Other Sections */}
-            <Section
-              id="education"
-              innerRef={(el) => (sectionRefs.current["education"] = el)}
-            >
-              <EducationHistory />
-            </Section>
-            <Section id="experience" innerRef={(el) => (sectionRefs.current["experience"] = el)}>
-              <WorkExperience
-                userPackage={profile.userPackage}
-                onUpgradeClick={() => setIsUpgradeDialogOpen(true)}
-              />
-            </Section>
-
-            <Section
-              id="skills"
-              innerRef={(el) => (sectionRefs.current["skills"] = el)}
-            >
-              <Skill onUpgradeClick={() => setIsUpgradeDialogOpen(true)} />
-            </Section>
-          </div>
-        ) : (
-          <div className="text-center text-gray-500 dark:text-gray-300 py-16">
-            Đang tải thông tin hồ sơ...
-          </div>
-        )}
-      </main>
-
-      {/* Edit Dialog */}
-      <Dialog
-        open={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
-        title="Cập nhật thông tin"
-      >
-        <form onSubmit={handleUpdateProfile} className="space-y-4">
-          {["fullName", "phoneNumber", "address", "title"].map((f) => {
-            const labels = {
-              fullName: "Họ và tên",
-              phoneNumber: "Số điện thoại",
-              address: "Địa chỉ",
-              title: "Chức danh"
-            };
-
-            return (
-              <div key={f}>
-                <label className="block text-sm font-medium">
-                  {labels[f]}
-                </label>
-                <input
-                  type="text"
-                  className="w-full px-4 py-2 rounded border dark:bg-[#3a3a3a]"
-                  value={form[f]}
-                  onChange={(e) => setForm({ ...form, [f]: e.target.value })}
+          <ScrollArea className="flex-1 p-4">
+            <nav className="space-y-2">
+              {SECTIONS.map((sec) => (
+                <ProfileNavItem
+                  key={sec.id}
+                  icon={sec.icon}
+                  label={sec.label}
+                  isActive={currentSection === sec.id}
+                  onClick={() => scrollToSection(sec.id)}
                 />
-              </div>
-            );
-          })}
-          <div>
-            <label className="block text-sm font-medium">Giới tính</label>
-            <select
-              value={form.gender}
-              onChange={(e) => setForm({ ...form, gender: e.target.value })}
-              className="w-full px-4 py-2 rounded border dark:bg-[#3a3a3a]"
-            >
-              <option value="">Chọn giới tính</option>
-              <option value="MALE">Nam</option>
-              <option value="FEMALE">Nữ</option>
-              <option value="OTHER">Khác</option>
-            </select>
-          </div>
+              ))}
+            </nav>
 
-
-          <div className="space-y-2">
-            <label className="block text-sm font-medium">
-              Giới thiệu bản thân
-            </label>
-            <textarea
-              rows={4}
-              value={form.bio}
-              onChange={(e) => setForm({ ...form, bio: e.target.value })}
-              className="w-full px-4 py-2 rounded border dark:bg-[#3a3a3a]"
-              placeholder="Nhập vài ý chính..."
-            />
-            <Button
-              type="button"
-              onClick={() => handleAIFeatureClick(handleGetSuggestion)}
-              disabled={isSuggesting}
-              className={classNames(
-                "w-full flex items-center justify-center gap-2 text-sm font-semibold",
-                checkAIAccess()
-                  ? "bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white"
-                  : "bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-              )}
-            >
-              {isSuggesting ? (
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              ) : checkAIAccess() ? (
-                <Wand2 size={16} />
-              ) : (
-                <Crown size={16} />
-              )}
-              {isSuggesting
-                ? "Đang xử lý..."
-                : checkAIAccess()
-                  ? " Gợi ý từ AI"
-                  : "🔒 Nâng cấp để dùng AI"}
-            </Button>
-
-            {bioSuggestion && (
-              <div className="mt-3 bg-gradient-to-br from-blue-50 via-blue-100 to-white dark:from-blue-900/20 rounded-xl p-4 border border-blue-300 dark:border-blue-700 shadow-inner">
-                <p className="text-sm font-medium mb-2 flex items-center gap-2">
-                  <Wand2 size={14} /> 🤖 Gợi ý từ AI
-                </p>
-                <p className="text-sm italic whitespace-pre-wrap">
-                  {bioSuggestion}
-                </p>
-                <div className="mt-2 flex gap-2">
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      setForm({ ...form, bio: bioSuggestion });
-                      setBioSuggestion("");
-                    }}
-                    className="flex-1 bg-blue-600 text-white"
+            {/* Package info */}
+            {profile?.userPackage && (
+              <div className="mt-6 p-4 rounded-xl bg-muted/50 border border-border">
+                <p className="text-xs text-muted-foreground mb-2">Gói hiện tại</p>
+                <div className="flex items-center gap-2">
+                  <Badge
+                    variant={profile.userPackage.isActive ? "success" : "error"}
                   >
-                    Dùng gợi ý
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={() => setBioSuggestion("")}
-                    className="flex-1 bg-gray-200 dark:bg-[#444] text-black dark:text-white"
-                  >
-                    Bỏ qua
-                  </Button>
+                    {profile.userPackage.name}
+                  </Badge>
                 </div>
+                {profile.userPackage.isActive && profile.userPackage.endDate && (
+                  <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+                    <Calendar className="w-3 h-3" />
+                    Hết hạn {formatDate(profile.userPackage.endDate)}
+                  </p>
+                )}
+                {!profile.userPackage.isActive && (
+                  <Button
+                    variant="ai"
+                    size="sm"
+                    className="w-full mt-3"
+                    onClick={() => setIsUpgradeDialogOpen(true)}
+                  >
+                    <Zap className="w-3 h-3" />
+                    Nâng cấp
+                  </Button>
+                )}
+              </div>
+            )}
+          </ScrollArea>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 min-w-0">
+          <div className="max-w-4xl mx-auto p-6 space-y-6">
+            {/* Mobile back button */}
+            <div className="lg:hidden">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/candidate-dashboard")}
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Quay về
+              </Button>
+            </div>
+
+            {profile ? (
+              <>
+                {/* Profile Header Card */}
+                <div ref={(el) => (sectionRefs.current["profile"] = el)}>
+                  <ProfileCard>
+                    <ProfileCardHeader
+                      avatar={profile.avatar}
+                      name={profile.fullName}
+                      title={profile.title}
+                      email={profile.email}
+                      phone={profile.phoneNumber}
+                      address={profile.address}
+                      isPremium={checkAIAccess()}
+                      onAvatarChange={handleAvatarChange}
+                      onEdit={handleOpenEdit}
+                      avatarTimestamp={avatarTimestamp}
+                    />
+                    <ProfileCardContent>
+                      <Separator className="mb-4" />
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-muted-foreground">
+                            Giới tính:
+                          </span>{" "}
+                          <span className="font-medium">
+                            {genderLabel[profile.gender] || "-"}
+                          </span>
+                        </div>
+                        {profile.bio && (
+                          <div className="sm:col-span-2">
+                            <span className="text-muted-foreground">
+                              Giới thiệu:
+                            </span>{" "}
+                            <span>{profile.bio}</span>
+                          </div>
+                        )}
+                      </div>
+                      {profile.resumeFile && (
+                        <a
+                          href={profile.resumeFile}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-full bg-muted text-sm font-medium hover:bg-accent transition-colors"
+                        >
+                          <FileText className="w-4 h-4" />
+                          Xem CV hiện tại
+                        </a>
+                      )}
+                    </ProfileCardContent>
+                  </ProfileCard>
+                </div>
+
+                {/* Education Section */}
+                <ProfileSection
+                  id="education"
+                  innerRef={(el) => (sectionRefs.current["education"] = el)}
+                >
+                  <ProfileSectionHeader>
+                    <ProfileSectionTitle icon={GraduationCap}>
+                      Học vấn
+                    </ProfileSectionTitle>
+                  </ProfileSectionHeader>
+                  <ProfileSectionContent>
+                    <EducationHistory />
+                  </ProfileSectionContent>
+                </ProfileSection>
+
+                {/* Experience Section */}
+                <ProfileSection
+                  id="experience"
+                  innerRef={(el) => (sectionRefs.current["experience"] = el)}
+                >
+                  <ProfileSectionHeader>
+                    <ProfileSectionTitle icon={Briefcase}>
+                      Kinh nghiệm làm việc
+                    </ProfileSectionTitle>
+                  </ProfileSectionHeader>
+                  <ProfileSectionContent>
+                    <WorkExperience
+                      userPackage={profile.userPackage}
+                      onUpgradeClick={() => setIsUpgradeDialogOpen(true)}
+                    />
+                  </ProfileSectionContent>
+                </ProfileSection>
+
+                {/* Skills Section */}
+                <ProfileSection
+                  id="skills"
+                  innerRef={(el) => (sectionRefs.current["skills"] = el)}
+                >
+                  <ProfileSectionHeader>
+                    <ProfileSectionTitle icon={Award}>
+                      Kỹ năng & Việc đã lưu
+                    </ProfileSectionTitle>
+                  </ProfileSectionHeader>
+                  <ProfileSectionContent>
+                    <Skill
+                      onUpgradeClick={() => setIsUpgradeDialogOpen(true)}
+                    />
+                  </ProfileSectionContent>
+                </ProfileSection>
+              </>
+            ) : (
+              // Loading skeleton
+              <div className="space-y-6">
+                <div className="rounded-2xl bg-card border border-border p-6">
+                  <div className="flex items-start gap-6">
+                    <Skeleton className="w-24 h-24 rounded-full" />
+                    <div className="flex-1 space-y-3">
+                      <Skeleton className="h-8 w-48" />
+                      <Skeleton className="h-4 w-32" />
+                      <div className="grid grid-cols-2 gap-2">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-full" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {[1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="rounded-xl bg-card border border-border p-6"
+                  >
+                    <Skeleton className="h-6 w-32 mb-4" />
+                    <div className="space-y-3">
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-3/4" />
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
+        </main>
+      </div>
 
-          <div className="flex gap-2">
-            <Button
-              type="submit"
-              className="flex-1 bg-blue-600 text-white hover:bg-blue-700"
-            >
-              Lưu
-            </Button>
-            <Button
-              type="button"
-              onClick={() => setIsDialogOpen(false)}
-              className="flex-1 bg-gray-200 dark:bg-[#444] text-black dark:text-white"
-            >
-              Huỷ
-            </Button>
-          </div>
-        </form>
-      </Dialog>
+      {/* Dialogs */}
+      <EditProfileDialog
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        form={form}
+        setForm={setForm}
+        onSubmit={handleUpdateProfile}
+        onGetSuggestion={handleGetSuggestion}
+        bioSuggestion={bioSuggestion}
+        setBioSuggestion={setBioSuggestion}
+        isSuggesting={isSuggesting}
+        checkAIAccess={checkAIAccess}
+        onAIFeatureClick={handleAIFeatureClick}
+      />
 
-      {/* Upgrade Dialog */}
       <UpgradeDialog
         open={isUpgradeDialogOpen}
-        onClose={() => setIsUpgradeDialogOpen(false)}
+        onOpenChange={setIsUpgradeDialogOpen}
         onUpgrade={handleUpgradeRedirect}
       />
     </div>

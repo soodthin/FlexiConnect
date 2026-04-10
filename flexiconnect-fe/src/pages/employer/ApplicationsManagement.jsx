@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, useRef } from "react";
+import { cn } from "@/utils/cn";
 import { toast } from "sonner";
 import { authApis, endpoints } from "@configs/APIs";
 import {
@@ -9,14 +10,14 @@ import {
 import { createPortal } from "react-dom";
 
 const Card = ({ children, className = "" }) => (
-  <div className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 ${className}`}>
+  <div className={`bg-white dark:bg-neutral-800 rounded-xl shadow-sm border border-neutral-100 dark:border-dark-border-primary ${className}`}>
     {children}
   </div>
 );
 
 const Badge = ({ children, variant = "default", className = "" }) => {
   const variants = {
-    default: "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200",
+    default: "bg-neutral-100 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-200",
     pending: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200",
     accepted: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
     rejected: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
@@ -32,11 +33,11 @@ const Badge = ({ children, variant = "default", className = "" }) => {
 
 const Button = ({ children, variant = "default", size = "default", className = "", disabled, onClick, ...props }) => {
   const variants = {
-    default: "bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600",
+    default: "bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 border border-neutral-200 dark:border-dark-border-subtle hover:bg-neutral-50 dark:hover:bg-neutral-600",
     primary: "bg-blue-600 text-white hover:bg-blue-700",
     success: "bg-green-600 text-white hover:bg-green-700",
     danger: "bg-red-600 text-white hover:bg-red-700",
-    secondary: "bg-gray-600 text-white hover:bg-gray-700"
+    secondary: "bg-neutral-600 text-white hover:bg-neutral-700"
   };
   const sizes = {
     default: "px-4 py-2",
@@ -60,7 +61,7 @@ const Dialog = ({ open, onClose, children }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 max-h-[90vh] overflow-y-auto animate-in fade-in duration-200">
+      <div className="relative bg-white dark:bg-neutral-800 rounded-xl shadow-xl border border-neutral-200 dark:border-dark-border-primary max-h-[90vh] overflow-y-auto animate-in fade-in duration-200">
         {children}
       </div>
     </div>
@@ -102,7 +103,7 @@ const DropdownMenu = ({ trigger, children, align = "right" }) => {
       {open &&
         createPortal(
           <div
-            className="absolute z-50 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 animate-dropdown"
+            className="absolute z-50 mt-2 w-48 bg-white dark:bg-neutral-800 rounded-lg shadow-lg border border-neutral-200 dark:border-dark-border-primary py-1 animate-dropdown"
             style={{ top: coords.top, left: coords.left }}
           >
             {children}
@@ -115,12 +116,12 @@ const DropdownMenu = ({ trigger, children, align = "right" }) => {
 
 const DropdownItem = ({ onClick, icon, children, variant = "default" }) => {
   const variants = {
-    default: "text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700",
+    default: "text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-700",
     success: "text-green-700 dark:text-green-200 hover:bg-green-50 dark:hover:bg-green-700",
     primary: "text-blue-700 dark:text-blue-200 hover:bg-blue-50 dark:hover:bg-blue-700",
     warning: "text-orange-700 dark:text-orange-200 hover:bg-orange-50 dark:hover:bg-orange-700",
     danger: "text-red-700 dark:text-red-200 hover:bg-red-50 dark:hover:bg-red-700",
-    secondary: "text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+    secondary: "text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-700"
   };
   return (
     <button
@@ -244,26 +245,26 @@ export default function ApplicationsManagement() {
   const handleSend = () => { if (validate()) sendEmail(); };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-6 text-gray-900 dark:text-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-6 text-neutral-900 dark:text-neutral-100">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold mb-2">Quản lý hồ sơ ứng tuyển</h1>
 
         {/* 🔎 Filter & Search */}
         <Card className="mb-6 p-6 flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400 dark:text-neutral-300 w-4 h-4" />
             <input
               type="text"
               placeholder="Tìm kiếm..."
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-all duration-200"
+              className="w-full pl-10 pr-4 py-3 border border-neutral-200 dark:border-dark-border-primary rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 transition-all duration-200"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
           </div>
           <div className="relative">
-            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
+            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400 dark:text-neutral-300 w-4 h-4" />
             <select
-              className="pl-10 pr-8 py-3 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 appearance-none bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 min-w-[180px]"
+              className="pl-10 pr-8 py-3 border border-neutral-200 dark:border-dark-border-primary rounded-lg focus:ring-2 focus:ring-blue-500 appearance-none bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 min-w-[180px]"
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
             >
@@ -283,7 +284,7 @@ export default function ApplicationsManagement() {
           <div className="overflow-x-auto">
             <table className="min-w-full">
               <thead>
-                <tr className="border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                <tr className="border-b border-neutral-100 dark:border-dark-border-primary bg-neutral-50 dark:bg-neutral-800">
                   <th className="text-left py-4 px-6 font-semibold"><div className="flex items-center gap-2"><User className="w-4 h-4" />Ứng viên</div></th>
                   <th className="text-left py-4 px-6 font-semibold">Vị trí</th>
                   <th className="text-center py-4 px-6 font-semibold">Ngày nộp</th>
@@ -294,9 +295,9 @@ export default function ApplicationsManagement() {
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                 {filtered.length === 0 ? (
-                  <tr><td colSpan={6} className="text-center py-12 text-gray-500 dark:text-gray-400">Không có hồ sơ phù hợp</td></tr>
+                  <tr><td colSpan={6} className="text-center py-12 text-neutral-500 dark:text-neutral-400">Không có hồ sơ phù hợp</td></tr>
                 ) : filtered.map(app => (
-                  <tr key={app.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
+                  <tr key={app.id} className="hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-colors duration-150">
                     <td className="px-6 py-4 flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white font-medium">{app.candidateName?.charAt(0) || "?"}</div>
                       <p className="font-medium">{app.candidateName}</p>
@@ -306,7 +307,7 @@ export default function ApplicationsManagement() {
                     <td className="px-6 py-4 text-center">
                       {app.resumeFile ? (
                         <a href={app.resumeFile} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">Xem CV (thêm đuôi .pft)</a>
-                      ) : <span className="text-gray-400 dark:text-gray-300">Không có</span>}
+                      ) : <span className="text-neutral-400 dark:text-neutral-300">Không có</span>}
                     </td>
                     <td className="px-6 py-4 text-center">{getStatusBadge(app.status)}</td>
                     <td className="px-6 py-4 text-center">
@@ -318,7 +319,7 @@ export default function ApplicationsManagement() {
                           </div>
                           {rejectingId === app.id && (
                             <Card className="p-4 w-72 animate-in slide-in-from-top-2">
-                              <textarea placeholder="Nhập lý do từ chối..." className="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg resize-none focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" rows={3} value={reason} onChange={e => setReason(e.target.value)} />
+                              <textarea placeholder="Nhập lý do từ chối..." className="w-full px-3 py-2 border border-neutral-200 dark:border-dark-border-primary rounded-lg resize-none focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100" rows={3} value={reason} onChange={e => setReason(e.target.value)} />
                               <div className="flex gap-2 mt-3">
                                 <Button variant="danger" size="sm" className="flex-1" onClick={() => review(app.id, "REJECTED", reason.trim())} disabled={!reason.trim()}>Xác nhận</Button>
                                 <Button variant="default" size="sm" onClick={() => setRejectingId(null)}>Hủy</Button>
@@ -335,9 +336,9 @@ export default function ApplicationsManagement() {
                           <DropdownItem icon={<XCircle className="w-4 h-4" />} onClick={() => setEmailDialog({ appId: app.id, actionType: "INTERVIEW_CANCEL" })}>Hủy phỏng vấn</DropdownItem>
                         </DropdownMenu>
                       ) : app.status === "REJECTED" ? (
-                        <span className="text-gray-400 dark:text-gray-300">Đã từ chối</span>
+                        <span className="text-neutral-400 dark:text-neutral-300">Đã từ chối</span>
                       ) : app.status === "WITHDRAWN" ? (
-                        <span className="text-gray-400 dark:text-gray-300">Ứng viên đã rút đơn</span>
+                        <span className="text-neutral-400 dark:text-neutral-300">Ứng viên đã rút đơn</span>
                       ) : null}
                     </td>
                   </tr>
@@ -349,13 +350,13 @@ export default function ApplicationsManagement() {
 
         {/* 📧 Email Dialog */}
         <Dialog open={!!emailDialog} onClose={() => setEmailDialog(null)}>
-          <div className="p-6 w-[500px] bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-xl shadow-lg">
+          <div className="p-6 w-[500px] bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 rounded-xl shadow-lg">
             <div className="flex items-center justify-between mb-6">
               <Button
                 variant="default"
                 size="sm"
                 onClick={() => setEmailDialog(null)}
-                className="dark:bg-gray-800 dark:text-gray-200"
+                className="dark:bg-neutral-800 dark:text-neutral-200"
               >
                 <X className="w-4 h-4" />
               </Button>
@@ -366,13 +367,13 @@ export default function ApplicationsManagement() {
               {emailDialog?.actionType === "INTERVIEW_INVITE" && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
                       <Clock className="w-4 h-4 inline mr-1" />
                       Thời gian phỏng vấn
                     </label>
                     <input
                       type="datetime-local"
-                      className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 ${errors.interviewTime ? "border-red-500" : "border-gray-200 dark:border-gray-700"
+                      className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-neutral-800 dark:border-dark-border-primary dark:text-neutral-100 ${errors.interviewTime ? "border-red-500" : "border-neutral-200 dark:border-dark-border-primary"
                         }`}
                       value={emailPayload.interviewTime}
                       onChange={(e) =>
@@ -385,13 +386,13 @@ export default function ApplicationsManagement() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
                       <MapPin className="w-4 h-4 inline mr-1" />
                       Link phỏng vấn online
                     </label>
                     <input
                       type="text"
-                      className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 ${errors.location ? "border-red-500" : "border-gray-200 dark:border-gray-700"
+                      className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-neutral-800 dark:border-dark-border-primary dark:text-neutral-100 ${errors.location ? "border-red-500" : "border-neutral-200 dark:border-dark-border-primary"
                         }`}
                       value={emailPayload.location}
                       onChange={(e) =>
@@ -408,12 +409,12 @@ export default function ApplicationsManagement() {
               {/* INTERVIEW_RESULT */}
               {emailDialog?.actionType === "INTERVIEW_RESULT" && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
                     <CheckCircle className="w-4 h-4 inline mr-1" />
                     Kết quả (Đậu / Rớt)
                   </label>
                   <select
-                    className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 ${errors.result ? "border-red-500" : "border-gray-200 dark:border-gray-700"
+                    className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-neutral-800 dark:border-dark-border-primary dark:text-neutral-100 ${errors.result ? "border-red-500" : "border-neutral-200 dark:border-dark-border-primary"
                       }`}
                     value={emailPayload.result}
                     onChange={(e) =>
@@ -433,13 +434,13 @@ export default function ApplicationsManagement() {
               {/* REQUEST_DOCUMENTS */}
               {emailDialog?.actionType === "REQUEST_DOCUMENTS" && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
                     <FileText className="w-4 h-4 inline mr-1" />
                     Danh sách giấy tờ cần bổ sung...
                   </label>
                   <textarea
                     placeholder="Ví dụ: Bằng cấp, chứng chỉ, giấy khám sức khỏe..."
-                    className={`w-full px-3 py-2.5 border rounded-lg resize-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 ${errors.documents ? "border-red-500" : "border-gray-200 dark:border-gray-700"
+                    className={`w-full px-3 py-2.5 border rounded-lg resize-none focus:ring-2 focus:ring-blue-500 dark:bg-neutral-800 dark:border-dark-border-primary dark:text-neutral-100 ${errors.documents ? "border-red-500" : "border-neutral-200 dark:border-dark-border-primary"
                       }`}
                     rows={4}
                     value={emailPayload.documents}
@@ -456,13 +457,13 @@ export default function ApplicationsManagement() {
               {/* OFFER_LETTER */}
               {emailDialog?.actionType === "OFFER_LETTER" && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
                     <CheckCircle className="w-4 h-4 inline mr-1" />
                     Gửi thư mời nhận việc
                   </label>
 
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
                       Mức lương (triệu)
                     </label>
                     <input
@@ -472,7 +473,7 @@ export default function ApplicationsManagement() {
                         setEmailPayload({ ...emailPayload, salary: e.target.value })
                       }
                       placeholder="VD: 15"
-                      className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 ${errors.salary ? "border-red-500" : "border-gray-200 dark:border-gray-700"
+                      className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-neutral-800 dark:border-dark-border-primary dark:text-neutral-100 ${errors.salary ? "border-red-500" : "border-neutral-200 dark:border-dark-border-primary"
                         }`}
                     />
                     {errors.salary && (
@@ -481,7 +482,7 @@ export default function ApplicationsManagement() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
                       Ngày bắt đầu làm việc
                     </label>
                     <input
@@ -490,7 +491,7 @@ export default function ApplicationsManagement() {
                       onChange={(e) =>
                         setEmailPayload({ ...emailPayload, startDate: e.target.value })
                       }
-                      className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 ${errors.startDate ? "border-red-500" : "border-gray-200 dark:border-gray-700"
+                      className={`w-full px-3 py-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-neutral-800 dark:border-dark-border-primary dark:text-neutral-100 ${errors.startDate ? "border-red-500" : "border-neutral-200 dark:border-dark-border-primary"
                         }`}
                     />
                     {errors.startDate && (
@@ -503,7 +504,7 @@ export default function ApplicationsManagement() {
               {/* INTERVIEW_CANCEL */}
               {emailDialog?.actionType === "INTERVIEW_CANCEL" && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
                     <FileText className="w-4 h-4 inline mr-1" />
                     Gửi thư hủy phỏng vấn
                   </label>
@@ -512,11 +513,11 @@ export default function ApplicationsManagement() {
               )}
             </div>
 
-            <div className="flex gap-3 justify-end mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
+            <div className="flex gap-3 justify-end mt-6 pt-4 border-t border-neutral-100 dark:border-dark-border-primary">
               <Button
                 variant="default"
                 onClick={() => setEmailDialog(null)}
-                className="dark:bg-gray-800 dark:text-gray-200"
+                className="dark:bg-neutral-800 dark:text-neutral-200"
               >
                 Hủy
               </Button>

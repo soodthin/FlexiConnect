@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { cn } from "@/utils/cn";
 import { authApis, endpoints } from "@configs/APIs";
 import { toast } from "sonner";
 import * as Tabs from "@radix-ui/react-tabs";
@@ -7,9 +8,9 @@ function Button({ children, className = "", ...props }) {
     <button
       {...props}
       className={`px-4 py-2 rounded-full shadow font-semibold transition border
-        bg-[#f5efe6] dark:bg-[#232323] text-[#222222] dark:text-[#f5efe6]
-        border-[#d1d5db] dark:border-[#444]
-        hover:bg-[#f5f5dc] dark:hover:bg-[#353535] ${className}`}
+        bg-beige-200 dark:bg-dark-bg-secondary text-softblack dark:text-beige-200
+        border-neutral-300 dark:border-dark-border-primary
+        hover:bg-beige-300 dark:hover:bg-dark-bg-elevated ${className}`}
     >
       {children}
     </button>
@@ -86,9 +87,9 @@ function UserManagement() {
   };
 
   const renderTable = (list) => (
-    <div className="overflow-x-auto border rounded-lg mt-4 shadow-sm dark:border-neutral-700">
+    <div className="overflow-x-auto border rounded-lg mt-4 shadow-sm dark:border-dark-border-primary">
       <table className="w-full border-collapse text-sm">
-        <thead className="bg-gray-100 dark:bg-[#2b2b2b] text-gray-700 dark:text-gray-200">
+        <thead className="bg-neutral-100 dark:bg-dark-bg-tertiary text-neutral-700 dark:text-neutral-200">
           <tr>
             <th className="p-3 text-left">ID</th>
             <th className="p-3 text-left">Email</th>
@@ -108,7 +109,7 @@ function UserManagement() {
               <td className="p-3">
                 <span className={`px-3 py-1 rounded-full font-medium ${u.status === "ACTIVE" ? "bg-green-500 text-white" :
                   u.status === "BANNED" ? "bg-red-500 text-white" :
-                    "bg-gray-400 text-white"
+                    "bg-neutral-400 text-white"
                   }`}>
                   {u.status}
                 </span>
@@ -131,7 +132,7 @@ function UserManagement() {
 
                 <button
                   onClick={() => handleDeleteClick(u.id)}
-                  className="px-3 py-1 bg-gray-500 text-white rounded-full shadow hover:scale-105 transform transition"
+                  className="px-3 py-1 bg-neutral-500 text-white rounded-full shadow hover:scale-105 transform transition"
                 >
                   Xóa
                 </button>
@@ -142,11 +143,11 @@ function UserManagement() {
                       className="absolute inset-0 bg-black/50"
                       onClick={() => setShowDeleteConfirm(false)}
                     ></div>
-                    <div className="bg-white dark:bg-[#232323] rounded-xl shadow-lg p-6 w-80 relative z-10 text-center">
-                      <h3 className="text-lg font-semibold mb-4 dark:text-[#f5efe6]">
+                    <div className="bg-white dark:bg-dark-bg-secondary rounded-xl shadow-lg p-6 w-80 relative z-10 text-center">
+                      <h3 className="text-lg font-semibold mb-4 dark:text-beige-200">
                         Xác nhận xóa user
                       </h3>
-                      <p className="mb-6 text-gray-700 dark:text-gray-300">
+                      <p className="mb-6 text-neutral-700 dark:text-neutral-300">
                         Bạn có chắc chắn muốn xóa user này không?
                       </p>
                       <div className="flex justify-center gap-4">
@@ -166,7 +167,7 @@ function UserManagement() {
 
           )) : (
             <tr>
-              <td colSpan={6} className="text-center p-6 text-gray-500 dark:text-gray-400 italic">
+              <td colSpan={6} className="text-center p-6 text-neutral-500 dark:text-neutral-400 italic">
                 Không có dữ liệu
               </td>
             </tr>
@@ -177,12 +178,12 @@ function UserManagement() {
   );
 
   return (
-    <div className="p-6 min-h-screen bg-beige-light dark:bg-[#181818] text-gray-800 dark:text-gray-100">
+    <div className="p-6 min-h-screen bg-beige-light dark:bg-dark-bg-primary text-neutral-800 dark:text-neutral-100">
       <h2 className="text-2xl font-bold mb-6">TRANG QUẢN LÝ NGƯỜI DÙNG</h2>
 
       {/* Tabs */}
       <Tabs.Root defaultValue={roleFilter} onValueChange={setRoleFilter}>
-        <Tabs.List className="flex space-x-4 border-b pb-2 mb-4 dark:border-neutral-700">
+        <Tabs.List className="flex space-x-4 border-b pb-2 mb-4 dark:border-dark-border-primary">
           <Tabs.Trigger value="ALL" className="px-4 py-2 data-[state=active]:border-b-2 border-blue-500 font-medium">
             Tất cả
           </Tabs.Trigger>
@@ -202,12 +203,12 @@ function UserManagement() {
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(0); }}
           placeholder="🔍 Tìm kiếm..."
-          className="p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 dark:bg-[#2d2d2d] dark:text-gray-100 dark:border-neutral-600"
+          className="p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 dark:bg-dark-bg-elevated dark:text-neutral-100 dark:border-dark-border-subtle"
         />
         <select
           value={size}
           onChange={(e) => { setSize(Number(e.target.value)); setPage(0); }}
-          className="p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 dark:bg-[#2d2d2d] dark:text-gray-100 dark:border-neutral-600"
+          className="p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 dark:bg-dark-bg-elevated dark:text-neutral-100 dark:border-dark-border-subtle"
         >
           <option value={5}>5 / trang</option>
           <option value={10}>10 / trang</option>
@@ -223,7 +224,7 @@ function UserManagement() {
         <button
           onClick={() => setPage(p => Math.max(p - 1, 0))}
           disabled={page === 0}
-          className="px-4 py-2 border rounded-lg shadow hover:bg-gray-100 dark:hover:bg-[#333] disabled:opacity-50 transition"
+          className="px-4 py-2 border rounded-lg shadow hover:bg-neutral-100 dark:hover:bg-[#333] disabled:opacity-50 transition"
         >
           ◀ Trang trước
         </button>
@@ -231,7 +232,7 @@ function UserManagement() {
         <button
           onClick={() => setPage(p => Math.min(p + 1, totalPages - 1))}
           disabled={page + 1 >= totalPages}
-          className="px-4 py-2 border rounded-lg shadow hover:bg-gray-100 dark:hover:bg-[#333] disabled:opacity-50 transition"
+          className="px-4 py-2 border rounded-lg shadow hover:bg-neutral-100 dark:hover:bg-[#333] disabled:opacity-50 transition"
         >
           Trang sau ▶
         </button>

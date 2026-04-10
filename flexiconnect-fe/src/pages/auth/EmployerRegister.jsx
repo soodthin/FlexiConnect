@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { cn } from "@/utils/cn";
 import { useNavigate, Link } from "react-router-dom";
 import Apis, { endpoints } from "@configs/APIs";
 import { FaUserPlus } from "react-icons/fa";
@@ -9,16 +10,16 @@ import { motion, AnimatePresence } from "framer-motion";
 // Input field
 function InputField({ label, type = "text", value, onChange, placeholder, error }) {
   const inputClass =
-    "flex-1 bg-gray-100 dark:bg-[#2d2d2d] text-gray-800 dark:text-gray-100 placeholder-gray-400 outline-none text-sm";
+    "flex-1 bg-neutral-100 dark:bg-dark-bg-elevated text-neutral-800 dark:text-neutral-100 placeholder-gray-400 outline-none text-sm";
   const wrapperClass =
     "flex items-center gap-2 rounded-md border px-3 h-10 transition " +
     (error
       ? "border-red-500 focus-within:ring-2 focus-within:ring-red-400"
-      : "border-gray-300 dark:border-neutral-600 bg-gray-100 dark:bg-[#2d2d2d] hover:border-blue-400 focus-within:ring-2 focus-within:ring-blue-400");
+      : "border-neutral-300 dark:border-dark-border-subtle bg-neutral-100 dark:bg-dark-bg-elevated hover:border-blue-400 focus-within:ring-2 focus-within:ring-blue-400");
 
   return (
     <div className="space-y-1">
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">{label}</label>
+      <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200">{label}</label>
       <div className={wrapperClass}>
         <input
           type={type}
@@ -37,16 +38,16 @@ function InputField({ label, type = "text", value, onChange, placeholder, error 
 // Password field
 function PasswordField({ label, value, onChange, placeholder, error }) {
   const inputClass =
-    "flex-1 bg-gray-100 dark:bg-[#2d2d2d] text-gray-800 dark:text-gray-100 placeholder-gray-400 outline-none text-sm";
+    "flex-1 bg-neutral-100 dark:bg-dark-bg-elevated text-neutral-800 dark:text-neutral-100 placeholder-gray-400 outline-none text-sm";
   const wrapperClass =
     "flex items-center gap-2 rounded-md border px-3 h-10 transition " +
     (error
       ? "border-red-500 focus-within:ring-2 focus-within:ring-red-400"
-      : "border-gray-300 dark:border-neutral-600 bg-gray-100 dark:bg-[#2d2d2d] hover:border-blue-400 focus-within:ring-2 focus-within:ring-blue-400");
+      : "border-neutral-300 dark:border-dark-border-subtle bg-neutral-100 dark:bg-dark-bg-elevated hover:border-blue-400 focus-within:ring-2 focus-within:ring-blue-400");
 
   return (
     <div className="space-y-1">
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">{label}</label>
+      <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200">{label}</label>
       <PasswordToggleField.Root>
         <div className={wrapperClass}>
           <PasswordToggleField.Input
@@ -57,7 +58,7 @@ function PasswordField({ label, value, onChange, placeholder, error }) {
             onChange={onChange}
             required
           />
-          <PasswordToggleField.Toggle className="outline-none flex items-center justify-center w-5 h-5 text-gray-500">
+          <PasswordToggleField.Toggle className="outline-none flex items-center justify-center w-5 h-5 text-neutral-500">
             <PasswordToggleField.Icon visible={<EyeOpenIcon />} hidden={<EyeClosedIcon />} />
           </PasswordToggleField.Toggle>
         </div>
@@ -86,10 +87,10 @@ function Alert({ msg }) {
 function FileUpload({ images, onChange, onRemove }) {
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-        Ảnh môi trường làm việc <span className="text-gray-400">(3-5 ảnh)</span>
+      <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-200">
+        Ảnh môi trường làm việc <span className="text-neutral-400">(3-5 ảnh)</span>
       </label>
-      <div className="relative flex flex-col items-center justify-center border border-gray-300 dark:border-neutral-600 rounded-md bg-gray-100 dark:bg-[#2d2d2d] hover:border-blue-400 focus-within:ring-2 focus-within:ring-blue-400 transition p-4">
+      <div className="relative flex flex-col items-center justify-center border border-neutral-300 dark:border-dark-border-subtle rounded-md bg-neutral-100 dark:bg-dark-bg-elevated hover:border-blue-400 focus-within:ring-2 focus-within:ring-blue-400 transition p-4">
         <input
           type="file"
           accept="image/*"
@@ -100,7 +101,7 @@ function FileUpload({ images, onChange, onRemove }) {
         />
         <div className="flex flex-col items-center pointer-events-none">
           <svg
-            className="w-8 h-8 text-gray-400 mb-2"
+            className="w-8 h-8 text-neutral-400 mb-2"
             fill="none"
             stroke="currentColor"
             strokeWidth={2}
@@ -112,10 +113,10 @@ function FileUpload({ images, onChange, onRemove }) {
               d="M7 16V4a1 1 0 011-1h8a1 1 0 011 1v12m-9 0h8m-8 0v2a1 1 0 001 1h6a1 1 0 001-1v-2"
             />
           </svg>
-          <span className="text-sm text-gray-800 dark:text-gray-100 mb-1">
+          <span className="text-sm text-neutral-800 dark:text-neutral-100 mb-1">
             Kéo thả hoặc <span className="text-blue-600 underline">chọn file</span>
           </span>
-          <span className="text-xs text-gray-500 dark:text-gray-400">
+          <span className="text-xs text-neutral-500 dark:text-neutral-400">
             Hỗ trợ ảnh JPG, PNG. Tối đa 5 ảnh.
           </span>
         </div>
@@ -268,26 +269,26 @@ export default function EmployerRegister() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-beige-50 dark:bg-[#181818] p-4">
-      <form className="bg-white dark:bg-[#232323] shadow-lg border border-gray-200 dark:border-gray-700 rounded-2xl p-8 w-full max-w-md space-y-4">
+    <div className="min-h-screen flex items-center justify-center bg-beige-50 dark:bg-dark-bg-primary p-4">
+      <form className="bg-white dark:bg-dark-bg-secondary shadow-lg border border-neutral-200 dark:border-dark-border-primary rounded-2xl p-8 w-full max-w-md space-y-4">
         {/* Stepper */}
         <div className="flex items-center justify-center gap-4 mb-4">
           <div
-            className={`w-8 h-8 flex items-center justify-center rounded-full font-bold ${step === 1 ? "bg-blue-600 text-white" : "bg-gray-300 text-gray-600"
+            className={`w-8 h-8 flex items-center justify-center rounded-full font-bold ${step === 1 ? "bg-blue-600 text-white" : "bg-neutral-300 text-neutral-600"
               }`}
           >
             1
           </div>
-          <div className="h-0.5 w-12 bg-gray-400"></div>
+          <div className="h-0.5 w-12 bg-neutral-400"></div>
           <div
-            className={`w-8 h-8 flex items-center justify-center rounded-full font-bold ${step === 2 ? "bg-blue-600 text-white" : "bg-gray-300 text-gray-600"
+            className={`w-8 h-8 flex items-center justify-center rounded-full font-bold ${step === 2 ? "bg-blue-600 text-white" : "bg-neutral-300 text-neutral-600"
               }`}
           >
             2
           </div>
         </div>
 
-        <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100 mb-2">
+        <h2 className="text-2xl font-bold text-center text-neutral-800 dark:text-neutral-100 mb-2">
           Đăng ký Nhà Tuyển Dụng
         </h2>
 
@@ -344,7 +345,7 @@ export default function EmployerRegister() {
               />
               {employer.password && (
                 <>
-                  <div className="w-full h-2 rounded bg-gray-200 dark:bg-gray-600 mt-1">
+                  <div className="w-full h-2 rounded bg-neutral-200 dark:bg-neutral-600 mt-1">
                     <div
                       className={`h-2 rounded ${strength.color}`}
                       style={{ width: `${strength.percent || 0}%` }}
@@ -372,7 +373,7 @@ export default function EmployerRegister() {
                 <FaUserPlus /> Tiếp theo
               </ActionButton>
 
-              <p className="text-sm text-center text-gray-600 dark:text-gray-400 mt-2">
+              <p className="text-sm text-center text-neutral-600 dark:text-neutral-400 mt-2">
                 Đã có tài khoản?{" "}
                 <Link to="/login" className="text-blue-600 hover:underline">
                   Quay lại đăng nhập
@@ -395,7 +396,7 @@ export default function EmployerRegister() {
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="flex-1 bg-gray-200 dark:bg-neutral-700 text-gray-800 dark:text-gray-100 
+                  className="flex-1 bg-neutral-200 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-100 
              py-2 px-6 rounded-xl font-semibold shadow hover:opacity-90 transition 
              flex items-center justify-center"
                 >
