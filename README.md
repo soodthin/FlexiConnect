@@ -174,8 +174,6 @@ MAIL_USERNAME=
 MAIL_PASSWORD=
 ```
 
-> Không commit file `.env` hoặc thông tin khoá bí mật lên repository.
-
 ---
 
 ## Triển khai với Docker
