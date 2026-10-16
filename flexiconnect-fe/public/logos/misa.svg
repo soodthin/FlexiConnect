@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <circle cx="60" cy="60" r="60" fill="#ffffff"/>
+  <circle cx="60" cy="60" r="58.5" fill="none" stroke="#e5e7eb" stroke-width="1.5"/>
+  <g transform="translate(35, 18)">
+    <path d="M25 5 L5 25 L25 25 Z" fill="#009B4D"/>
+    <path d="M25 5 L45 25 L25 25 Z" fill="#FFB600"/>
+    <path d="M5 25 L25 45 L25 25 Z" fill="#0082C8"/>
+    <path d="M45 25 L25 45 L25 25 Z" fill="#ED1C24"/>
+    <text x="25" y="68" font-family="'Segoe UI', Arial, sans-serif" font-weight="900" font-size="19" fill="#004F9E" text-anchor="middle" letter-spacing="1">MISA</text>
+  </g>
+</svg>

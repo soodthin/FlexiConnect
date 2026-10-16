@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <circle cx="60" cy="60" r="60" fill="#ffffff"/>
+  <circle cx="60" cy="60" r="58.5" fill="none" stroke="#e5e7eb" stroke-width="1.5"/>
+  <g transform="translate(25, 20)">
+    <path d="M35 10 L60 25 L60 50 L35 35 Z" fill="#ED174C"/>
+    <path d="M35 10 L10 25 L10 50 L35 35 Z" fill="#0F146D"/>
+    <path d="M35 35 L60 50 L35 62 L10 50 Z" fill="#FF6000"/>
+    <text x="35" y="78" font-family="'Segoe UI', Arial, sans-serif" font-weight="700" font-size="13" fill="#0F146D" text-anchor="middle">Lazada</text>
+  </g>
+</svg>

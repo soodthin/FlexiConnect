@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <circle cx="60" cy="60" r="60" fill="#004B99"/>
+  <circle cx="60" cy="48" r="23" fill="none" stroke="#FFC72C" stroke-width="2.5"/>
+  <path d="M60 30 L45 46 L60 62 L75 46 Z" fill="none" stroke="#FFC72C" stroke-width="2"/>
+  <circle cx="60" cy="46" r="6" fill="#FFC72C"/>
+  <text x="60" y="90" font-family="'Segoe UI', Arial, sans-serif" font-weight="900" font-size="13" fill="#FFC72C" text-anchor="middle" letter-spacing="1.5">BAOVIET</text>
+</svg>

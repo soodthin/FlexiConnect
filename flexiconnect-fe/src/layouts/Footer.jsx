@@ -100,7 +100,7 @@ export default function Footer() {
             </div>
 
             <div className="border-t border-neutral-200 dark:border-dark-border-subtle py-4 text-center text-sm text-neutral-500 dark:text-dark-text-tertiary">
-                &copy; {new Date().getFullYear()} FlexiConnect. All rights reserved.
+                &copy; 2025 FlexiConnect. All rights reserved.
             </div>
         </footer>
     );

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <circle cx="60" cy="60" r="60" fill="#990000"/>
+  <circle cx="60" cy="48" r="23" fill="none" stroke="#FFD700" stroke-width="2"/>
+  <path d="M60 28 C54 37, 54 45, 60 50 C66 45, 66 37, 60 28 Z" fill="#FFD700"/>
+  <path d="M60 50 C50 45, 42 45, 40 52 C45 56, 53 56, 60 50 Z" fill="#FFD700"/>
+  <path d="M60 50 C70 45, 78 45, 80 52 C75 56, 67 56, 60 50 Z" fill="#FFD700"/>
+  <path d="M60 50 C53 52, 47 59, 51 64 C56 64, 60 59, 60 50 Z" fill="#FFD700"/>
+  <path d="M60 50 C67 52, 73 59, 69 64 C64 64, 60 59, 60 50 Z" fill="#FFD700"/>
+  <text x="60" y="88" font-family="'Segoe UI', Arial, sans-serif" font-weight="800" font-size="9" fill="#FFD700" text-anchor="middle" letter-spacing="1.5">HOA SEN GROUP</text>
+</svg>

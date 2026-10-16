@@ -29,3 +29,13 @@ Thumbs.db
 
 # Local env backups
 /env_local/
+
+# Eclipse / IDE metadata
+.classpath
+.project
+.settings/
+.metadata/
+bin/
+
+# Package manager locks
+/flexiconnect-fe/package-lock.json

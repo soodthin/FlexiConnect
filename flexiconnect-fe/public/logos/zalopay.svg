@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <circle cx="60" cy="60" r="60" fill="#008FE5"/>
+  <text x="60" y="62" font-family="'Segoe UI', Arial, sans-serif" font-weight="900" font-size="20" fill="#ffffff" text-anchor="middle">Zalo</text>
+  <text x="60" y="82" font-family="'Segoe UI', Arial, sans-serif" font-weight="900" font-size="18" fill="#00E676" text-anchor="middle">Pay</text>
+</svg>

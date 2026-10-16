@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { cn } from "@/utils/cn";
 import { useParams, useNavigate } from "react-router-dom";
+import { getCompanyLogo } from "@/utils/companyLogos";
 import {
   Bookmark,
   BookmarkCheck,
@@ -452,12 +453,12 @@ export default function JobDetail() {
               <Card className="p-6 text-center">
                 {/* Company Logo */}
                 <div className="relative inline-block mb-4">
-                  <div className="w-16 h-16 bg-neutral-100 dark:bg-neutral-700 rounded-lg flex items-center justify-center">
-                    {job.avatar ? (
+                  <div className="w-16 h-16 bg-white dark:bg-neutral-800 border border-border shadow-sm rounded-lg flex items-center justify-center p-1.5">
+                    {getCompanyLogo(job.companyName, job.avatar) ? (
                       <img
-                        src={job.avatar}
+                        src={getCompanyLogo(job.companyName, job.avatar)}
                         alt="company logo"
-                        className="w-14 h-14 object-contain rounded-lg"
+                        className="w-full h-full object-contain rounded-lg"
                       />
                     ) : (
                       <Building2 size={24} className="text-neutral-600 dark:text-neutral-400" />
