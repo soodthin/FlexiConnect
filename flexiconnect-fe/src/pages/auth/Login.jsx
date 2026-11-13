@@ -6,6 +6,7 @@ import { unstable_PasswordToggleField as PasswordToggleField } from "radix-ui";
 import { EyeClosedIcon, EyeOpenIcon } from "@radix-ui/react-icons";
 import { MyDispatcherContext } from "@contexts/MyContexts";
 import { cn } from "@/utils/cn";
+import { KeyRound, User, Building2, ShieldCheck } from "lucide-react";
 
 // UI components
 const Card = ({ children, className = "" }) => (
@@ -252,14 +253,14 @@ export default function Login() {
             </div>
 
             {/* Quick Demo Login Box */}
-            <div className="mb-6 p-4 rounded-xl border border-beige-300/90 dark:border-dark-border-subtle bg-gradient-to-br from-beige-50/90 via-white to-amber-50/50 dark:from-dark-bg-tertiary/70 dark:to-dark-bg-secondary/70 shadow-soft">
-              <div className="flex items-center justify-between mb-2.5">
-                <span className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
-                  <span className="inline-block w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-                  ⚡ Demo Login (1-Click)
+            <div className="mb-6 p-4 rounded-xl border border-neutral-200/80 dark:border-dark-border-subtle bg-neutral-50/80 dark:bg-dark-bg-tertiary/60">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-medium text-neutral-600 dark:text-dark-text-secondary flex items-center gap-1.5">
+                  <KeyRound size={14} className="text-neutral-400 dark:text-dark-text-tertiary" />
+                  Quick demo access
                 </span>
-                <span className="text-[11px] text-neutral-500 dark:text-dark-text-tertiary font-medium">
-                  Không cần đăng ký
+                <span className="text-[11px] text-neutral-400 dark:text-dark-text-tertiary">
+                  No sign-up needed
                 </span>
               </div>
 
@@ -268,39 +269,49 @@ export default function Login() {
                   type="button"
                   disabled={loading}
                   onClick={() => handleDemoLogin("candidate@demo.com", "123456")}
-                  className="flex flex-col items-start p-2.5 rounded-lg border border-amber-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-800/80 hover:border-amber-400 dark:hover:border-amber-400 hover:shadow-sm transition-all text-left group"
+                  className="flex items-center gap-2 p-2.5 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800/80 hover:border-beige-500 dark:hover:border-beige-400 hover:shadow-sm transition-all text-left group"
                 >
-                  <span className="text-xs font-semibold text-softblack dark:text-dark-text-primary group-hover:text-amber-700 dark:group-hover:text-amber-300">
-                    👤 Ứng viên (Khuyên dùng)
-                  </span>
-                  <span className="text-[10px] text-neutral-500 dark:text-dark-text-tertiary mt-0.5 line-clamp-1">
-                    Mock Interview, CV AI
-                  </span>
+                  <User size={14} className="text-neutral-400 group-hover:text-beige-600 dark:group-hover:text-beige-300 shrink-0" />
+                  <div className="min-w-0">
+                    <span className="text-xs font-medium text-softblack dark:text-dark-text-primary flex items-center gap-1.5">
+                      Candidate
+                      <span className="text-[9px] font-medium px-1.5 py-px rounded-full bg-beige-100 text-beige-700 dark:bg-beige-900/40 dark:text-beige-300 shrink-0">
+                        Recommended
+                      </span>
+                    </span>
+                    <span className="text-[10px] text-neutral-400 dark:text-dark-text-tertiary block truncate">
+                      Mock Interview, CV AI
+                    </span>
+                  </div>
                 </button>
 
                 <button
                   type="button"
                   disabled={loading}
                   onClick={() => handleDemoLogin("employer@demo.com", "123456")}
-                  className="flex flex-col items-start p-2.5 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800/80 hover:border-beige-500 dark:hover:border-beige-400 hover:shadow-sm transition-all text-left group"
+                  className="flex items-center gap-2 p-2.5 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800/80 hover:border-beige-500 dark:hover:border-beige-400 hover:shadow-sm transition-all text-left group"
                 >
-                  <span className="text-xs font-semibold text-softblack dark:text-dark-text-primary group-hover:text-beige-700 dark:group-hover:text-beige-300">
-                    🏢 Tuyển dụng (Demo)
-                  </span>
-                  <span className="text-[10px] text-neutral-500 dark:text-dark-text-tertiary mt-0.5 line-clamp-1">
-                    Đăng tin, duyệt hồ sơ
-                  </span>
+                  <Building2 size={14} className="text-neutral-400 group-hover:text-beige-600 dark:group-hover:text-beige-300 shrink-0" />
+                  <div className="min-w-0">
+                    <span className="text-xs font-medium text-softblack dark:text-dark-text-primary block">
+                      Employer
+                    </span>
+                    <span className="text-[10px] text-neutral-400 dark:text-dark-text-tertiary block truncate">
+                      Post jobs, review CVs
+                    </span>
+                  </div>
                 </button>
               </div>
 
-              <div className="mt-2 text-center">
+              <div className="mt-2.5 text-center">
                 <button
                   type="button"
                   disabled={loading}
                   onClick={() => handleDemoLogin("admin@example.com", "Admin123")}
-                  className="text-[11px] text-neutral-500 dark:text-dark-text-tertiary hover:text-neutral-800 dark:hover:text-neutral-200 hover:underline"
+                  className="inline-flex items-center gap-1 text-[11px] text-neutral-400 dark:text-dark-text-tertiary hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors"
                 >
-                  Hoặc đăng nhập Admin (admin@example.com) →
+                  <ShieldCheck size={12} />
+                  Or sign in as Admin →
                 </button>
               </div>
             </div>
@@ -308,7 +319,7 @@ export default function Login() {
             <div className="relative flex py-2 items-center mb-4">
               <div className="flex-grow border-t border-neutral-200 dark:border-neutral-700"></div>
               <span className="flex-shrink mx-3 text-[11px] text-neutral-400 dark:text-dark-text-tertiary uppercase tracking-wider">
-                Hoặc tự nhập tài khoản
+                Or enter credentials
               </span>
               <div className="flex-grow border-t border-neutral-200 dark:border-neutral-700"></div>
             </div>
