@@ -8,6 +8,7 @@ import com.soodthin.repositories.PackageRepository;
 import com.soodthin.services.PaymentTransactionService;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,9 @@ import org.springframework.security.core.Authentication;
 @RestController
 @RequestMapping("/api/momo")
 public class MomoPaymentController {
+
+    @Value("${FRONTEND_URL:https://flexiconnectweb.onrender.com}")
+    private String frontendUrl;
 
     @Autowired
     private PaymentTransactionService paymentTransactionService;
@@ -43,11 +47,9 @@ public class MomoPaymentController {
             Package pkg = packageRepository.findById(packageId)
                     .orElseThrow(() -> new RuntimeException("Package not found"));
 
-//            String returnUrlSuccess = "http://localhost:3000/payment-success";
-//            String returnUrlFail = "http://localhost:3000/payment-failed";
             // URL frontend để MoMo redirect sau khi thanh toán
-            String returnUrlSuccess = "https://flexiconnectweb.onrender.com/payment-success";
-            String returnUrlFail = "https://flexiconnectweb.onrender.com/payment-failed";
+            String returnUrlSuccess = frontendUrl + "/payment-success";
+            String returnUrlFail = frontendUrl + "/payment-failed";
 
             // Gọi service tạo payment, truyền returnUrl/failUrl
             MomoPaymentResponse payUrl = paymentTransactionService.createPremiumPayment(
@@ -74,8 +76,8 @@ public class MomoPaymentController {
 
             // Redirect user sang trang frontend dựa trên kết quả
             String redirectUrl = success
-                    ? "http://localhost:3000/payment-success"
-                    : "http://localhost:3000/payment-failed";
+                    ? frontendUrl + "/payment-success"
+                    : frontendUrl + "/payment-failed";
 
             return ResponseEntity.status(302) // HTTP redirect
                     .header("Location", redirectUrl)
@@ -83,7 +85,7 @@ public class MomoPaymentController {
         } catch (Exception e) {
             log.error("❌ Lỗi confirm callback", e);
             return ResponseEntity.status(302)
-                    .header("Location", "http://localhost:3000/payment-failed")
+                    .header("Location", frontendUrl + "/payment-failed")
                     .build();
         }
     }

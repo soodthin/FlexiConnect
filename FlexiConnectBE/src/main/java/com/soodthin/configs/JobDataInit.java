@@ -73,6 +73,9 @@ public class JobDataInit implements CommandLineRunner {
                         return roleRepository.save(r);
                     });
 
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            String encodedDefaultPassword = encoder.encode("123456");
+
             for (Row row : sheet) {
                 if (lineNumber++ == 0) {
                     continue; // Skip header
@@ -91,11 +94,10 @@ public class JobDataInit implements CommandLineRunner {
 
                     // Create or find user
                     String fakeEmail = companyName.toLowerCase().replaceAll("\\s+", "") + "@demo.com";
-                    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
                     User user = userRepo.findByEmail(fakeEmail).orElseGet(() -> {
                         User u = new User();
                         u.setEmail(fakeEmail);
-                        u.setPassword(encoder.encode("123456"));
+                        u.setPassword(encodedDefaultPassword);
                         u.setStatus(UserStatus.ACTIVE);
                         u.setCreatedAt(randomDateTime(start2025, end2025));
                         u.setRoleSet(Set.of(employerRole)); 

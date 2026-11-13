@@ -18,8 +18,14 @@ import java.util.Date;
 @Component
 public class JwtUtils {
 
-    private static String secret = "12345678901234567890123456789012"; // tối thiểu 32 ký tự
+    private static final String DEFAULT_SECRET = "12345678901234567890123456789012"; // tối thiểu 32 ký tự
+    private static String secret;
     private static final long EXPIRATION_MS = 86400000; // 1 ngày
+
+    static {
+        String envSecret = System.getenv().getOrDefault("JWT_SECRET", DEFAULT_SECRET);
+        secret = (envSecret != null && envSecret.trim().length() >= 32) ? envSecret.trim() : DEFAULT_SECRET;
+    }
 
     @Value("${JWT_SECRET:12345678901234567890123456789012}")
     public void setSecret(String jwtSecret) {

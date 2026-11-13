@@ -18,5 +18,5 @@ VOLUME /tmp
 # Copy the JAR từ stage build
 COPY --from=build /app/target/*.jar app.jar
 
-ENTRYPOINT ["java", "-Xms128m", "-Xmx300m", "-XX:+UseSerialGC", "-jar", "/app.jar"]
+ENTRYPOINT ["java", "-Xms128m", "-Xmx256m", "-Xss512k", "-XX:+UseSerialGC", "-jar", "/app.jar"]
 EXPOSE 8081
