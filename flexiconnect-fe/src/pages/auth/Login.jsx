@@ -72,17 +72,26 @@ const jobs = [
 
 export default function Login() {
   const [user, setUser] = useState({});
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const dispatch = useContext(MyDispatcherContext);
 
   const setState = (value, field) => setUser({ ...user, [field]: value });
 
-  const login = async (e) => {
-    e.preventDefault();
+  const performLogin = async (credentials) => {
+    const loginEmail = credentials?.email ?? user.email;
+    const loginPassword = credentials?.password ?? user.password;
+
+    if (!loginEmail || !loginPassword) {
+      toast.error("Vui lòng nhập đầy đủ email và mật khẩu!");
+      return;
+    }
+
+    setLoading(true);
     try {
       const res = await Apis.post(endpoints["login"], {
-        email: user.email,
-        password: user.password,
+        email: loginEmail,
+        password: loginPassword,
       });
       const { token, role } = res.data;
       const currentUserRes = await Apis.get(endpoints["current-user"], {
@@ -110,7 +119,19 @@ export default function Login() {
       } else {
         toast.error("Không thể kết nối đến server!");
       }
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const login = (e) => {
+    e.preventDefault();
+    performLogin({ email: user.email, password: user.password });
+  };
+
+  const handleDemoLogin = (email, password) => {
+    setUser({ email, password });
+    performLogin({ email, password });
   };
 
   return (
@@ -230,6 +251,68 @@ export default function Login() {
               </p>
             </div>
 
+            {/* Quick Demo Login Box */}
+            <div className="mb-6 p-4 rounded-xl border border-beige-300/90 dark:border-dark-border-subtle bg-gradient-to-br from-beige-50/90 via-white to-amber-50/50 dark:from-dark-bg-tertiary/70 dark:to-dark-bg-secondary/70 shadow-soft">
+              <div className="flex items-center justify-between mb-2.5">
+                <span className="text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
+                  <span className="inline-block w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                  ⚡ Demo Login (1-Click)
+                </span>
+                <span className="text-[11px] text-neutral-500 dark:text-dark-text-tertiary font-medium">
+                  Không cần đăng ký
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  disabled={loading}
+                  onClick={() => handleDemoLogin("candidate@demo.com", "123456")}
+                  className="flex flex-col items-start p-2.5 rounded-lg border border-amber-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-800/80 hover:border-amber-400 dark:hover:border-amber-400 hover:shadow-sm transition-all text-left group"
+                >
+                  <span className="text-xs font-semibold text-softblack dark:text-dark-text-primary group-hover:text-amber-700 dark:group-hover:text-amber-300">
+                    👤 Ứng viên (Khuyên dùng)
+                  </span>
+                  <span className="text-[10px] text-neutral-500 dark:text-dark-text-tertiary mt-0.5 line-clamp-1">
+                    Mock Interview, CV AI
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  disabled={loading}
+                  onClick={() => handleDemoLogin("employer@demo.com", "123456")}
+                  className="flex flex-col items-start p-2.5 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800/80 hover:border-beige-500 dark:hover:border-beige-400 hover:shadow-sm transition-all text-left group"
+                >
+                  <span className="text-xs font-semibold text-softblack dark:text-dark-text-primary group-hover:text-beige-700 dark:group-hover:text-beige-300">
+                    🏢 Tuyển dụng (Demo)
+                  </span>
+                  <span className="text-[10px] text-neutral-500 dark:text-dark-text-tertiary mt-0.5 line-clamp-1">
+                    Đăng tin, duyệt hồ sơ
+                  </span>
+                </button>
+              </div>
+
+              <div className="mt-2 text-center">
+                <button
+                  type="button"
+                  disabled={loading}
+                  onClick={() => handleDemoLogin("admin@example.com", "Admin123")}
+                  className="text-[11px] text-neutral-500 dark:text-dark-text-tertiary hover:text-neutral-800 dark:hover:text-neutral-200 hover:underline"
+                >
+                  Hoặc đăng nhập Admin (admin@example.com) →
+                </button>
+              </div>
+            </div>
+
+            <div className="relative flex py-2 items-center mb-4">
+              <div className="flex-grow border-t border-neutral-200 dark:border-neutral-700"></div>
+              <span className="flex-shrink mx-3 text-[11px] text-neutral-400 dark:text-dark-text-tertiary uppercase tracking-wider">
+                Hoặc tự nhập tài khoản
+              </span>
+              <div className="flex-grow border-t border-neutral-200 dark:border-neutral-700"></div>
+            </div>
+
             {/* Email */}
             <div className="space-y-1">
               <Label>Email</Label>
@@ -268,7 +351,9 @@ export default function Login() {
 
             {/* Submit */}
             <div className="mt-6">
-              <Button type="submit">Đăng nhập</Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? "Đang xử lý..." : "Đăng nhập"}
+              </Button>
             </div>
 
             {/* Register link */}
