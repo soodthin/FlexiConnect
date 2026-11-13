@@ -5,6 +5,7 @@ import com.cloudinary.utils.ObjectUtils;
 import com.soodthin.filters.JwtFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -31,8 +32,18 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
     "com.soodthin.controllers",
     "com.soodthin.repositories",
     "com.soodthin.services",
-    "com.soodthin.filters"})
+    "com.soodthin.filters",
+    "com.soodthin.utils"})
 public class SpringSecurityConfigs {
+
+    @Value("${CLOUDINARY_CLOUD_NAME:}")
+    private String cloudinaryCloudName;
+
+    @Value("${CLOUDINARY_API_KEY:}")
+    private String cloudinaryApiKey;
+
+    @Value("${CLOUDINARY_API_SECRET:}")
+    private String cloudinaryApiSecret;
 
     private final JwtFilter jwtFilter;
 
@@ -78,9 +89,9 @@ public class SpringSecurityConfigs {
     @Bean
     public Cloudinary cloudinary() {
         return new Cloudinary(ObjectUtils.asMap(
-                "cloud_name", "dxhp3sukx",
-                "api_key", "617439694271559",
-                "api_secret", "39XT_q48WmxY1QOb4z4CbE-SZTU",
+                "cloud_name", cloudinaryCloudName,
+                "api_key", cloudinaryApiKey,
+                "api_secret", cloudinaryApiSecret,
                 "secure", true
         ));
     }

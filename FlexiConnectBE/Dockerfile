@@ -11,12 +11,12 @@ COPY src ./src
 # CHỈ build backend, không cần profile gì cả
 RUN mvn clean package -DskipTests
 
-# Stage 2: Create the final Docker image using OpenJDK 17
-FROM openjdk:17-jdk
+# Stage 2: Create the final lightweight runtime image
+FROM eclipse-temurin:17-jre-alpine
 VOLUME /tmp
 
 # Copy the JAR từ stage build
 COPY --from=build /app/target/*.jar app.jar
 
-ENTRYPOINT ["java","-jar","/app.jar"]
+ENTRYPOINT ["java", "-Xms128m", "-Xmx300m", "-XX:+UseSerialGC", "-jar", "/app.jar"]
 EXPOSE 8081

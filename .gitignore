@@ -39,3 +39,5 @@ bin/
 
 # Package manager locks
 /flexiconnect-fe/package-lock.json
+*.zip
+*.pem

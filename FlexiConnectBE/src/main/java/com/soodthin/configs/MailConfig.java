@@ -1,6 +1,7 @@
 package com.soodthin.configs;
 
 import java.util.Properties;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -9,15 +10,27 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 @Configuration
 public class MailConfig {
 
+    @Value("${MAIL_HOST:smtp.gmail.com}")
+    private String mailHost;
+
+    @Value("${MAIL_PORT:587}")
+    private int mailPort;
+
+    @Value("${MAIL_USERNAME:}")
+    private String mailUsername;
+
+    @Value("${MAIL_PASSWORD:}")
+    private String mailPassword;
+
     @Bean
     public JavaMailSender getJavaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 
-        mailSender.setHost("smtp.gmail.com");
-        mailSender.setPort(587); 
+        mailSender.setHost(mailHost);
+        mailSender.setPort(mailPort); 
 
-        mailSender.setUsername("flexiconnect.mail@gmail.com");
-        mailSender.setPassword("rkyu gula jiny kswi");
+        mailSender.setUsername(mailUsername);
+        mailSender.setPassword(mailPassword);
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
@@ -25,7 +38,7 @@ public class MailConfig {
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.starttls.required", "true");
         props.put("mail.smtp.ssl.trust", "*");
-        props.put("mail.debug", "true");
+        props.put("mail.debug", "false");
 
         return mailSender;
     }
